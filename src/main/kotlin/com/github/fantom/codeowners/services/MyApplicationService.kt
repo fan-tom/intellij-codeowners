@@ -1,6 +1,6 @@
-package com.github.fantom.intellijcodeowners.services
+package com.github.fantom.codeowners.services
 
-import com.github.fantom.intellijcodeowners.MyBundle
+import com.github.fantom.codeowners.MyBundle
 
 class MyApplicationService {
 

@@ -1,9 +1,9 @@
-package com.github.fantom.intellijcodeowners.listeners
+package com.github.fantom.codeowners.listeners
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import com.github.fantom.intellijcodeowners.services.MyProjectService
+import com.github.fantom.codeowners.services.MyProjectService
 
 internal class MyProjectManagerListener : ProjectManagerListener {
 
