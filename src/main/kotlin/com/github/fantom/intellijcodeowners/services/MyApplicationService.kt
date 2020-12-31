@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.fantom.intellijcodeowners.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.fantom.intellijcodeowners.MyBundle
 
 class MyApplicationService {
 
