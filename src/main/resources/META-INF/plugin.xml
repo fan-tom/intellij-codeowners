@@ -1,19 +1,29 @@
 <idea-plugin>
-    <id>com.github.fantom.intellijcodeowners</id>
-    <name>intellij-codeowners</name>
-    <vendor>fan-tom</vendor>
+    <id>fantom.codeowners</id>
+    <name>CODEOWNERS</name>
+    <vendor url="https://github.com/fan-tom">fan-tom</vendor>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.fantom.intellijcodeowners.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.fantom.intellijcodeowners.services.MyProjectService"/>
+        <applicationService serviceImplementation="com.github.fantom.codeowners.services.MyApplicationService"/>
+        <projectService serviceImplementation="com.github.fantom.codeowners.services.MyProjectService"/>
     </extensions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Codeowners File" implementationClass="com.github.fantom.codeowners.CodeownersFileType"
+                  fieldName="INSTANCE" language="CODEOWNERS" fileNames="CODEOWNERS"/>
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <lang.parserDefinition language="CODEOWNERS"
+                               implementationClass="com.github.fantom.codeowners.language.CodeownersParserDefinition"/>
+    </extensions>
+
+
     <applicationListeners>
-        <listener class="com.github.fantom.intellijcodeowners.listeners.MyProjectManagerListener"
+        <listener class="com.github.fantom.codeowners.listeners.MyProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
 </idea-plugin>
