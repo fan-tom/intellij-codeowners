@@ -36,6 +36,8 @@ val platformDownloadSources: String by project
 group = pluginGroup
 version = pluginVersion
 
+sourceSets["main"].java.srcDirs("src/main/gen")
+
 // Configure project's dependencies
 repositories {
     mavenCentral()
