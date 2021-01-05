@@ -1,0 +1,48 @@
+{
+  parserClass               = "com.github.fantom.codeowners.language.parser.CodeownersParser"
+  extends                   = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix            = "Codeowners"
+  psiImplClassSuffix        = "Impl"
+  psiPackage                = "com.github.fantom.codeowners.language.psi"
+  psiImplPackage            = "com.github.fantom.codeowners.language.psi.impl"
+
+  elementTypeHolderClass    = "com.github.fantom.codeowners.language.psi.CodeownersTypes"
+  elementTypeClass          = "com.github.fantom.codeowners.language.psi.CodeownersElementType"
+  tokenTypeClass            = "com.github.fantom.codeowners.language.psi.CodeownersTokenType"
+
+  tokens = [
+    CRLF                    = "regexp:[\s\r\n]+"
+    HEADER                  = "regexp:###.*"
+    SECTION                 = "regexp:##.*"
+    COMMENT                 = "regexp:#.*"
+    SLASH                   = "/"
+    AT                      = "@"
+//    TEAMNAME                = "regexp:[\w-]+"
+//    USERNAME                = "regexp:[\w\d-]+"
+//    DOMAIN                  = "regexp:\w+(\.\w+)+"
+    VALUE                   = "regexp:[^@/\s]+"
+//    SPACES                  = 'regexp:\s+'
+  ]
+}
+
+codeownersFile          ::= item_*
+private item_           ::= HEADER | SECTION | COMMENT | Pattern | CRLF
+
+Pattern                 ::= (EntryDirectory | EntryFile) /*SPACES*/ CRLF Owners /*CRLF*/
+
+EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/'
+EntryFile               ::= '/' ? <<list_macro VALUE>>
+
+Owners                  ::= Owner (CRLF Owner)*
+Owner                   ::= Email | Team | User
+
+Team                    ::= '@' TeamName '/' Username
+User                    ::= '@' Username
+Email                   ::= Username '@' Domain
+
+Username                ::= VALUE
+TeamName                ::= VALUE
+Domain                  ::= VALUE
+
+private meta list_macro ::= <<p>> + ('/' <<p>> +) *
