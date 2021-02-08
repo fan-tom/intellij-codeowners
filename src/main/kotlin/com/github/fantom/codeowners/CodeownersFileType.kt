@@ -1,26 +1,24 @@
 package com.github.fantom.codeowners
 
 import com.intellij.openapi.fileTypes.LanguageFileType
-import javax.swing.Icon
+import org.jetbrains.annotations.NonNls
 
-internal class CodeownersFileType private constructor() : LanguageFileType(CodeownersLanguage.INSTANCE) {
-    override fun getName(): String {
-        return "Codeowners File"
-    }
-
-    override fun getDescription(): String {
-        return "Codeowners file"
-    }
-
-    override fun getDefaultExtension(): String {
-        return "CODEOWNERS"
-    }
-
-    override fun getIcon(): Icon? {
-        return CodeownersIcons.FILE
-    }
+class CodeownersFileType private constructor() : LanguageFileType(CodeownersLanguage.INSTANCE) {
 
     companion object {
         val INSTANCE = CodeownersFileType()
     }
+
+    @NonNls
+    override fun getName() = "Codeowners File"
+
+    override fun getDescription() = "Codeowners file"
+
+    override fun getDefaultExtension() = "CODEOWNERS"
+
+    override fun getIcon() = CodeownersIcons.FILE
+
+    override fun equals(other: Any?) = other is CodeownersFileType
+
+    override fun hashCode() = INSTANCE.language.id.hashCode()
 }

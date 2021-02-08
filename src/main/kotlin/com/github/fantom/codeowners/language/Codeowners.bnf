@@ -24,15 +24,20 @@
     VALUE                   = "regexp:[^@/\s]+"
 //    SPACES                  = 'regexp:\s+'
   ]
+
+  name("Entry.*")           = "entry"
+  mixin("Entry")            = "com.github.fantom.codeowners.language.psi.impl.CodeownersEntryExtImpl"
+  implements("Entry")       = "com.github.fantom.codeowners.language.psi.CodeownersEntryBase"
 }
 
-codeownersFile          ::= item_*
+codeownersFile          ::= item_ *
 private item_           ::= HEADER | SECTION | COMMENT | Pattern | CRLF
 
 Pattern                 ::= (EntryDirectory | EntryFile) /*SPACES*/ CRLF Owners /*CRLF*/
 
-EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/'
-EntryFile               ::= '/' ? <<list_macro VALUE>>
+Entry                   ::= '/' ? <<list_macro VALUE>>
+EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' { extends = "EntryFile"}
+EntryFile               ::= '/' ? <<list_macro VALUE>>     { extends = "Entry"}
 
 Owners                  ::= Owner (CRLF Owner)*
 Owner                   ::= Email | Team | User
