@@ -8,22 +8,73 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.fantom.codeowners.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.fantom.codeowners.services.MyProjectService"/>
-    </extensions>
+        <applicationService serviceImplementation="com.github.fantom.codeowners.settings.CodeownersSettings"/>
 
-    <extensions defaultExtensionNs="com.intellij">
+
+        <projectService serviceImplementation="com.github.fantom.codeowners.services.CodeownersMatcher"/>
+        <projectService serviceImplementation="com.github.fantom.codeowners.CodeownersManager"/>
+
         <fileType name="Codeowners File" implementationClass="com.github.fantom.codeowners.CodeownersFileType"
                   fieldName="INSTANCE" language="CODEOWNERS" fileNames="CODEOWNERS"/>
-    </extensions>
-    <extensions defaultExtensionNs="com.intellij">
         <lang.parserDefinition language="CODEOWNERS"
                                implementationClass="com.github.fantom.codeowners.language.CodeownersParserDefinition"/>
+        <psi.referenceContributor
+                language="CODEOWNERS"
+                implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"/>
+        <codeInsight.lineMarkerProvider
+                language="CODEOWNERS"
+                implementationClass="com.github.fantom.codeowners.daemon.CodeownersDirectoryMarkerProvider"/>
+
+        <localInspection
+                bundle="messages.CodeownersBundle"
+                enabledByDefault="true"
+                groupKey="codeInspection.group"
+                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersCoverEntryInspection"
+                key="codeInspection.coverEntry"
+                level="WARNING"/>
+        <localInspection
+                bundle="messages.CodeownersBundle"
+                enabledByDefault="true"
+                groupKey="codeInspection.group"
+                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersDuplicateEntryInspection"
+                key="codeInspection.duplicateEntry"
+                level="ERROR"/>
+        <localInspection
+                bundle="messages.CodeownersBundle"
+                enabledByDefault="true"
+                groupKey="codeInspection.group"
+                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedEntryInspection"
+                key="codeInspection.unusedEntry"
+                level="WEAK WARNING"/>
+        <localInspection
+                bundle="messages.CodeownersBundle"
+                enabledByDefault="true"
+                groupKey="codeInspection.group"
+                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersRelativeEntryInspection"
+                key="codeInspection.relativeEntry"
+                level="ERROR"/>
+        <localInspection
+                bundle="messages.CodeownersBundle"
+                enabledByDefault="true"
+                groupKey="codeInspection.group"
+                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersIncorrectEntryInspection"
+                key="codeInspection.incorrectEntry"
+                level="ERROR"/>
+
+        <vcsConfigurableProvider
+                implementation="com.github.fantom.codeowners.settings.CodeownersSettingsConfigurable"/>
+
+        <statusBarWidgetFactory id="codeownersWidget" implementation="com.github.fantom.codeowners.CodeownersBarWidgetFactory" order="after positionWidget"/>
+        <fileBasedIndex implementation="com.github.fantom.codeowners.indexing.CodeownersFilesIndex"/>
+        <lang.elementManipulator
+                forClass="com.github.fantom.codeowners.language.psi.CodeownersEntry"
+                implementationClass="com.github.fantom.codeowners.language.psi.CodeownersEntryManipulator"/>
+
     </extensions>
 
 
-    <applicationListeners>
-        <listener class="com.github.fantom.codeowners.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+<!--    <applicationListeners>-->
+<!--        <listener class="com.github.fantom.codeowners.listeners.MyProjectManagerListener"-->
+<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
+<!--    </applicationListeners>-->
 </idea-plugin>
