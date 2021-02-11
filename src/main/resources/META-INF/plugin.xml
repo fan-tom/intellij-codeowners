@@ -69,12 +69,10 @@
         <lang.elementManipulator
                 forClass="com.github.fantom.codeowners.language.psi.CodeownersEntry"
                 implementationClass="com.github.fantom.codeowners.language.psi.CodeownersEntryManipulator"/>
+        <lang.elementManipulator
+                forClass="com.github.fantom.codeowners.language.psi.CodeownersNamedOwner"
+                implementationClass="com.github.fantom.codeowners.language.psi.CodeownersNamedOwnerManipulator"/>
 
+        <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
     </extensions>
-
-
-<!--    <applicationListeners>-->
-<!--        <listener class="com.github.fantom.codeowners.listeners.MyProjectManagerListener"-->
-<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
-<!--    </applicationListeners>-->
 </idea-plugin>

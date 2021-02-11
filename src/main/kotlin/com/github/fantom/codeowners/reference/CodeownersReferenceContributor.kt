@@ -2,6 +2,7 @@ package com.github.fantom.codeowners.reference
 
 import com.github.fantom.codeowners.language.psi.CodeownersEntry
 import com.github.fantom.codeowners.language.psi.CodeownersFile
+import com.github.fantom.codeowners.language.psi.CodeownersNamedOwner
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
@@ -25,7 +26,8 @@ class CodeownersReferenceContributor : PsiReferenceContributor() {
     private class CodeownersReferenceProvider : PsiReferenceProvider() {
         override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference> =
                 when (psiElement) {
-                    is CodeownersEntry -> CodeownersReferenceSet(psiElement).allReferences
+                    is CodeownersEntry -> CodeownersEntryReferenceSet(psiElement).allReferences
+                    is CodeownersNamedOwner -> arrayOf(CodeownersGithubOwnerReference(psiElement))
                     else -> PsiReference.EMPTY_ARRAY
                 }
     }

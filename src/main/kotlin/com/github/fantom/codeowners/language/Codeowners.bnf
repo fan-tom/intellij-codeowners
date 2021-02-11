@@ -27,6 +27,7 @@
 
   name("Entry.*")           = "entry"
   mixin("Entry")            = "com.github.fantom.codeowners.language.psi.impl.CodeownersEntryExtImpl"
+  mixin("NamedOwner")       = "com.github.fantom.codeowners.language.psi.impl.CodeownersNamedOwnerExtImpl"
   implements("Entry")       = "com.github.fantom.codeowners.language.psi.CodeownersEntryBase"
 }
 
@@ -40,13 +41,16 @@ EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' { extends = "EntryFil
 EntryFile               ::= '/' ? <<list_macro VALUE>>     { extends = "Entry"}
 
 Owners                  ::= Owner (CRLF Owner)*
-Owner                   ::= Email | Team | User
+Owner                   ::= Email | NamedOwner
+NamedOwner              ::= '@' OwnerName
 
-Team                    ::= '@' TeamName '/' Username
-User                    ::= '@' Username
-Email                   ::= Username '@' Domain
+OwnerName               ::= Team | UserName
+Team                    ::= OrgName '/' TeamName
 
-Username                ::= VALUE
+Email                   ::= UserName '@' Domain
+
+UserName                ::= VALUE
+OrgName                 ::= VALUE
 TeamName                ::= VALUE
 Domain                  ::= VALUE
 

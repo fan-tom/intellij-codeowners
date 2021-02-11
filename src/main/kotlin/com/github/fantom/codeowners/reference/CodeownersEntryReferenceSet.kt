@@ -27,11 +27,11 @@ import java.util.ArrayList
 /**
  * [FileReferenceSet] definition class.
  */
-class CodeownersReferenceSet(element: CodeownersEntry) : FileReferenceSet(element) {
+class CodeownersEntryReferenceSet(element: CodeownersEntry) : FileReferenceSet(element) {
 
     private val matcher = element.project.service<CodeownersMatcher>()
 
-    override fun createFileReference(range: TextRange, index: Int, text: String) = CodeownersReference(this, range, index, text)
+    override fun createFileReference(range: TextRange, index: Int, text: String) = CodeownersEntryReference(this, range, index, text)
 
     override fun isEndingSlashNotAllowed() = false
 
@@ -88,7 +88,7 @@ class CodeownersReferenceSet(element: CodeownersEntry) : FileReferenceSet(elemen
         myReferences = referencesList.toTypedArray()
     }
 
-    inner class CodeownersReference(fileReferenceSet: FileReferenceSet, range: TextRange?, index: Int, text: String?) :
+    inner class CodeownersEntryReference(fileReferenceSet: FileReferenceSet, range: TextRange?, index: Int, text: String?) :
         FileReference(fileReferenceSet, range, index, text) {
         private val cacheMap = concurrentMapOf<String, Collection<VirtualFile>>()
 
