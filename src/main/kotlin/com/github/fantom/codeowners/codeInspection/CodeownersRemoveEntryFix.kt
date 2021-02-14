@@ -2,6 +2,7 @@ package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.language.psi.CodeownersEntry
+import com.github.fantom.codeowners.language.psi.CodeownersPattern
 import com.github.fantom.codeowners.language.psi.CodeownersTypes
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
@@ -14,10 +15,10 @@ import com.intellij.psi.impl.source.tree.TreeUtil
  * QuickFix action that removes specified entry handled by code inspections like [CodeownersCoverEntryInspection],
  * [CodeownersDuplicateEntryInspection], [CodeownersUnusedEntryInspection].
  */
-class CodeownersRemoveEntryFix(entry: CodeownersEntry) : LocalQuickFixAndIntentionActionOnPsiElement(entry) {
+class CodeownersRemoveEntryFix(pattern: CodeownersPattern) : LocalQuickFixAndIntentionActionOnPsiElement(pattern) {
 
     override fun invoke(project: Project, file: PsiFile, editor: Editor?, startElement: PsiElement, endElement: PsiElement) {
-        if (startElement is CodeownersEntry) {
+        if (startElement is CodeownersPattern) {
             removeCrlf(startElement)
             startElement.delete()
         }

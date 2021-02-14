@@ -3,6 +3,7 @@ package com.github.fantom.codeowners.codeInspection
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.language.psi.CodeownersEntry
 import com.github.fantom.codeowners.language.psi.CodeownersFile
+import com.github.fantom.codeowners.language.psi.CodeownersPattern
 import com.github.fantom.codeowners.language.psi.CodeownersVisitor
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Glob
@@ -36,7 +37,8 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
         val matcher = holder.project.service<CodeownersMatcher>()
 
         return object : CodeownersVisitor() {
-            override fun visitEntry(entry: CodeownersEntry) {
+            override fun visitPattern(pattern: CodeownersPattern) {
+                val entry = pattern.entryFile
                 val references = entry.references
                 var resolved = true
                 var previous = Int.MAX_VALUE
@@ -58,7 +60,7 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
                         ?: holder.registerProblem(
                             entry,
                             CodeownersBundle.message("codeInspection.unusedEntry.message"),
-                            CodeownersRemoveEntryFix(entry)
+                            CodeownersRemoveEntryFix(pattern)
                         )
                 }
                 super.visitEntry(entry)

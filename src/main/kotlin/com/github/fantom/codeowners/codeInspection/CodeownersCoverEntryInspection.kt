@@ -3,6 +3,7 @@ package com.github.fantom.codeowners.codeInspection
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.language.psi.CodeownersEntry
 import com.github.fantom.codeowners.language.psi.CodeownersFile
+import com.github.fantom.codeowners.language.psi.CodeownersPattern
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Glob
@@ -40,26 +41,26 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
         val contextDirectory = virtualFile.parent ?: return null
         val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
 
-        val ignored = mutableSetOf<String>()
-        val unignored = mutableSetOf<String>()
-        val result = mutableListOf<Pair<CodeownersEntry, CodeownersEntry>>()
-        val map = mutableMapOf<CodeownersEntry, Set<String>>()
+        val owned = mutableSetOf<String>()
+//        val unignored = mutableSetOf<String>()
+        val result = mutableListOf<Pair<CodeownersPattern, CodeownersPattern>>()
+        val map = mutableMapOf<CodeownersPattern, Set<String>>()
 
-        val entries = file.findChildrenByClass(CodeownersEntry::class.java)
+        val patterns = file.findChildrenByClass(CodeownersPattern::class.java)
         val matcher = file.project.service<CodeownersMatcher>()
-        val matchedMap = getPathsSet(contextDirectory, entries, matcher)
+        val matchedMap = getPathsSet(contextDirectory, patterns.map { it.entryFile }, matcher)
 
-        entries.forEach entries@{ entry ->
+        patterns.forEach entries@{ pattern ->
             ProgressManager.checkCanceled()
-            val matched = matchedMap[entry] ?: return@entries
-            val intersection: Collection<String>
+            val matched = matchedMap[pattern.entryFile] ?: return@entries
+//            val intersection: Collection<String>
 
-            ignored.addAll(matched)
-            intersection = unignored.intersect(matched)
+            owned.addAll(matched)
+//            intersection = unignored.intersect(matched)
 
-            if (unignored.removeAll(intersection)) {
-                return@entries
-            }
+//            if (unignored.removeAll(intersection)) {
+//                return@entries
+//            }
 
             map.keys.forEach recent@{ recent ->
                 ProgressManager.checkCanceled()
@@ -69,21 +70,21 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
                 }
 //                if (entry.isNegated == recent.isNegated) {
                     if (recentValues.containsAll(matched)) {
-                        result.add(Pair.create(recent, entry))
+                        result.add(Pair.create(recent, pattern))
                     } else if (matched.containsAll(recentValues)) {
-                        result.add(Pair.create(entry, recent))
+                        result.add(Pair.create(pattern, recent))
                     }
 //                } else if (intersection.containsAll(recentValues)) {
 //                    result.add(Pair.create(entry, recent))
 //                }
             }
-            map[entry] = matched
+            map[pattern] = matched
         }
 
         result.forEach { pair ->
             problemsHolder.registerProblem(
                 pair.second,
-                message(pair.first, virtualFile, isOnTheFly),
+                message(pair.first.entryFile, virtualFile, isOnTheFly),
                 CodeownersRemoveEntryFix(pair.second)
             )
         }
@@ -99,9 +100,9 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
      * @param entries          to check
      * @return paths list
      */
-    private fun getPathsSet(contextDirectory: VirtualFile, entries: Array<CodeownersEntry>, matcher: CodeownersMatcher) =
+    private fun getPathsSet(contextDirectory: VirtualFile, entries: List<CodeownersEntry>, matcher: CodeownersMatcher) =
         mutableMapOf<CodeownersEntry, Set<String>>().apply {
-            val found = Glob.findAsPaths(contextDirectory, entries.toList(), matcher, true)
+            val found = Glob.findAsPaths(contextDirectory, entries, matcher, true)
             found.forEach { (key, value) ->
                 ProgressManager.checkCanceled()
                 this[key] = value
