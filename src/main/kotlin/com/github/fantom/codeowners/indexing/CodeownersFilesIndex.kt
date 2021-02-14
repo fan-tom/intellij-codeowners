@@ -1,11 +1,9 @@
 package com.github.fantom.codeowners.indexing
 
-import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.CodeownersFileType
-import com.github.fantom.codeowners.CodeownersManager
-import com.github.fantom.codeowners.language.psi.CodeownersFile
-import com.github.fantom.codeowners.language.psi.CodeownersPattern
-import com.github.fantom.codeowners.language.psi.CodeownersVisitor
+import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
+import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
+import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
@@ -14,7 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.indexing.*
 import com.intellij.util.indexing.FileBasedIndex.InputFilter
 import com.intellij.util.io.DataExternalizer
-import com.intellij.util.io.DifferentSerializableBytesImplyNonEqualityPolicy
 import com.intellij.util.io.KeyDescriptor
 import java.io.DataInput
 import java.io.DataOutput

@@ -1,11 +1,11 @@
-package com.github.fantom.codeowners.language;
+package com.github.fantom.codeowners.languages.github;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
-import static com.github.fantom.codeowners.language.psi.CodeownersTypes.*;
+import static com.github.fantom.codeowners.languages.github.psi.CodeownersTypes.*;
 
 %%
 

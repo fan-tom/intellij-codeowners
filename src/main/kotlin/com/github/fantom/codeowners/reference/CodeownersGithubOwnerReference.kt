@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners.reference
 
-import com.github.fantom.codeowners.language.psi.CodeownersNamedOwner
+import com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwner
 import com.intellij.openapi.paths.WebReference
 import com.intellij.psi.PsiElement
 

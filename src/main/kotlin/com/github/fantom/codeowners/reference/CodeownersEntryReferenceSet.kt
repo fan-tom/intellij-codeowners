@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.reference
 
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
-import com.github.fantom.codeowners.language.psi.CodeownersFile
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Glob

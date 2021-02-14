@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.daemon
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.language.psi.CodeownersEntryDirectory
-import com.github.fantom.codeowners.language.psi.CodeownersEntryFile
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntryDirectory
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntryFile
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.components.service

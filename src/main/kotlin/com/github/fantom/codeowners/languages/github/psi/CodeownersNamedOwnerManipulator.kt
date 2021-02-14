@@ -1,7 +1,8 @@
-package com.github.fantom.codeowners.language.psi
+package com.github.fantom.codeowners.languages.github.psi
 
 import com.github.fantom.codeowners.CodeownersFileType
 import com.github.fantom.codeowners.CodeownersLanguage
+import com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwner
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.AbstractElementManipulator
 import com.intellij.psi.PsiFileFactory

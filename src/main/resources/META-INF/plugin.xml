@@ -17,7 +17,7 @@
         <fileType name="Codeowners File" implementationClass="com.github.fantom.codeowners.CodeownersFileType"
                   fieldName="INSTANCE" language="CODEOWNERS" fileNames="CODEOWNERS"/>
         <lang.parserDefinition language="CODEOWNERS"
-                               implementationClass="com.github.fantom.codeowners.language.CodeownersParserDefinition"/>
+                               implementationClass="com.github.fantom.codeowners.languages.github.CodeownersParserDefinition"/>
         <psi.referenceContributor
                 language="CODEOWNERS"
                 implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"/>
@@ -67,11 +67,11 @@
         <statusBarWidgetFactory id="codeownersWidget" implementation="com.github.fantom.codeowners.CodeownersBarWidgetFactory" order="after positionWidget"/>
         <fileBasedIndex implementation="com.github.fantom.codeowners.indexing.CodeownersFilesIndex"/>
         <lang.elementManipulator
-                forClass="com.github.fantom.codeowners.language.psi.CodeownersEntry"
-                implementationClass="com.github.fantom.codeowners.language.psi.CodeownersEntryManipulator"/>
+                forClass="com.github.fantom.codeowners.languages.github.psi.CodeownersEntry"
+                implementationClass="com.github.fantom.codeowners.languages.github.psi.CodeownersEntryManipulator"/>
         <lang.elementManipulator
-                forClass="com.github.fantom.codeowners.language.psi.CodeownersNamedOwner"
-                implementationClass="com.github.fantom.codeowners.language.psi.CodeownersNamedOwnerManipulator"/>
+                forClass="com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwner"
+                implementationClass="com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwnerManipulator"/>
 
         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
     </extensions>

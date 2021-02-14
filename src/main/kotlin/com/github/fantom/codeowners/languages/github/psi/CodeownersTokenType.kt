@@ -1,4 +1,4 @@
-package com.github.fantom.codeowners.language.psi
+package com.github.fantom.codeowners.languages.github.psi
 
 import com.intellij.psi.tree.IElementType
 import com.github.fantom.codeowners.CodeownersLanguage

@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners.util
 
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile

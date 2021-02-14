@@ -1,9 +1,7 @@
-package com.github.fantom.codeowners.language.psi
+package com.github.fantom.codeowners.languages.github.psi
 
 import com.github.fantom.codeowners.CodeownersException
 import com.intellij.psi.FileViewProvider
-import com.intellij.extapi.psi.PsiFileBase
-import com.intellij.openapi.fileTypes.FileType
 import com.github.fantom.codeowners.CodeownersLanguage
 import com.github.fantom.codeowners.CodeownersFileType
 import com.intellij.lang.Language

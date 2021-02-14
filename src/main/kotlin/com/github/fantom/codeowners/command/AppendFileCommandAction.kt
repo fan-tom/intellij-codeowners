@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.command
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
-import com.github.fantom.codeowners.language.psi.CodeownersVisitor
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
 import com.github.fantom.codeowners.settings.CodeownersSettings
 import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Notify

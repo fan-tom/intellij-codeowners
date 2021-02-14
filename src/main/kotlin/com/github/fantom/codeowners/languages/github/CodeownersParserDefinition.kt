@@ -1,17 +1,17 @@
-package com.github.fantom.codeowners.language
+package com.github.fantom.codeowners.languages.github
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.psi.tree.TokenSet
-import com.github.fantom.codeowners.language.parser.CodeownersParser
+import com.github.fantom.codeowners.languages.github.parser.CodeownersParser
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.FileViewProvider
-import com.github.fantom.codeowners.language.psi.CodeownersFile
+import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
 import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
-import com.github.fantom.codeowners.language.psi.CodeownersTypes
+import com.github.fantom.codeowners.languages.github.psi.CodeownersTypes
 import com.github.fantom.codeowners.CodeownersLanguage
 
 class CodeownersParserDefinition : ParserDefinition {

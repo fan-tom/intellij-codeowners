@@ -1,9 +1,8 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
-import com.github.fantom.codeowners.language.psi.CodeownersPattern
-import com.github.fantom.codeowners.language.psi.CodeownersTypes
+import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
+import com.github.fantom.codeowners.languages.github.psi.CodeownersTypes
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project

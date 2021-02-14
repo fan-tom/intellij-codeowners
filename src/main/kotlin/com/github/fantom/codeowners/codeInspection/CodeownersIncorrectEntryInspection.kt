@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
-import com.github.fantom.codeowners.language.psi.CodeownersVisitor
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder

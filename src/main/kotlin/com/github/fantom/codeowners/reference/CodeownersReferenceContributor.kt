@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.reference
 
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
-import com.github.fantom.codeowners.language.psi.CodeownersFile
-import com.github.fantom.codeowners.language.psi.CodeownersNamedOwner
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
+import com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwner
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference

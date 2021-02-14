@@ -1,6 +1,7 @@
-package com.github.fantom.codeowners.language.psi.impl
+package com.github.fantom.codeowners.languages.github.psi.impl
 
-import com.github.fantom.codeowners.language.psi.*
+import com.github.fantom.codeowners.languages.github.psi.CodeownersElementImpl
+import com.github.fantom.codeowners.languages.github.psi.*
 import com.intellij.lang.ASTNode
 
 /**

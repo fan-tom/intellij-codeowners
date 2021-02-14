@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.language.psi.CodeownersEntry
+import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
