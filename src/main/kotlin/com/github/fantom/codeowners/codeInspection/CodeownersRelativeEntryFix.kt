@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
@@ -13,10 +13,10 @@ import java.net.URISyntaxException
 /**
  * QuickFix action that removes relative parts of the entry [CodeownersRelativeEntryInspection].
  */
-class CodeownersRelativeEntryFix(entry: CodeownersEntry) : LocalQuickFixOnPsiElement(entry) {
+class CodeownersRelativeEntryFix(entry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry) : LocalQuickFixOnPsiElement(entry) {
 
     override fun invoke(project: Project, psiFile: PsiFile, startElement: PsiElement, endElement: PsiElement) {
-        if (startElement is CodeownersEntry) {
+        if (startElement is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry) {
             val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)
             if (document != null) {
                 val start = startElement.getStartOffsetInParent()

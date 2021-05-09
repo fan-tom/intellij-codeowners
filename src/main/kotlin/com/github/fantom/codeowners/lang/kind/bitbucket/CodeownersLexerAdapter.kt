@@ -1,5 +1,6 @@
-package com.github.fantom.codeowners.languages.github
+package com.github.fantom.codeowners.lang.kind.bitbucket
 
+import com.github.fantom.codeowners.lang.kind.bitbucket.lexer.CodeownersLexer
 import com.intellij.lexer.FlexAdapter
 import java.io.Reader
 

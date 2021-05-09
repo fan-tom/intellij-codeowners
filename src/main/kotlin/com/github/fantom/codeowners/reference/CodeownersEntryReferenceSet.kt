@@ -1,7 +1,6 @@
 package com.github.fantom.codeowners.reference
 
-import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
-import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
+import com.github.fantom.codeowners.lang.CodeownersFile
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Glob
@@ -14,10 +13,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
-import com.intellij.psi.PsiElementResolveResult
-import com.intellij.psi.PsiFileSystemItem
-import com.intellij.psi.PsiManager
-import com.intellij.psi.ResolveResult
+import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReference
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceSet
 import com.intellij.util.containers.ContainerUtil
@@ -27,7 +23,7 @@ import java.util.ArrayList
 /**
  * [FileReferenceSet] definition class.
  */
-class CodeownersEntryReferenceSet(element: CodeownersEntry) : FileReferenceSet(element) {
+class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(element) {
 
     private val matcher = element.project.service<CodeownersMatcher>()
 
@@ -111,9 +107,9 @@ class CodeownersEntryReferenceSet(element: CodeownersEntry) : FileReferenceSet(e
                 else -> return
             }
             if (contextVirtualFile != null) {
-                val entry = fileReferenceSet.element as CodeownersEntry
+                val entry = fileReferenceSet.element// as com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
                 val current = canonicalText
-                val pattern = Glob.createPattern(current) ?: return
+                val pattern = Glob.createPattern(current, acceptChildren = false, supportSquareBrackets = false) ?: return
                 val root = element.containingFile.parent?.virtualFile
                 val psiManager = element.manager
 

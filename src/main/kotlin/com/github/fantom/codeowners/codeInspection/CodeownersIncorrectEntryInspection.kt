@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
-import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
@@ -14,9 +14,9 @@ import java.util.regex.PatternSyntaxException
  */
 class CodeownersIncorrectEntryInspection : LocalInspectionTool() {
 
-    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) = object : CodeownersVisitor() {
-        override fun visitEntry(entry: CodeownersEntry) {
-            val regex = Glob.createRegex(entry.text, false)
+    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) = object : com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor() {
+        override fun visitEntry(entry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry) {
+            val regex = entry.regex(false)
 
             try {
                 Pattern.compile(regex)

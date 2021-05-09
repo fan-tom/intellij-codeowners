@@ -1,9 +1,8 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
-import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
-import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.lang.CodeownersFile
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Glob
@@ -43,10 +42,10 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
 
         val owned = mutableSetOf<String>()
 //        val unignored = mutableSetOf<String>()
-        val result = mutableListOf<Pair<CodeownersPattern, CodeownersPattern>>()
-        val map = mutableMapOf<CodeownersPattern, Set<String>>()
+        val result = mutableListOf<Pair<com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern>>()
+        val map = mutableMapOf<com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern, Set<String>>()
 
-        val patterns = file.findChildrenByClass(CodeownersPattern::class.java)
+        val patterns = file.findChildrenByClass(com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern::class.java)
         val matcher = file.project.service<CodeownersMatcher>()
         val matchedMap = getPathsSet(contextDirectory, patterns.map { it.entryFile }, matcher)
 
@@ -100,8 +99,8 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
      * @param entries          to check
      * @return paths list
      */
-    private fun getPathsSet(contextDirectory: VirtualFile, entries: List<CodeownersEntry>, matcher: CodeownersMatcher) =
-        mutableMapOf<CodeownersEntry, Set<String>>().apply {
+    private fun getPathsSet(contextDirectory: VirtualFile, entries: List<com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry>, matcher: CodeownersMatcher) =
+        mutableMapOf<com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry, Set<String>>().apply {
             val found = Glob.findAsPaths(contextDirectory, entries, matcher, true)
             found.forEach { (key, value) ->
                 ProgressManager.checkCanceled()
@@ -120,7 +119,7 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
      * otherwise
      * @return generated message [String]
      */
-    private fun message(coveringEntry: CodeownersEntry, virtualFile: VirtualFile, onTheFly: Boolean): String {
+    private fun message(coveringEntry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry, virtualFile: VirtualFile, onTheFly: Boolean): String {
         val document = FileDocumentManager.getInstance().getDocument(virtualFile)
 
         return if (onTheFly || document == null) {

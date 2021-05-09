@@ -1,9 +1,8 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
-import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
-import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
+import com.github.fantom.codeowners.lang.CodeownersFile
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
@@ -25,10 +24,10 @@ class CodeownersDuplicateEntryInspection : LocalInspectionTool() {
         LOG.warn("Checking file for duplicates ${file.name}")
 
         val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
-        val entries = MultiMap.create<String, CodeownersPattern>()
+        val entries = MultiMap.create<String, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern>()
         file.acceptChildren(
             object : CodeownersVisitor() {
-                override fun visitPattern(pattern: CodeownersPattern) {
+                override fun visitPattern(pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
                     val entry = pattern.entryFile
                     LOG.warn("Remembering entry ${entry.text}")
                     entries.putValue(entry.text, pattern)

@@ -1,17 +1,18 @@
-package com.github.fantom.codeowners.languages.github.psi
+package com.github.fantom.codeowners.lang
 
 import com.github.fantom.codeowners.CodeownersException
+import com.github.fantom.codeowners.OwnersReference
 import com.intellij.psi.FileViewProvider
-import com.github.fantom.codeowners.CodeownersLanguage
-import com.github.fantom.codeowners.CodeownersFileType
+import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.indexing.PatternString
 import com.intellij.lang.Language
 import com.intellij.lang.LanguageParserDefinitions
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.impl.source.PsiFileImpl
 
-class CodeownersFile(viewProvider: FileViewProvider) : PsiFileImpl(viewProvider) {
+class CodeownersFile(viewProvider: FileViewProvider, private val fileType: CodeownersFileType) : PsiFileImpl(viewProvider) {
 
-    private val language = findLanguage(fileType.language, viewProvider)
+    private val language = findLanguage(fileType.language, viewProvider) as CodeownersLanguage
 
     companion object {
         /**
@@ -38,9 +39,15 @@ class CodeownersFile(viewProvider: FileViewProvider) : PsiFileImpl(viewProvider)
         visitor.visitFile(this)
     }
 
-    override fun getFileType(): CodeownersFileType = CodeownersFileType.INSTANCE
+    override fun getFileType() = fileType
 
     override fun getLanguage() = language
 
     override fun toString() = fileType.name
+
+    fun getPatternsList(): List<Pair<PatternString, OwnersReference>> {
+        val items = mutableListOf<Pair<PatternString, OwnersReference>>()
+        language.getPatternsVisitor(items)?.let { acceptChildren(it) }
+        return items
+    }
 }

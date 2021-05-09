@@ -1,7 +1,6 @@
-package com.github.fantom.codeowners.languages.github.psi
+package com.github.fantom.codeowners.lang
 
 import com.intellij.psi.tree.IElementType
-import com.github.fantom.codeowners.CodeownersLanguage
 import org.jetbrains.annotations.NonNls
 
 class CodeownersTokenType(@NonNls debugName: String) : IElementType(debugName, CodeownersLanguage.INSTANCE) {

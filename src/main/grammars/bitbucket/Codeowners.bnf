@@ -1,0 +1,83 @@
+// https://mibexsoftware.atlassian.net/wiki/spaces/CODEOWNERS/pages/222822413/Usage
+{
+  parserClass               = "com.github.fantom.codeowners.lang.kind.bitbucket.parser.CodeownersParser"
+  extends                   = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix            = "Codeowners"
+  psiImplClassSuffix        = "Impl"
+  psiPackage                = "com.github.fantom.codeowners.lang.kind.bitbucket.psi"
+  psiImplPackage            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl"
+
+  elementTypeHolderClass    = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTypes"
+  elementTypeClass          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersElementType"
+  tokenTypeClass            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTokenType"
+//  tokenTypeClass            = "com.github.fantom.codeowners.lang.CodeownersTokenType"
+
+  tokens = [
+    CRLF                    = "regexp:[\s\r\n]+"
+    HEADER                  = "regexp:###.*"
+    SECTION                 = "regexp:##.*"
+    COMMENT                 = "regexp:#.*"
+    SLASH                   = "/"
+    AT                      = "@"
+//    TEAMNAME                = "regexp:[\w-]+"
+//    USERNAME                = "regexp:[\w\d-]+"
+//    DOMAIN                  = "regexp:\w+(\.\w+)+"
+    VALUE                   = "regexp:[^@/\s]+"
+    //QUOTED_VALUE            = 'regexp:"([^@/]+)+"'
+//    VALUES_LIST             = 'regexp:[^@/]+'
+//    SPACES                  = 'regexp:\s+'
+  ]
+
+  name("Entry.*")           = "entry"
+  implements("Entry")       = "com.github.fantom.codeowners.lang.CodeownersEntryBase"
+  mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersEntryExtImpl"
+  implements("Pattern")     = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPatternBase"
+  mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPatternExtImpl"
+  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
+}
+
+codeownersFile          ::= item_ *
+private item_           ::= HEADER | SECTION | COMMENT | Pattern | Reset | TeamDefinition | CRLF
+
+NEGATION                ::= "!"
+Reset                   ::= NEGATION Entry
+
+TeamDefinition          ::= '@''@''@' TeamName CRLF Owners
+
+Assign                  ::= Entry /*SPACES*/ CRLF Owners /*CRLF*/
+
+Pattern                 ::= Reset | Assign
+
+Entry                   ::= EntryDirectory | EntryFile
+
+//QuotedEntry             ::= '"' <<entry_macro VALUES_LIST>> '"'
+//private meta QuotedEntry::= '"' <<p>> '"'
+//private meta entry_macro::= <<QuotedEntry <<p VALUES_LIST>> >> | <<p VALUE>>
+
+//Entry                   ::= '/' ? <<list_macro VALUE>>
+//private meta entry_file_raw ::= '/' ? <<list_macro <<p>>>>
+//private meta entry_dir_raw  ::= '/' ? <<list_macro <<p>>>> '/'
+
+EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' //| ('"' '/' ? <<list_macro VALUES_LIST>> '/' '"') //{ extends = "EntryFile"}
+EntryFile               ::= '/' ? <<list_macro VALUE>> //| ('"' '/' ? <<list_macro VALUES_LIST>> '"')  //{ extends = "Entry"}
+//EntryDirectory          ::= ('/' ? <<list_macro VALUE>> '/') | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> '/'>> //{ extends = "EntryFile"}
+//EntryFile               ::= ('/' ? <<list_macro VALUE>>) | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> >> //{ extends = "Entry"}
+
+Owners                  ::= Owner (CRLF Owner)*
+Owner                   ::= Email | NamedOwner
+NamedOwner              ::= Team | User
+
+Team                    ::= '@''@' TeamName
+User                    ::= '@' UserName
+
+Email                   ::= UserName '@' Domain
+
+// or make it token?
+//QuotedValue             ::= '"'(CRLF VALUE)*'"'
+
+UserName                ::= VALUE //| QUOTED_VALUE
+TeamName                ::= VALUE //| QUOTED_VALUE
+Domain                  ::= VALUE
+
+private meta list_macro ::= <<p>> + ('/' <<p>> +) *

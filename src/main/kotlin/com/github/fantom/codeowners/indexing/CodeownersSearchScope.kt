@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners.indexing
 
-import com.github.fantom.codeowners.CodeownersFileType
+import com.github.fantom.codeowners.file.type.CodeownersFileType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile

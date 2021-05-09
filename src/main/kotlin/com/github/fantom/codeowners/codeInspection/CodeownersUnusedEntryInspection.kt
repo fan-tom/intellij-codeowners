@@ -1,12 +1,9 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
-import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
-import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
-import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
+import com.github.fantom.codeowners.lang.CodeownersFile
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.github.fantom.codeowners.services.CodeownersMatcher
-import com.github.fantom.codeowners.util.Glob
 import com.github.fantom.codeowners.util.MatcherUtil
 import com.github.fantom.codeowners.util.Utils
 import com.intellij.codeInspection.LocalInspectionTool
@@ -36,8 +33,8 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         val matcher = holder.project.service<CodeownersMatcher>()
 
-        return object : CodeownersVisitor() {
-            override fun visitPattern(pattern: CodeownersPattern) {
+        return object : com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor() {
+            override fun visitPattern(pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
                 val entry = pattern.entryFile
                 val references = entry.references
                 var resolved = true
@@ -74,8 +71,8 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
              * @return entry is excluded in current project
              */
             @Suppress("ReturnCount")
-            private fun isEntryExcluded(entry: CodeownersEntry, project: Project): Boolean {
-                val pattern = Glob.createPattern(entry) ?: return false
+            private fun isEntryExcluded(entry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry, project: Project): Boolean {
+                val pattern = entry.pattern() ?: return false
                 val moduleRoot = Utils.getModuleRootForFile(entry.containingFile.virtualFile, project) ?: return false
                 val files = MatcherUtil.getFilesForPattern(project, pattern)
 

@@ -1,5 +1,6 @@
 package com.github.fantom.codeowners.indexing
 
+import com.github.fantom.codeowners.OwnersReference
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import org.apache.commons.lang.StringUtils
@@ -9,11 +10,19 @@ import java.io.DataOutput
 import java.io.IOException
 import java.io.Serializable
 
+inline class PatternString(val pattern: String) {
+    override fun toString() = pattern
+}
+
+inline class OwnerString(val owner: String) {
+    override fun toString() = owner
+}
+
 /**
  * Entry containing information about the [VirtualFile] instance of the codeowners file mapped with the collection
- * of codeowners entries for better performance. Class is used for indexing.
+ * of codeowners entries with line numbers for better performance. Class is used for indexing.
  */
-class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<String, List<String>>>) : Serializable {
+class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<PatternString, OwnersReference>>) : Serializable {
 
     /**
      * Returns current [VirtualFile].
@@ -37,10 +46,11 @@ class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<St
                 writeUTF(entry.url)
                 writeInt(entry.items.size)
                 entry.items.forEach {
-                    writeUTF(it.first)
-                    writeInt(it.second.size)
-                    it.second.forEach { owner ->
-                        writeUTF(owner)
+                    writeUTF(it.first.pattern)
+                    writeInt(it.second.offset)
+                    writeInt(it.second.owners.size)
+                    it.second.owners.forEach { owner ->
+                        writeUTF(owner.owner)
                     }
                 }
             }
@@ -50,18 +60,19 @@ class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<St
         @Throws(IOException::class)
         fun deserialize(input: DataInput): CodeownersEntryOccurrence {
             val url = input.readUTF()
-            val items = mutableListOf<Pair<String, List<String>>>()
+            val items = mutableListOf<Pair<PatternString, OwnersReference>>()
 
             if (!StringUtils.isEmpty(url)) {
                 val size = input.readInt()
                 repeat((0 until size).count()) {
-                    val pattern = input.readUTF()
+                    val pattern = PatternString(input.readUTF())
+                    val offset = input.readInt()
                     val size = input.readInt()
-                    val owners = mutableListOf<String>()
+                    val owners = mutableListOf<OwnerString>()
                     repeat((0 until size).count()) {
-                        owners.add(input.readUTF())
+                        owners.add(OwnerString(input.readUTF()))
                     }
-                    items.add(Pair(pattern, owners))
+                    items.add(Pair(pattern, OwnersReference(owners, offset)))
                 }
             }
             return CodeownersEntryOccurrence(url, items)

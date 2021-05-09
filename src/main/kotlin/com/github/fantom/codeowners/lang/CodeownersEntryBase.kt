@@ -1,4 +1,4 @@
-package com.github.fantom.codeowners.languages.github.psi
+package com.github.fantom.codeowners.lang
 
 import com.intellij.psi.PsiElement
 import java.util.regex.Pattern
@@ -11,10 +11,19 @@ interface CodeownersEntryBase : PsiElement {
      */
     val value: String
 
+    val isDirectory: Boolean
+
     /**
      * Returns current pattern.
      *
      * @return pattern
      */
-    val pattern: Pattern?
+    fun regex(acceptChildren: Boolean = false): String
+
+    /**
+     * Returns current pattern.
+     *
+     * @return pattern
+     */
+    fun pattern(acceptChildren: Boolean = false): Pattern?
 }

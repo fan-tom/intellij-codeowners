@@ -1,6 +1,8 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.changelog.closure
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.grammarkit.tasks.GenerateLexer
+import org.jetbrains.grammarkit.tasks.GenerateParser
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -16,6 +18,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+    id("org.jetbrains.grammarkit") version "2020.3.2"
 }
 
 // Import variables from gradle.properties file
@@ -45,6 +48,37 @@ repositories {
 }
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
+    implementation(kotlin("stdlib-jdk8"))
+}
+
+val generateGithubLexer = task<GenerateLexer>("generateGithubLexer") {
+    source = "src/main/grammars/github/CodeownersLexer.flex"
+    targetDir = "src/main/gen/com/github/fantom/codeowners/lang/kind/github/lexer"
+    targetClass = "CodeownersLexer"
+    purgeOldFiles = true
+}
+
+val generateGithubParser = task<GenerateParser>("generateGithubParser") {
+    source = "src/main/grammars/github/Codeowners.bnf"
+    targetRoot = "src/main/gen"
+    pathToParser = "/com/github/fantom/codeowners/lang/kind/github/parser/CodeownersParser.java"
+    pathToPsiRoot = "/com/github/fantom/codeowners/lang/kind/github/psi"
+    purgeOldFiles = true
+}
+
+val generateBitbucketLexer = task<GenerateLexer>("generateBitbucketLexer") {
+    source = "src/main/grammars/bitbucket/CodeownersLexer.flex"
+    targetDir = "src/main/gen/com/github/fantom/codeowners/lang/kind/bitbucket/lexer"
+    targetClass = "CodeownersLexer"
+    purgeOldFiles = true
+}
+
+val generateBitbucketParser = task<GenerateParser>("generateBitbucketParser") {
+    source = "src/main/grammars/bitbucket/Codeowners.bnf"
+    targetRoot = "src/main/gen"
+    pathToParser = "/com/github/fantom/codeowners/lang/kind/bitbucket/parser/CodeownersParser.java"
+    pathToPsiRoot = "/com/github/fantom/codeowners/lang/kind/bitbucket/psi"
+    purgeOldFiles = true
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -81,6 +115,8 @@ tasks {
     }
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
+
+        dependsOn(generateGithubLexer, generateGithubParser, generateBitbucketLexer, generateBitbucketParser)
     }
 
     withType<Detekt> {
@@ -95,7 +131,7 @@ tasks {
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription(
             closure {
-                File("./README.md").readText().lines().run {
+                File(projectDir, "./README.md").readText().lines().run {
                     val start = "<!-- Plugin description -->"
                     val end = "<!-- Plugin description end -->"
 
@@ -127,4 +163,13 @@ tasks {
         // https://jetbrains.org/intellij/sdk/docs/tutorials/build_system/deployment.html#specifying-a-release-channel
         channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    freeCompilerArgs = listOf("-Xinline-classes")
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

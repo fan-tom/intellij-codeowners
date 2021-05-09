@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.highlighter
 
-import com.github.fantom.codeowners.languages.github.CodeownersLexerAdapter
-import com.github.fantom.codeowners.languages.github.CodeownersParserDefinition
+import com.github.fantom.codeowners.lang.kind.github.CodeownersLexerAdapter
+import com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.openapi.vfs.VirtualFile

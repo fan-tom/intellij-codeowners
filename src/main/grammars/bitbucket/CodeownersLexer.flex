@@ -1,11 +1,9 @@
-package com.github.fantom.codeowners.languages.github;
+package com.github.fantom.codeowners.lang.kind.bitbucket.lexer;
 
-import com.intellij.lexer.FlexLexer;
+import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
 
-import static com.intellij.psi.TokenType.BAD_CHARACTER;
-import static com.intellij.psi.TokenType.WHITE_SPACE;
-import static com.github.fantom.codeowners.languages.github.psi.CodeownersTypes.*;
+import static com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTypes.*;
 
 %%
 
@@ -21,6 +19,7 @@ import static com.github.fantom.codeowners.languages.github.psi.CodeownersTypes.
 %function advance
 %type IElementType
 %unicode
+%debug
 
 //EOL=\R
 //WHITE_SPACE={SPACES}
@@ -32,28 +31,43 @@ WHITE_SPACE     = ({LINE_WS}*{CRLF}+)+
 HEADER          = ###[^\r\n]*
 SECTION         = ##[^\r\n]*
 COMMENT         = #[^\r\n]*
+NEGATION        = \!
 SLASH           = \/
 AT              = @
+QUOTE           = \"
 
 
-FIRST_CHARACTER = [^# ]
+ENTRY_FIRST_CHARACTER = [^#@ ]
 VALUE=[^@/\s\/]+
+//VALUES_LIST=[^@/]+
 SPACES=\s+
 
-%state IN_ENTRY, IN_OWNERS
+%state IN_ENTRY, IN_OWNERS, IN_TEAM_DEFINITION
 
 %%
 <YYINITIAL> {
-    {WHITE_SPACE}+     { yybegin(YYINITIAL); return CRLF; }
+    {WHITE_SPACE}      { yybegin(YYINITIAL); return CRLF; }
     {LINE_WS}+         { return CRLF; }
     {HEADER}           { return HEADER; }
     {SECTION}          { return SECTION; }
     {COMMENT}          { return COMMENT; }
+    {NEGATION}         { return NEGATION; }
 
-    {FIRST_CHARACTER}  { yypushback(1); yybegin(IN_ENTRY); }
+    {AT}               { yypushback(1); yybegin(IN_TEAM_DEFINITION); }
+
+    {ENTRY_FIRST_CHARACTER}  { yypushback(1); yybegin(IN_ENTRY); }
+}
+
+<IN_TEAM_DEFINITION> {
+    {AT}                { yybegin(IN_TEAM_DEFINITION); return AT; }
+    {VALUE}             { yybegin(IN_TEAM_DEFINITION); return VALUE; }
+//    {QUOTED_VALUE}      { return QUOTED_VALUE; }
+    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
+    {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
 }
 
 <IN_ENTRY> {
+//    {QUOTE}             { yybegin(IN_WS_ENTRY); return QUOTE; }
     {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
     {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
 
@@ -63,11 +77,17 @@ SPACES=\s+
 //  {SPACES}           { return SPACES; }
 }
 
+//<IN_WS_ENTRY> {
+//    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
+//    {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
+//    {VALUES_LIST}       { yybegin(IN_WS_ENTRY); return VALUES_LIST; }
+//}
+
 <IN_OWNERS> {
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
     {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
     {VALUE}             { yybegin(IN_OWNERS); return VALUE; }
-    {SLASH}             { yybegin(IN_OWNERS); return SLASH; }
+//    {SLASH}             { return SLASH; }
     {AT}                { yybegin(IN_OWNERS); return AT; }
 }
 

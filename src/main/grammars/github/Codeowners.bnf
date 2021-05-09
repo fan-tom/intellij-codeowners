@@ -1,15 +1,18 @@
+// https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
 {
-  parserClass               = "com.github.fantom.codeowners.languages.github.parser.CodeownersParser"
+  parserClass               = "com.github.fantom.codeowners.lang.kind.github.parser.CodeownersParser"
   extends                   = "com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix            = "Codeowners"
   psiImplClassSuffix        = "Impl"
-  psiPackage                = "com.github.fantom.codeowners.languages.github.psi"
-  psiImplPackage            = "com.github.fantom.codeowners.languages.github.psi.impl"
+  psiPackage                = "com.github.fantom.codeowners.lang.kind.github.psi"
+  psiImplPackage            = "com.github.fantom.codeowners.lang.kind.github.psi.impl"
 
-  elementTypeHolderClass    = "com.github.fantom.codeowners.languages.github.psi.CodeownersTypes"
-  elementTypeClass          = "com.github.fantom.codeowners.languages.github.psi.CodeownersElementType"
-  tokenTypeClass            = "com.github.fantom.codeowners.languages.github.psi.CodeownersTokenType"
+  elementTypeHolderClass    = "com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes"
+  elementTypeClass          = "com.github.fantom.codeowners.lang.kind.github.psi.CodeownersElementType"
+//  elementTypeClass          = "com.github.fantom.codeowners.lang.CodeownersElementType"
+  tokenTypeClass            = "com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTokenType"
+//  tokenTypeClass            = "com.github.fantom.codeowners.lang.CodeownersTokenType"
 
   tokens = [
     CRLF                    = "regexp:[\s\r\n]+"
@@ -26,9 +29,9 @@
   ]
 
   name("Entry.*")           = "entry"
-  mixin("Entry")            = "com.github.fantom.codeowners.languages.github.psi.impl.CodeownersEntryExtImpl"
-  mixin("NamedOwner")       = "com.github.fantom.codeowners.languages.github.psi.impl.CodeownersNamedOwnerExtImpl"
-  implements("Entry")       = "com.github.fantom.codeowners.languages.github.psi.CodeownersEntryBase"
+  mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersEntryExtImpl"
+  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersNamedOwnerExtImpl"
+  implements("Entry")       = "com.github.fantom.codeowners.lang.CodeownersEntryBase"
 }
 
 codeownersFile          ::= item_ *

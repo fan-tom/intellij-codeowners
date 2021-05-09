@@ -14,52 +14,94 @@
         <projectService serviceImplementation="com.github.fantom.codeowners.services.CodeownersMatcher"/>
         <projectService serviceImplementation="com.github.fantom.codeowners.CodeownersManager"/>
 
-        <fileType name="Codeowners File" implementationClass="com.github.fantom.codeowners.CodeownersFileType"
-                  fieldName="INSTANCE" language="CODEOWNERS" fileNames="CODEOWNERS"/>
-        <lang.parserDefinition language="CODEOWNERS"
-                               implementationClass="com.github.fantom.codeowners.languages.github.CodeownersParserDefinition"/>
+        <fileTypeDetector
+                order="LAST"
+                implementation="com.github.fantom.codeowners.CodeownersFileTypeDetector"/>
+
+        <!-- Common -->
+<!--        <fileType-->
+<!--                name="CODEOWNERS File"-->
+<!--                implementationClass="com.github.fantom.codeowners.file.type.CodeownersFileType"-->
+<!--                fieldName="INSTANCE"-->
+<!--                language="CODEOWNERS"-->
+<!--        />-->
+<!--                fileNames="CODEOWNERS"-->
+<!--        <lang.parserDefinition language="CODEOWNERS"-->
+<!--                               implementationClass="com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition"/>-->
         <psi.referenceContributor
-                language="CODEOWNERS"
+                language="Github"
                 implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"/>
+        <psi.referenceContributor
+                language="Bitbucket"
+                implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"/>
+        <!-- End Common -->
+
+        <!-- Github -->
+        <fileType
+                name="Github File"
+                implementationClass="com.github.fantom.codeowners.file.type.kind.GithubFileType"
+                fieldName="INSTANCE"
+                language="Github"/>
+<!--                fileNames="CODEOWNERS"-->
+        <lang.parserDefinition language="Github"
+                               implementationClass="com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition"/>
+        <!-- End Github -->
+
+        <!-- Bitbucket -->
+        <fileType
+                name="Bitbucket File"
+                implementationClass="com.github.fantom.codeowners.file.type.kind.BitbucketFileType"
+                fieldName="INSTANCE"
+                language="Bitbucket"
+        />
+<!--                fileNames="CODEOWNERS"-->
+        <lang.parserDefinition language="Bitbucket"
+                               implementationClass="com.github.fantom.codeowners.lang.kind.bitbucket.CodeownersParserDefinition"/>
+        <!-- End Bitbucket -->
+
         <codeInsight.lineMarkerProvider
-                language="CODEOWNERS"
+                language="Github"
                 implementationClass="com.github.fantom.codeowners.daemon.CodeownersDirectoryMarkerProvider"/>
 
-        <localInspection
-                bundle="messages.CodeownersBundle"
-                enabledByDefault="true"
-                groupKey="codeInspection.group"
-                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersCoverEntryInspection"
-                key="codeInspection.coverEntry"
-                level="WARNING"/>
-        <localInspection
-                bundle="messages.CodeownersBundle"
-                enabledByDefault="true"
-                groupKey="codeInspection.group"
-                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersDuplicateEntryInspection"
-                key="codeInspection.duplicateEntry"
-                level="ERROR"/>
-        <localInspection
-                bundle="messages.CodeownersBundle"
-                enabledByDefault="true"
-                groupKey="codeInspection.group"
-                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedEntryInspection"
-                key="codeInspection.unusedEntry"
-                level="WEAK WARNING"/>
-        <localInspection
-                bundle="messages.CodeownersBundle"
-                enabledByDefault="true"
-                groupKey="codeInspection.group"
-                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersRelativeEntryInspection"
-                key="codeInspection.relativeEntry"
-                level="ERROR"/>
-        <localInspection
-                bundle="messages.CodeownersBundle"
-                enabledByDefault="true"
-                groupKey="codeInspection.group"
-                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersIncorrectEntryInspection"
-                key="codeInspection.incorrectEntry"
-                level="ERROR"/>
+        <codeInsight.lineMarkerProvider
+                language="Bitbucket"
+                implementationClass="com.github.fantom.codeowners.daemon.CodeownersDirectoryMarkerProvider"/>
+
+<!--        <localInspection-->
+<!--                bundle="messages.CodeownersBundle"-->
+<!--                enabledByDefault="true"-->
+<!--                groupKey="codeInspection.group"-->
+<!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersCoverEntryInspection"-->
+<!--                key="codeInspection.coverEntry"-->
+<!--                level="WARNING"/>-->
+<!--        <localInspection-->
+<!--                bundle="messages.CodeownersBundle"-->
+<!--                enabledByDefault="true"-->
+<!--                groupKey="codeInspection.group"-->
+<!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersDuplicateEntryInspection"-->
+<!--                key="codeInspection.duplicateEntry"-->
+<!--                level="ERROR"/>-->
+<!--        <localInspection-->
+<!--                bundle="messages.CodeownersBundle"-->
+<!--                enabledByDefault="true"-->
+<!--                groupKey="codeInspection.group"-->
+<!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedEntryInspection"-->
+<!--                key="codeInspection.unusedEntry"-->
+<!--                level="WEAK WARNING"/>-->
+<!--        <localInspection-->
+<!--                bundle="messages.CodeownersBundle"-->
+<!--                enabledByDefault="true"-->
+<!--                groupKey="codeInspection.group"-->
+<!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersRelativeEntryInspection"-->
+<!--                key="codeInspection.relativeEntry"-->
+<!--                level="ERROR"/>-->
+<!--        <localInspection-->
+<!--                bundle="messages.CodeownersBundle"-->
+<!--                enabledByDefault="true"-->
+<!--                groupKey="codeInspection.group"-->
+<!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersIncorrectEntryInspection"-->
+<!--                key="codeInspection.incorrectEntry"-->
+<!--                level="ERROR"/>-->
 
         <vcsConfigurableProvider
                 implementation="com.github.fantom.codeowners.settings.CodeownersSettingsConfigurable"/>
@@ -67,11 +109,11 @@
         <statusBarWidgetFactory id="codeownersWidget" implementation="com.github.fantom.codeowners.CodeownersBarWidgetFactory" order="after positionWidget"/>
         <fileBasedIndex implementation="com.github.fantom.codeowners.indexing.CodeownersFilesIndex"/>
         <lang.elementManipulator
-                forClass="com.github.fantom.codeowners.languages.github.psi.CodeownersEntry"
-                implementationClass="com.github.fantom.codeowners.languages.github.psi.CodeownersEntryManipulator"/>
+                forClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry"
+                implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntryManipulator"/>
         <lang.elementManipulator
-                forClass="com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwner"
-                implementationClass="com.github.fantom.codeowners.languages.github.psi.CodeownersNamedOwnerManipulator"/>
+                forClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner"
+                implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwnerManipulator"/>
 
         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
     </extensions>

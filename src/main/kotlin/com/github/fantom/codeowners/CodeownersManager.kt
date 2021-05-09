@@ -1,6 +1,10 @@
 package com.github.fantom.codeowners
 
+import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.indexing.CodeownersEntryOccurrence
 import com.github.fantom.codeowners.indexing.CodeownersFilesIndex
+import com.github.fantom.codeowners.indexing.OwnerString
+import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.*
 import com.intellij.ProjectTopics
@@ -29,9 +33,17 @@ import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.messages.Topic
 import com.github.fantom.codeowners.settings.CodeownersSettings
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileTypes.ExactFileNameMatcher
 import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.pom.Navigatable
 import com.jetbrains.rd.util.concurrentMapOf
+
+/**
+ * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them
+ */
+data class OwnersReference(val owners: List<OwnerString>, val offset: Int)
 
 /**
  * [CodeownersManager] handles ignore files indexing and status caching.
@@ -45,7 +57,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private val debouncedStatusesChanged = object : Debounced<Any?>(1000) {
         override fun task(argument: Any?) {
-            println("debouncedStatusesChanged task")
+            LOGGER.trace("debouncedStatusesChanged task")
             expiringStatusCache.clear()
             FileStatusManager.getInstance(project).fileStatusesChanged()
         }
@@ -55,13 +67,13 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private val commonRunnableListeners = CommonRunnableListeners(debouncedStatusesChanged)
     private var messageBus = project.messageBus.connect(this)
-    private val cachedCodeownersFilesIndex = CachedList { CodeownersFilesIndex.getEntries(project) }
+    private val cachedCodeownersFilesIndex = CachedConcurrentMap.create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key -> CodeownersFilesIndex.getEntries(project, key) }
 
-    private val expiringStatusCache = ExpiringMap<VirtualFile, List<String>?>(Time.SECOND)
+    private val expiringStatusCache = ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersReference>?>(Time.SECOND)
 
     private val debouncedExitDumbMode = object : Debounced<Boolean?>(3000) {
         override fun task(argument: Boolean?) {
-            println("debouncedExitDumbMode task")
+            LOGGER.trace("debouncedExitDumbMode task")
             cachedCodeownersFilesIndex.clear()
             for ((key, value) in FILE_TYPES_ASSOCIATION_QUEUE) {
                 associateFileType(key, value)
@@ -90,11 +102,11 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         }
 
         private fun handleEvent(event: VFileEvent) {
-            println("handleEvent")
+            LOGGER.trace("handleEvent")
             val fileType = event.file?.fileType
             if (fileType is CodeownersFileType) {
-                println("handleEvent clear")
-                cachedCodeownersFilesIndex.clear()
+                LOGGER.trace("handleEvent clear")
+                cachedCodeownersFilesIndex.remove(fileType)
                 expiringStatusCache.clear()
                 debouncedStatusesChanged.run()
             }
@@ -121,41 +133,42 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
      * @return file owners list or null if cannot retrieve them due to project or IDE state (dumb mode, disposed)
      */
     @Suppress("ComplexCondition", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
-    fun getFileOwners(file: VirtualFile): List<String>? {
-        println(">getFileOwners ${file.name}")
+    fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersReference>? {
+        LOGGER.trace(">getFileOwners ${file.name}")
         expiringStatusCache[file]?.let {
-            println("<getFileOwners ${file.name} cached ${it.joinToString(",")}")
+            LOGGER.trace("<getFileOwners ${file.name} cached ${it.entries.joinToString(",")}")
             return it
         }
         if (DumbService.isDumb(project)) {
-            println("<getFileOwners ${file.name} dumbMode, null")
+            LOGGER.trace("<getFileOwners ${file.name} dumbMode, null")
             return null
         }
         if (!Utils.isInProject(file, project)) {
-            println("<getFileOwners ${file.name} not in project, emptyList")
-            return emptyList()
+            LOGGER.trace("<getFileOwners ${file.name} not in project, emptyList")
+            return emptyMap()
         }
         if (ApplicationManager.getApplication().isDisposed || project.isDisposed ||
                 /*|| !isEnabled  || */
                 NoAccessDuringPsiEvents.isInsideEventProcessing()
         ) {
-            println("<getFileOwners ${file.name} emptyList")
-            return emptyList()
+            LOGGER.trace("<getFileOwners ${file.name} emptyList")
+            return emptyMap()
         }
-        var owners: List<String>? = null
+        val ownersMap = mutableMapOf<CodeownersFileType, OwnersReference>()
 //        var matched = false
-//        for (fileType in FILE_TYPES) {
+        for (fileType in FILE_TYPES) {
         ProgressManager.checkCanceled()
 //            if (CodeownersBundle.ENABLED_LANGUAGES[fileType] != true) {
 //                continue
 //            }
-        val valuesCount = cachedCodeownersFilesIndex.size
-        println(">getFileOwners ${file.name}, inspecting CODEOWNERS with $valuesCount entries")
+        val codeownersFiles = cachedCodeownersFilesIndex[fileType] ?: emptyList()
+        val filesCount = codeownersFiles.size
+        LOGGER.trace(">>getFileOwners ${file.name}, inspecting $fileType with $filesCount codeowners files")
 
         @Suppress("LoopWithTooManyJumpStatements")
-        for (value in cachedCodeownersFilesIndex) {
+        for (codeownersFile in codeownersFiles) {
             ProgressManager.checkCanceled()
-            val entryFile = value.file
+            val entryFile = codeownersFile.file
             var relativePath = if (entryFile == null) {
                 continue
             } else {
@@ -169,9 +182,9 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             if (file.isDirectory) {
                 relativePath += "/"
             }
-            owners = value.items.lastOrNull {
-                println(">getFileOwners check pattern ${it.first} against $relativePath")
-                val pattern = Glob.getPattern(it.first)
+            val owners = codeownersFile.items.lastOrNull {
+                LOGGER.trace(">>>getFileOwners check pattern ${it.first} against $relativePath")
+                val pattern = Glob.getPattern(it.first.pattern)
 //                if (
                 return@lastOrNull matcher.match(pattern, relativePath)
 //                ) {
@@ -180,15 +193,16 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 //                }
 //                return@lastOrNull false
             }?.let {
-                println(">getFileOwners pattern ${it.first} matches $relativePath")
+                LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
                 return@let it.second
             }
             if (owners != null) {
-                break
+//                break
+                ownersMap[fileType] = owners
             }
         }
-//        }
-        val res = if (/*valuesCount > 0*/ /*&& !ignored  &&*/ owners == null) {
+        }
+        val res = if (/*valuesCount > 0*/ /*&& !ignored  &&*/ ownersMap.isEmpty()) {
             file.parent.let { directory ->
                 vcsRoots.forEach { vcsRoot ->
                     ProgressManager.checkCanceled()
@@ -202,9 +216,9 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 //                )
             }
         } else {
-            owners
-        } ?: emptyList()
-        println("<getFileOwners ${file.name} ${res.joinToString(",")}")
+            ownersMap
+        } ?: emptyMap()
+        LOGGER.trace("<getFileOwners ${file.name} '${res.entries.joinToString(",")}'")
         return expiringStatusCache.set(file, res)
     }
 
@@ -249,7 +263,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     override fun dispose() {
 //        disable()
-        println("dispose")
+        LOGGER.trace("dispose")
         cachedCodeownersFilesIndex.clear()
     }
 
@@ -277,8 +291,9 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     }
 
     companion object {
-//        /** List of all available [CodeownersFileType]. */
-//        private val FILE_TYPES = CodeownersBundle.LANGUAGES.map(CodeownersLanguage::fileType)
+        private val LOGGER = Logger.getInstance(CodeownersManager::class.java)
+        /** List of all available [CodeownersFileType]. */
+        private val FILE_TYPES = CodeownersBundle.LANGUAGES.map(CodeownersLanguage::fileType)
 //
         /** List of filenames that require to be associated with specific [CodeownersFileType]. */
         val FILE_TYPES_ASSOCIATION_QUEUE = concurrentMapOf<String, CodeownersFileType>()

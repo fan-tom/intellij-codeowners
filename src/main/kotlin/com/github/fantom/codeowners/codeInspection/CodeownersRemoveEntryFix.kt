@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
-import com.github.fantom.codeowners.languages.github.psi.CodeownersTypes
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -14,10 +14,10 @@ import com.intellij.psi.impl.source.tree.TreeUtil
  * QuickFix action that removes specified entry handled by code inspections like [CodeownersCoverEntryInspection],
  * [CodeownersDuplicateEntryInspection], [CodeownersUnusedEntryInspection].
  */
-class CodeownersRemoveEntryFix(pattern: CodeownersPattern) : LocalQuickFixAndIntentionActionOnPsiElement(pattern) {
+class CodeownersRemoveEntryFix(pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) : LocalQuickFixAndIntentionActionOnPsiElement(pattern) {
 
     override fun invoke(project: Project, file: PsiFile, editor: Editor?, startElement: PsiElement, endElement: PsiElement) {
-        if (startElement is CodeownersPattern) {
+        if (startElement is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
             removeCrlf(startElement)
             startElement.delete()
         }
@@ -25,9 +25,9 @@ class CodeownersRemoveEntryFix(pattern: CodeownersPattern) : LocalQuickFixAndInt
 
     private fun removeCrlf(startElement: PsiElement) {
         (
-            TreeUtil.findSibling(startElement.node, CodeownersTypes.CRLF) ?: TreeUtil.findSiblingBackward(
+            TreeUtil.findSibling(startElement.node, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF) ?: TreeUtil.findSiblingBackward(
                 startElement.node,
-                CodeownersTypes.CRLF
+                com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF
             )
             )?.psi?.delete()
     }

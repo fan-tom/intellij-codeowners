@@ -1,18 +1,19 @@
-package com.github.fantom.codeowners.languages.github
+package com.github.fantom.codeowners.lang.kind.github
 
+import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.lang.CodeownersFile
+import com.github.fantom.codeowners.lang.CodeownersLanguage
+import com.github.fantom.codeowners.lang.kind.github.parser.CodeownersParser
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
-import com.intellij.psi.tree.TokenSet
-import com.github.fantom.codeowners.languages.github.parser.CodeownersParser
-import com.intellij.psi.tree.IFileElementType
-import com.intellij.psi.FileViewProvider
-import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
 import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.openapi.project.Project
+import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
-import com.github.fantom.codeowners.languages.github.psi.CodeownersTypes
-import com.github.fantom.codeowners.CodeownersLanguage
+import com.intellij.psi.tree.IFileElementType
+import com.intellij.psi.tree.TokenSet
 
 class CodeownersParserDefinition : ParserDefinition {
     override fun createLexer(project: Project) = CodeownersLexerAdapter()
@@ -27,7 +28,10 @@ class CodeownersParserDefinition : ParserDefinition {
 
     override fun getFileNodeType() = FILE
 
-    override fun createFile(viewProvider: FileViewProvider) = CodeownersFile(viewProvider)
+    override fun createFile(viewProvider: FileViewProvider) = when (viewProvider.baseLanguage) {
+        is CodeownersLanguage -> (viewProvider.baseLanguage as CodeownersLanguage).createFile(viewProvider)
+        else -> CodeownersFile(viewProvider, CodeownersFileType.INSTANCE)
+    }
 
     override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) = SpaceRequirements.MAY
 
@@ -36,6 +40,6 @@ class CodeownersParserDefinition : ParserDefinition {
     companion object {
         val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
         val COMMENTS = TokenSet.create(CodeownersTypes.COMMENT)
-        val FILE = IFileElementType(CodeownersLanguage.INSTANCE)
+        val FILE = IFileElementType(GithubLanguage.INSTANCE)
     }
 }

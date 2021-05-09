@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.command
 
-import com.github.fantom.codeowners.CodeownersFileType
-import com.github.fantom.codeowners.CodeownersLanguage
+import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile

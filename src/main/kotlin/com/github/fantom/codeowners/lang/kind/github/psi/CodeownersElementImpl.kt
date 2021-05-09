@@ -1,4 +1,4 @@
-package com.github.fantom.codeowners.languages.github.psi
+package com.github.fantom.codeowners.lang.kind.github.psi
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode

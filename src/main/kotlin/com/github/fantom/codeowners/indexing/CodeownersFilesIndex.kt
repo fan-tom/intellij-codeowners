@@ -1,11 +1,10 @@
 package com.github.fantom.codeowners.indexing
 
-import com.github.fantom.codeowners.CodeownersFileType
-import com.github.fantom.codeowners.languages.github.psi.CodeownersFile
-import com.github.fantom.codeowners.languages.github.psi.CodeownersPattern
-import com.github.fantom.codeowners.languages.github.psi.CodeownersVisitor
-import com.github.fantom.codeowners.util.Glob
+import com.github.fantom.codeowners.CodeownersBundle
+import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.lang.CodeownersFile
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -42,6 +41,7 @@ class CodeownersFilesIndex :
     override fun getInputFilter() = this
 
     companion object {
+        private val LOGGER = Logger.getInstance(CodeownersFilesIndex::class.java)
         val KEY = ID.create<CodeownersFileType, CodeownersEntryOccurrence>("CodeownersFilesIndex")
         private const val VERSION = 1
         private val DATA_EXTERNALIZER = object : DataExternalizer<CodeownersEntryOccurrence> {
@@ -60,18 +60,18 @@ class CodeownersFilesIndex :
          * @param fileType filetype
          * @return [CodeownersEntryOccurrence] collection
          */
-        fun getEntries(project: Project): List<CodeownersEntryOccurrence>? {
-            println(">getEntries ${project.name}")
+        fun getEntries(project: Project, fileType: CodeownersFileType): List<CodeownersEntryOccurrence>? {
+            LOGGER.trace(">getEntries for file type $fileType in project ${project.name}")
 //            try {
                 if (ApplicationManager.getApplication().isReadAccessAllowed) {
                     val scope = CodeownersSearchScope[project]
-                    val res = FileBasedIndex.getInstance().getValues(KEY, CodeownersFileType.INSTANCE, scope)
-                    println(">getEntries ${project.name} ${res.size}")
+                    val res = FileBasedIndex.getInstance().getValues(KEY, fileType, scope)
+                    LOGGER.trace("<getEntries ${project.name} ${res.size}")
                     return res
                 }
 //            } catch (ignored: RuntimeException) {
 //            }
-            println(">getEntries ${project.name} null")
+            LOGGER.trace("<getEntries ${project.name} null")
             return null//emptyList()
         }
     }
@@ -81,29 +81,26 @@ class CodeownersFilesIndex :
     @Suppress("ReturnCount")
     override fun map(inputData: FileContent): Map<CodeownersFileType, CodeownersEntryOccurrence> {
         val inputDataPsi = try {
-            inputData.psiFile
+            inputData.psiFile as? CodeownersFile
         } catch (e: Exception) {
             // if there is some stale indices
             // inputData.getPsiFile() could throw exception that should be avoided
             return emptyMap()
-        }
-        if (inputDataPsi !is CodeownersFile) {
-            return emptyMap()
-        }
+        } ?: return emptyMap()
 
-        val items = mutableListOf<Pair<String, List<String>>>()
-        inputDataPsi.acceptChildren(
-            object : CodeownersVisitor() {
-                override fun visitPattern(entry: CodeownersPattern) {
-                    val regex = Glob.createRegex(entry.entryFile.value, false)
-                    items.add(Pair(regex, entry.owners.ownerList.map{ it.text }))
-                }
-            }
-        )
+//        val items = mutableListOf<Pair<PatternString, List<OwnerString>>>()
+//        inputDataPsi.acceptChildren(
+//            object : com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor() {
+//                override fun visitPattern(entry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
+//                    val regex = entry.entryFile.regex(false)
+//                    items.add(Pair(PatternString(regex), entry.owners.ownerList.map{ OwnerString(it.text) }))
+//                }
+//            }
+//        )
 
         return Collections.singletonMap(
             (inputData.fileType as CodeownersFileType),
-            CodeownersEntryOccurrence(inputData.file.url, items)
+            CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getPatternsList())
         )
     }
 
@@ -115,14 +112,14 @@ class CodeownersFilesIndex :
 
     @Synchronized
     @Throws(IOException::class)
-    override fun read(input: DataInput): CodeownersFileType = CodeownersFileType.INSTANCE
-//    = input.readUTF().run {
-//        CodeownersBundle.LANGUAGES
-//            .asSequence()
-//            .map { it.fileType }
-//            .firstOrNull { it.languageName == this }
-//            .let { it ?: CodeownersFileType.INSTANCE }
-//    }
+    override fun read(input: DataInput): CodeownersFileType //= CodeownersFileType.INSTANCE
+    = input.readUTF().run {
+        CodeownersBundle.LANGUAGES
+            .asSequence()
+            .map { it.fileType }
+            .firstOrNull { it.languageName == this }
+            .let { it ?: CodeownersFileType.INSTANCE }
+    }
 
     override fun getValueExternalizer() = DATA_EXTERNALIZER
 

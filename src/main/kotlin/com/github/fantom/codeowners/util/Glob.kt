@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners.util
 
-import com.github.fantom.codeowners.languages.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -40,7 +40,7 @@ object Glob {
 
             entries.forEach {
                 this[it] = mutableListOf()
-                createPattern(it)?.let { pattern ->
+                it.pattern()?.let { pattern ->
                     map[it] = pattern
                 }
             }
@@ -99,7 +99,7 @@ object Glob {
      * @param acceptChildren Matches directory children
      * @return regex [Pattern]
      */
-    fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false) = createPattern(entry.value, acceptChildren)
+    fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) = createPattern(entry.value, acceptChildren, supportSquareBrackets)
 
     /**
      * Creates regex [Pattern] using glob rule.
@@ -108,8 +108,8 @@ object Glob {
      * @param syntax rule syntax
      * @return regex [Pattern]
      */
-    fun createPattern(rule: String, acceptChildren: Boolean = false) =
-        getPattern(createRegex(rule, acceptChildren))
+    fun createPattern(rule: String, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) =
+        getPattern(createRegex(rule, acceptChildren, supportSquareBrackets))
 
     /**
      * Converts regex string to [Pattern] with caching.
@@ -131,11 +131,12 @@ object Glob {
      * @return regex [String]
      */
     @Suppress("ComplexMethod", "LongMethod", "NestedBlockDepth")
-    fun createRegex(glob: String, acceptChildren: Boolean): String = glob.trim { it <= ' ' }.let {
+    fun createRegex(glob: String, acceptChildren: Boolean, supportSquareBrackets: Boolean): String = glob.trim { it <= ' ' }.let {
         val sb = StringBuilder("^")
         var escape = false
         var star = false
         var doubleStar = false
+        var bracket = false
         var beginIndex = 0
 
         if (StringUtil.startsWith(it, Constants.DOUBLESTAR)) {
@@ -161,7 +162,10 @@ object Glob {
 
         val chars = it.substring(beginIndex).toCharArray()
         chars.forEach { ch ->
-            if (doubleStar) {
+            if (supportSquareBrackets && bracket && ch != ']') {
+                sb.append(ch)
+                return@forEach
+            } else if (doubleStar) {
                 doubleStar = false
                 if (ch == '/') {
                     sb.append("(?:[^/]*/)*?")
@@ -195,38 +199,39 @@ object Glob {
                 sb.append("[^/]*?")
                 star = false
             }
-            when (ch) {
-                '\\' -> {
+            when {
+                ch == '\\' -> {
                     if (escape) {
                         sb.append("\\\\")
                     }
                     escape = !escape
                 }
-                '?' ->
+                ch == '?' ->
                     if (escape) {
                         sb.append("\\?")
                         escape = false
                     } else {
                         sb.append('.')
                     }
-//                '[' -> {
-//                    if (escape) {
-//                        sb.append('\\')
-//                        escape = false
-//                    } else {
-//                        bracket = true
-//                    }
-//                    sb.append(ch)
-//                }
-//                ']' -> {
-//                    if (!bracket) {
-//                        sb.append('\\')
-//                    }
-//                    sb.append(ch)
-//                    bracket = false
-//                    escape = false
-//                }
-                '.', '(', ')', '{', '}', '[', ']', '+', '|', '^', '$', '@', '%' -> {
+                ch == '[' && supportSquareBrackets -> {
+                    if (escape) {
+                        sb.append('\\')
+                        escape = false
+                    } else {
+                        bracket = true
+                    }
+                    sb.append(ch)
+                }
+                ch == ']' && supportSquareBrackets -> {
+                    if (!bracket) {
+                        sb.append('\\')
+                    }
+                    sb.append(ch)
+                    bracket = false
+                    escape = false
+                }
+                ch in arrayOf('.', '(', ')', '{', '}', '+', '|', '^', '$', '@', '%')
+                        || (!supportSquareBrackets && ch in arrayOf('[', ']')) -> {
                     sb.append('\\')
                     sb.append(ch)
                     escape = false
