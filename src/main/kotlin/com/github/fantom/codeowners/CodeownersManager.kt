@@ -12,11 +12,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.DumbService.DumbModeListener
-import com.intellij.openapi.project.NoAccessDuringPsiEvents
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vcs.FileStatusManager
@@ -34,19 +30,27 @@ import com.intellij.util.messages.Topic
 import com.github.fantom.codeowners.settings.CodeownersSettings
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileTypes.ExactFileNameMatcher
 import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.pom.Navigatable
+import com.intellij.openapi.project.*
+import com.intellij.psi.PsiManager
 import com.jetbrains.rd.util.concurrentMapOf
 
+typealias OwnersList = List<OwnerString>
+typealias OwnersSet = Set<OwnerString>
+//data class OwnersSet(owners: Sequence<OwnerString>) {
+//    val owners = owners.sortedWith()
+//    override fun toString(): String {
+//        return super.toString()
+//    }
+//}
 /**
  * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them
  */
-data class OwnersReference(val owners: List<OwnerString>, val offset: Int)
+data class OwnersReference(val owners: OwnersList, val offset: Int)
 
 /**
- * [CodeownersManager] handles ignore files indexing and status caching.
+ * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
  */
 @Suppress("MagicNumber")
 class CodeownersManager(private val project: Project) : DumbAware, Disposable {
@@ -84,7 +88,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private var working = false
     private val vcsRoots = mutableListOf<VcsRoot>()
-//
+
     /**
      * Checks if ignored files watching is enabled.
      *
@@ -220,6 +224,19 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         } ?: emptyMap()
         LOGGER.trace("<getFileOwners ${file.name} '${res.entries.joinToString(",")}'")
         return expiringStatusCache.set(file, res)
+    }
+
+    val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
+
+    // TODO: think about how to avoid this calculation and use index?
+    private fun codeownersFilesExist(): Boolean? {
+        val projectDir = project.guessProjectDir() ?: return null
+        val directory = PsiManager.getInstance(project).findDirectory(projectDir) ?: return null
+
+        val filename = CodeownersFileType.INSTANCE.codeownersLanguage.filename
+        val file = directory.findFile(filename)
+
+        return file?.virtualFile ?: directory.virtualFile.findChild(filename) != null
     }
 
     /** Enable manager. */

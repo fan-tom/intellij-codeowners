@@ -15,7 +15,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
-import org.apache.log4j.Level
 
 class CodeownersParserDefinition : ParserDefinition {
     override fun createLexer(project: Project) = CodeownersLexerAdapter()
