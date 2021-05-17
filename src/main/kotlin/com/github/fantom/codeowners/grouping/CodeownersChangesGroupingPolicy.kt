@@ -58,18 +58,21 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
             val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
             val owners = if (ownersRef.isEmpty()) {
                 emptySet()
+            } else {
+                ownersRef.values.first().owners.toSet()
             }
-            else {
-                val owners = ownersRef.values.first().owners.toSet()
-                CODEOWNERS_CACHE.getValue(cachingRoot)[owners]?.let { return it }
-                owners
+            val cachingKey = if (nodePath.isDirectory) {
+                nodePath.key
+            } else {
+                nodePath.parent?.key ?: ""
             }
+            CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(cachingKey) { mutableMapOf() }[owners]?.let { return it }
 
             CodeownersChangesBrowserNode(owners).let {
                 it.markAsHelperNode()
                 model.insertNodeInto(it, grandParent, grandParent.childCount)
 
-                CODEOWNERS_CACHE.getValue(cachingRoot)[owners] = it
+                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(cachingKey) {mutableMapOf() }[owners] = it
                 return it
             }
         }
@@ -81,6 +84,12 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
     }
 
     companion object {
-        val CODEOWNERS_CACHE = NotNullLazyKey.create<MutableMap<Set<OwnerString>, ChangesBrowserNode<*>>, ChangesBrowserNode<*>>("ChangesTree.CodeownersCache") { mutableMapOf() }
+        val CODEOWNERS_CACHE = NotNullLazyKey.create<
+                        MutableMap<
+                                String,
+                                MutableMap<Set<OwnerString>, ChangesBrowserNode<*>>,
+                                >,
+                        ChangesBrowserNode<*>
+                >("ChangesTree.CodeownersCache") { mutableMapOf() }
     }
 }
