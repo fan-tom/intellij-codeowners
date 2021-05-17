@@ -24,5 +24,5 @@ class CommonRunnableListeners(private val task: Runnable) : CodeownersManager.Re
 
     override fun moduleRemoved(project: Project, module: Module) = task.run()
 
-    override fun modulesRenamed(project: Project, modules: List<Module>, oldNameProvider: Function<Module, String>) = task.run()
+    override fun modulesRenamed(project: Project, modules: MutableList<out Module>, oldNameProvider: Function<in Module, String>) = task.run()
 }

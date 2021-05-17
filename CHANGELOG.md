@@ -4,4 +4,8 @@
 
 ## [Unreleased]
 ### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+- Files syntax highlight (lexical)
+- Show owner of currently opened file in IDE status bar
+- Group file changes by owners
+- Navigation to entries in Project view
+- Navigation to Github user/team by ctrl-click on owner

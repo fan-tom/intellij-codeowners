@@ -94,6 +94,15 @@ intellij {
     setPlugins(*platformPlugins.split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
 }
 
+changelog {
+    headerParserRegex = "\\[?v\\d(\\.\\d+)+\\]?.*".toRegex()
+    header = closure {
+        "[v$version] (https://github.com/fan-tom/intellij-codeowners/tree/v$version) (${org.jetbrains.changelog.date()})"
+    }
+    version = pluginVersion
+    groups = emptyList()
+}
+
 // Configure detekt plugin.
 // Read more: https://detekt.github.io/detekt/kotlindsl.html
 detekt {
@@ -121,6 +130,16 @@ tasks {
 
     withType<Detekt> {
         jvmTarget = "1.8"
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs("src/main/gen")
+        }
+    }
+
+    clean {
+        delete("src/main/gen")
     }
 
     patchPluginXml {
@@ -164,11 +183,13 @@ tasks {
         channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
     }
 }
+
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-Xinline-classes")
     jvmTarget = "1.8"
 }
+
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
