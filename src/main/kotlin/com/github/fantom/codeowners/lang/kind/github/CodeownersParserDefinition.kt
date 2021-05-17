@@ -38,8 +38,26 @@ class CodeownersParserDefinition : ParserDefinition {
     override fun createElement(node: ASTNode): PsiElement = CodeownersTypes.Factory.createElement(node)
 
     companion object {
+        /** Whitespaces.  */
         val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
+
+
+        /** Section comment started with ##  */
+        val SECTIONS = TokenSet.create(CodeownersTypes.SECTION)
+
+        /** Header comment started with ###  */
+        val HEADERS = TokenSet.create(CodeownersTypes.HEADER)
+
+        /** Slashes /  */
+        val SLASHES = TokenSet.create(CodeownersTypes.SLASH)
+
+        /** All values - parts of paths  */
+        val VALUES = TokenSet.create(CodeownersTypes.VALUE)
+
+        /** Regular comment started with #  */
         val COMMENTS = TokenSet.create(CodeownersTypes.COMMENT)
+
+        /** Element type of the node describing a file in the specified language.  */
         val FILE = IFileElementType(GithubLanguage.INSTANCE)
     }
 }

@@ -1,6 +1,5 @@
-package com.github.fantom.codeowners.highlighter
+package com.github.fantom.codeowners.lang.kind.bitbucket.highlighter
 
-import com.github.fantom.codeowners.highlighter.CodeownersHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile

@@ -1,5 +1,6 @@
-package com.github.fantom.codeowners.highlighter
+package com.github.fantom.codeowners.lang.kind.github.highlighter
 
+import com.github.fantom.codeowners.highlighter.CodeownersHighlighterColors
 import com.github.fantom.codeowners.lang.kind.github.CodeownersLexerAdapter
 import com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -17,13 +18,10 @@ class CodeownersHighlighter(private val virtualFile: VirtualFile?) : SyntaxHighl
 
         init {
             fillMap(ATTRIBUTES, CodeownersParserDefinition.COMMENTS, CodeownersHighlighterColors.COMMENT)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.SECTIONS, CodeownersHighlighterColors.SECTION)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.HEADERS, CodeownersHighlighterColors.HEADER)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.NEGATIONS, CodeownersHighlighterColors.NEGATION)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.BRACKETS, CodeownersHighlighterColors.BRACKET)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.SLASHES, CodeownersHighlighterColors.SLASH)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.SYNTAXES, CodeownersHighlighterColors.SYNTAX)
-//            fillMap(ATTRIBUTES, CodeownersParserDefinition.VALUES, CodeownersHighlighterColors.VALUE)
+            fillMap(ATTRIBUTES, CodeownersParserDefinition.SECTIONS, CodeownersHighlighterColors.SECTION)
+            fillMap(ATTRIBUTES, CodeownersParserDefinition.HEADERS, CodeownersHighlighterColors.HEADER)
+            fillMap(ATTRIBUTES, CodeownersParserDefinition.SLASHES, CodeownersHighlighterColors.SLASH)
+            fillMap(ATTRIBUTES, CodeownersParserDefinition.VALUES, CodeownersHighlighterColors.VALUE)
         }
     }
 

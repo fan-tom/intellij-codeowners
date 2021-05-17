@@ -1,0 +1,33 @@
+### Header element
+
+## First section
+*                        @default-owner
+*.java                   @java-owner
+# Team definition
+@@@MyDevs                @PeterTheHacker  @PeterTheJavaExpert ann@scala.lang @@JSDevs
+# Owner with spaces in name
+*.ts                     @"Paul the JSGuru" @@"Dev Ops Team"
+# Email owner
+docs/*                   docs@example.com
+
+# Path with spaces doesn't work yet
+# "a/path with spaces/*"   docs@example.com
+
+# ci/* will match all files in the directory ci, but not deeper in
+# the directory hierarchy (so ci/jobs/prod.yml will not match).
+ci/*                     @devops
+
+# Negation
+!ci/playgrounds.yml
+
+# It's also possible to use double-asterisk globs. Here's an example that will match
+# all JS files under /src/components.
+src/components/**/*.js   @@MyDevs
+
+# GroovyMaster owns any files in the groovy directory anywhere in the
+# file tree (e.g., src/main/groovy/com/x/y/z.groovy).
+groovy/                  @GroovyMaster
+
+# Files starting with a `#` or a `!` can still be used by escaping them.
+\#myfile.rb              @PeterTheHacker
+\!yourfile.rb            @PaulTheJSGuru

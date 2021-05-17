@@ -8,8 +8,16 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <additionalTextAttributes
+                file="colorSchemes/CodeownersDefault.xml"
+                scheme="Default"/>
+        <additionalTextAttributes
+                file="colorSchemes/CodeownersDarcula.xml"
+                scheme="Darcula"/>
+
         <applicationService serviceImplementation="com.github.fantom.codeowners.settings.CodeownersSettings"/>
 
+        <colorSettingsPage implementation="com.github.fantom.codeowners.highlighter.CodeownersColorSettingsPage"/>
 
         <projectService serviceImplementation="com.github.fantom.codeowners.services.CodeownersMatcher"/>
         <projectService serviceImplementation="com.github.fantom.codeowners.CodeownersManager"/>
@@ -45,6 +53,9 @@
 <!--                fileNames="CODEOWNERS"-->
         <lang.parserDefinition language="Github"
                                implementationClass="com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition"/>
+        <lang.syntaxHighlighterFactory
+                language="Github"
+                implementationClass="com.github.fantom.codeowners.lang.kind.github.highlighter.CodeownersHighlighterFactory"/>
         <!-- End Github -->
 
         <!-- Bitbucket -->
@@ -57,6 +68,9 @@
 <!--                fileNames="CODEOWNERS"-->
         <lang.parserDefinition language="Bitbucket"
                                implementationClass="com.github.fantom.codeowners.lang.kind.bitbucket.CodeownersParserDefinition"/>
+        <lang.syntaxHighlighterFactory
+                language="Bitbucket"
+                implementationClass="com.github.fantom.codeowners.lang.kind.bitbucket.highlighter.CodeownersHighlighterFactory"/>
         <!-- End Bitbucket -->
 
         <codeInsight.lineMarkerProvider

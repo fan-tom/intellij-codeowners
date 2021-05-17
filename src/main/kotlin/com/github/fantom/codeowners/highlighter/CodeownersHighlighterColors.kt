@@ -19,13 +19,10 @@ object CodeownersHighlighterColors {
     val NEGATION = TextAttributesKey.createTextAttributesKey("CODEOWNERS.NEGATION")
 
     /** Default style for bracket element - [] in the entry */
-    val BRACKET = TextAttributesKey.createTextAttributesKey("CODEOWNERS.BRACKET")
+//    val BRACKET = TextAttributesKey.createTextAttributesKey("CODEOWNERS.BRACKET")
 
     /** Default style for slash - / in the entry */
     val SLASH = TextAttributesKey.createTextAttributesKey("CODEOWNERS.SLASH")
-
-    /** Default style for syntax element - syntax: */
-    val SYNTAX = TextAttributesKey.createTextAttributesKey("CODEOWNERS.SYNTAX")
 
     /** Default style for value element - part of entry */
     val VALUE = TextAttributesKey.createTextAttributesKey("CODEOWNERS.VALUE")
