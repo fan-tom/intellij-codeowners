@@ -161,69 +161,61 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         val ownersMap = mutableMapOf<CodeownersFileType, OwnersReference>()
 //        var matched = false
         for (fileType in FILE_TYPES) {
-        ProgressManager.checkCanceled()
+            ProgressManager.checkCanceled()
 //            if (CodeownersBundle.ENABLED_LANGUAGES[fileType] != true) {
 //                continue
 //            }
-        val codeownersFiles = cachedCodeownersFilesIndex[fileType] ?: emptyList()
-        val filesCount = codeownersFiles.size
-        LOGGER.trace(">>getFileOwners ${file.name}, inspecting $fileType with $filesCount codeowners files")
+            val codeownersFiles = cachedCodeownersFilesIndex[fileType] ?: emptyList()
+            val filesCount = codeownersFiles.size
+            LOGGER.trace(">>getFileOwners ${file.name}, inspecting $fileType with $filesCount codeowners files")
 
-        @Suppress("LoopWithTooManyJumpStatements")
-        for (codeownersFile in codeownersFiles) {
-            ProgressManager.checkCanceled()
-            val entryFile = codeownersFile.file
-            var relativePath = if (entryFile == null) {
-                continue
-            } else {
-                Utils.getRelativePath(entryFile.parent, file)
-            } ?: continue
+            @Suppress("LoopWithTooManyJumpStatements")
+            for (codeownersFile in codeownersFiles) {
+                ProgressManager.checkCanceled()
+                getFileOwners(file, codeownersFile)?.also {
+                    ownersMap[fileType] = it
+                }
+            }
+        }
+        LOGGER.trace("<getFileOwners ${file.name} '${ownersMap.entries.joinToString(",")}'")
+        return expiringStatusCache.set(file, ownersMap)
+    }
 
-            relativePath = StringUtil.trimEnd(StringUtil.trimStart(relativePath, "/"), "/")
-            if (StringUtil.isEmpty(relativePath)) {
-                continue
-            }
-            if (file.isDirectory) {
-                relativePath += "/"
-            }
-            val owners = codeownersFile.items.lastOrNull {
-                LOGGER.trace(">>>getFileOwners check pattern ${it.first} against $relativePath")
-                val pattern = Glob.getPattern(it.first.pattern)
+    private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence): OwnersReference? {
+        var relativePath = codeownersFile.file?.let {
+            Utils.getRelativePath(it.parent, file)
+        } ?: return null
+
+        relativePath = StringUtil.trimEnd(StringUtil.trimStart(relativePath, "/"), "/")
+        if (StringUtil.isEmpty(relativePath)) {
+            return null
+        }
+        if (file.isDirectory) {
+            relativePath += "/"
+        }
+        return codeownersFile.items.lastOrNull {
+            LOGGER.trace(">>>getFileOwners check pattern ${it.first} against $relativePath")
+            val pattern = Glob.getPattern(it.first.pattern)
 //                if (
-                return@lastOrNull matcher.match(pattern, relativePath)
+            return@lastOrNull matcher.match(pattern, relativePath)
 //                ) {
 //                    true
 //                        matched = true
 //                }
 //                return@lastOrNull false
-            }?.let {
-                LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
-                return@let it.second
-            }
-            if (owners != null) {
-//                break
-                ownersMap[fileType] = owners
-            }
+        }?.let {
+            LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
+            return@let it.second
         }
-        }
-        val res = if (/*valuesCount > 0*/ /*&& !ignored  &&*/ ownersMap.isEmpty()) {
-            file.parent.let { directory ->
-                vcsRoots.forEach { vcsRoot ->
-                    ProgressManager.checkCanceled()
-                    if (directory == vcsRoot.path) {
-                        return@let null
-//                        return expiringStatusCache.set(file, null)
+                ?: file.parent.let { directory ->
+                    vcsRoots.forEach { vcsRoot ->
+                        ProgressManager.checkCanceled()
+                        if (directory == vcsRoot.path) {
+                            return@let null
+                        }
                     }
+                    return@let getFileOwners(file.parent, codeownersFile)
                 }
-//                expiringStatusCache.set(file,
-                return@let getFileOwners(file.parent)
-//                )
-            }
-        } else {
-            ownersMap
-        } ?: emptyMap()
-        LOGGER.trace("<getFileOwners ${file.name} '${res.entries.joinToString(",")}'")
-        return expiringStatusCache.set(file, res)
     }
 
     val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
@@ -247,24 +239,24 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         settings.addListener(settingsListener)
 
         messageBus.subscribe(
-            VirtualFileManager.VFS_CHANGES,
-            bulkFileListener
+                VirtualFileManager.VFS_CHANGES,
+                bulkFileListener
         )
         messageBus.subscribe(
-            ProjectLevelVcsManager.VCS_CONFIGURATION_CHANGED,
-            VcsListener {
-                vcsRoots.clear()
-                vcsRoots.addAll(projectLevelVcsManager.allVcsRoots)
-            }
-        )
-        messageBus.subscribe(
-            DumbService.DUMB_MODE,
-            object : DumbModeListener {
-                override fun enteredDumbMode() = Unit
-                override fun exitDumbMode() {
-                    debouncedExitDumbMode.run()
+                ProjectLevelVcsManager.VCS_CONFIGURATION_CHANGED,
+                VcsListener {
+                    vcsRoots.clear()
+                    vcsRoots.addAll(projectLevelVcsManager.allVcsRoots)
                 }
-            }
+        )
+        messageBus.subscribe(
+                DumbService.DUMB_MODE,
+                object : DumbModeListener {
+                    override fun enteredDumbMode() = Unit
+                    override fun exitDumbMode() {
+                        debouncedExitDumbMode.run()
+                    }
+                }
         )
         messageBus.subscribe(ProjectTopics.PROJECT_ROOTS, commonRunnableListeners)
         messageBus.subscribe(RefreshStatusesListener.REFRESH_STATUSES, commonRunnableListeners)
@@ -309,6 +301,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     companion object {
         private val LOGGER = Logger.getInstance(CodeownersManager::class.java)
+
         /** List of all available [CodeownersFileType]. */
         private val FILE_TYPES = CodeownersBundle.LANGUAGES.map(CodeownersLanguage::fileType)
 //
@@ -326,13 +319,13 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             if (application.isDispatchThread) {
                 val fileTypeManager = FileTypeManager.getInstance()
                 application.invokeLater(
-                    {
-                        application.runWriteAction {
-                            fileTypeManager.associate(fileType, ExactFileNameMatcher(fileName))
-                            FILE_TYPES_ASSOCIATION_QUEUE.remove(fileName)
-                        }
-                    },
-                    ModalityState.NON_MODAL
+                        {
+                            application.runWriteAction {
+                                fileTypeManager.associate(fileType, ExactFileNameMatcher(fileName))
+                                FILE_TYPES_ASSOCIATION_QUEUE.remove(fileName)
+                            }
+                        },
+                        ModalityState.NON_MODAL
                 )
             } else if (!FILE_TYPES_ASSOCIATION_QUEUE.containsKey(fileName)) {
                 FILE_TYPES_ASSOCIATION_QUEUE[fileName] = fileType
