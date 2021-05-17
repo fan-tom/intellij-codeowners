@@ -47,7 +47,7 @@ typealias OwnersSet = Set<OwnerString>
 /**
  * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them
  */
-data class OwnersReference(val owners: OwnersList, val offset: Int)
+data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0)
 
 /**
  * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
@@ -211,7 +211,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
                     vcsRoots.forEach { vcsRoot ->
                         ProgressManager.checkCanceled()
                         if (directory == vcsRoot.path) {
-                            return@let null
+                            return@let OwnersReference()
                         }
                     }
                     return@let getFileOwners(file.parent, codeownersFile)
