@@ -1,31 +1,45 @@
 # intellij-codeowners
 
 ![Build](https://github.com/fan-tom/intellij-codeowners/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/16811.svg)](https://plugins.jetbrains.com/plugin/16811)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/16811.svg)](https://plugins.jetbrains.com/plugin/16811)
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Verify the [pluginGroup](/gradle.properties), [plugin ID](/src/main/resources/META-INF/plugin.xml) and [sources package](/src/main/kotlin).
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html).
-- [ ] [Publish a plugin manually](https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/publishing_plugin.html) for the first time.
-- [ ] Set the Plugin ID in the above README badges.
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+Introduction
+------------
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+**CODEOWNERS** is a plugin for CODEOWNERS files in your project.
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+Features:
+---------
+
+- Files syntax highlight (lexical)
+- Show owner of currently opened file in IDE status bar
+- Group file changes by owners
+- Comments support
+- Navigation to entries in Project view
+- Navigation to Github user/team by ctrl-click on owner
+
+TODO:
+-----
+- Proper syntax-aware highlighting
+- GoTo team declaration in [Bitbucket][bitbucket-syntax] files
+- Entries inspection (duplicated, covered, unused, incorrect syntax, relative entries) with quick-fix actions
+- Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
+- Tests
+
+Supported syntaxes:
+- [Github][github-syntax]
+- [Bitbucket][bitbucket-syntax]
+
 <!-- Plugin description end -->
 
 ## Installation
 
 - Using IDE built-in plugin system:
   
-  <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "intellij-codeowners"</kbd> >
+  <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "CODEOWNERS"</kbd> >
   <kbd>Install Plugin</kbd>
   
 - Manually:
@@ -33,8 +47,6 @@ To keep everything working, do not remove `<!-- ... -->` sections.
   Download the [latest release](https://github.com/fan-tom/intellij-codeowners/releases/latest) and install it manually using
   <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
+[github-syntax]: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
+[bitbucket-syntax]: https://mibexsoftware.atlassian.net/wiki/spaces/CODEOWNERS/pages/222822413/Usage
 
----
-Plugin based on the [IntelliJ Platform Plugin Template][template].
-
-[template]: https://github.com/JetBrains/intellij-platform-plugin-template
