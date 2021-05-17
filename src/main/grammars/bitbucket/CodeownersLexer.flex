@@ -84,6 +84,7 @@ SPACES=\s+
 //}
 
 <IN_OWNERS> {
+    {COMMENT}           { yybegin(IN_OWNERS); return COMMENT; }
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
     {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
     {VALUE}             { yybegin(IN_OWNERS); return VALUE; }
