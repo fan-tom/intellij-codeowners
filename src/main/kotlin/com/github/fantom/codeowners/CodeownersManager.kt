@@ -95,7 +95,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
      * @return enabled
      */
     private val isEnabled
-        get() = settings.ignoredFileStatus
+        get() = settings.codeownersFileStatus
 
     /** [VirtualFileListener] instance to check if file's content was changed. */
     private val bulkFileListener = object : BulkFileListener {
@@ -120,7 +120,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     /** [CodeownersSettings] listener to watch changes in the plugin's settings. */
     private val settingsListener = CodeownersSettings.Listener { key, value ->
         when (key) {
-            CodeownersSettings.KEY.IGNORED_FILE_STATUS -> toggle(value as Boolean)
+            CodeownersSettings.KEY.CODEOWNERS_FILE_STATUS -> toggle(value as Boolean)
 //            CodeownersSettings.KEY.HIDE_IGNORED_FILES -> ProjectView.getInstance(project).refresh()
             else -> {}
         }

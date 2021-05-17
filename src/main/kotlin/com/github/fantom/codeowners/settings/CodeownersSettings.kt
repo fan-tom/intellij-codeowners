@@ -20,7 +20,7 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //        LANGUAGES("languages"),
 //        LANGUAGES_LANGUAGE("language"),
 //        LANGUAGES_ID("id"),
-        IGNORED_FILE_STATUS("ignoredFileStatus"),
+        CODEOWNERS_FILE_STATUS("codeownersFileStatus"),
         INSERT_AT_CURSOR("insertAtCursor")
 ;
 
@@ -34,10 +34,10 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
             field = value
         }
 
-    /** Enable ignored file status coloring. */
-    var ignoredFileStatus = true
+    /** Enable CODEOWNERS file status coloring. */
+    var codeownersFileStatus = true
         set(value) {
-            notifyOnChange(KEY.IGNORED_FILE_STATUS, ignoredFileStatus, value)
+            notifyOnChange(KEY.CODEOWNERS_FILE_STATUS, codeownersFileStatus, value)
             field = value
         }
 
@@ -78,7 +78,7 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //
     override fun getState() = Element(KEY.ROOT.toString()).apply {
         setAttribute(KEY.MISSING_CODEOWNERS.toString(), missingCodeowners.toString())
-        setAttribute(KEY.IGNORED_FILE_STATUS.toString(), ignoredFileStatus.toString())
+        setAttribute(KEY.CODEOWNERS_FILE_STATUS.toString(), codeownersFileStatus.toString())
 
 //        addContent(
 //            Element(KEY.LANGUAGES.toString()).apply {
@@ -105,8 +105,8 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
             getAttributeValue(KEY.MISSING_CODEOWNERS.toString())?.let {
                 missingCodeowners = it.toBoolean()
             }
-            getAttributeValue(KEY.IGNORED_FILE_STATUS.toString())?.let {
-                ignoredFileStatus = it.toBoolean()
+            getAttributeValue(KEY.CODEOWNERS_FILE_STATUS.toString())?.let {
+                codeownersFileStatus = it.toBoolean()
             }
 
 //            getChild(KEY.LANGUAGES.toString()).children.forEach {
