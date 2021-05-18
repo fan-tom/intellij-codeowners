@@ -14,6 +14,7 @@
 //  tokenTypeClass            = "com.github.fantom.codeowners.lang.CodeownersTokenType"
 
   tokens = [
+    WSS                     = "regexp:\s+"
     CRLF                    = "regexp:[\s\r\n]+"
     HEADER                  = "regexp:###.*"
     SECTION                 = "regexp:##.*"
@@ -23,7 +24,9 @@
 //    TEAMNAME                = "regexp:[\w-]+"
 //    USERNAME                = "regexp:[\w\d-]+"
 //    DOMAIN                  = "regexp:\w+(\.\w+)+"
-    VALUE                   = "regexp:[^@/\s]+"
+//    VALUE                   = "regexp:[^@/\s]+"
+    VALUE                   = "regexp:(?![!#\s])(?![\[\]])(?:(?:\\[\[\]])|(?:\/\/)|[^\[\]\/\s])+"
+    NAME_                   = "regexp:[^@/\s]+"
     //QUOTED_VALUE            = 'regexp:"([^@/]+)+"'
 //    VALUES_LIST             = 'regexp:[^@/]+'
 //    SPACES                  = 'regexp:\s+'
@@ -39,14 +42,14 @@
 
 codeownersFile          ::= item_ *
 private item_           ::= HEADER | SECTION | COMMENT | value_item_ | CRLF
-private value_item_     ::= (Pattern | Reset | TeamDefinition) COMMENT?
+private value_item_     ::= (Pattern | Reset | TeamDefinition) WSS? COMMENT?
 
 NEGATION                ::= "!"
 Reset                   ::= NEGATION Entry
 
-TeamDefinition          ::= '@''@''@' TeamName CRLF Owners
+TeamDefinition          ::= '@''@''@' TeamName WSS Owners
 
-Assign                  ::= Entry /*SPACES*/ CRLF Owners /*CRLF*/
+Assign                  ::= Entry /*SPACES*/ WSS Owners /*CRLF*/
 
 Pattern                 ::= Reset | Assign
 
@@ -65,7 +68,7 @@ EntryFile               ::= '/' ? <<list_macro VALUE>> //| ('"' '/' ? <<list_mac
 //EntryDirectory          ::= ('/' ? <<list_macro VALUE>> '/') | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> '/'>> //{ extends = "EntryFile"}
 //EntryFile               ::= ('/' ? <<list_macro VALUE>>) | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> >> //{ extends = "Entry"}
 
-Owners                  ::= Owner (CRLF Owner)*
+Owners                  ::= Owner (WSS Owner)*
 Owner                   ::= Email | NamedOwner
 NamedOwner              ::= Team | User
 
@@ -77,8 +80,8 @@ Email                   ::= UserName '@' Domain
 // or make it token?
 //QuotedValue             ::= '"'(CRLF VALUE)*'"'
 
-UserName                ::= VALUE //| QUOTED_VALUE
-TeamName                ::= VALUE //| QUOTED_VALUE
-Domain                  ::= VALUE
+UserName                ::= NAME_ //| QUOTED_VALUE
+TeamName                ::= NAME_ //| QUOTED_VALUE
+Domain                  ::= NAME_
 
 private meta list_macro ::= <<p>> + ('/' <<p>> +) *

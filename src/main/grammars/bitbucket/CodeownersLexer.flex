@@ -33,42 +33,45 @@ SECTION         = ##[^\r\n]*
 COMMENT         = #[^\r\n]*
 NEGATION        = \!
 SLASH           = \/
+ATATAT          = @@@
 AT              = @
 QUOTE           = \"
 
 
-ENTRY_FIRST_CHARACTER = [^#@ ]
-VALUE=[^@/\s\/]+
+ENTRY_FIRST_CHARACTER = [^#\ ]
+//VALUE=[^@/\s\/]+
+VALUE                 = ("\\\["|"\\\]"|"\\\/"|[^\[\]\r\n\/\s])+
+NAME_                  = [^#@/\s\/]+
 //VALUES_LIST=[^@/]+
-SPACES=\s+
+SPACES                = \s+
 
 %state IN_ENTRY, IN_OWNERS, IN_TEAM_DEFINITION
 
 %%
 <YYINITIAL> {
     {WHITE_SPACE}      { yybegin(YYINITIAL); return CRLF; }
-    {LINE_WS}+         { return CRLF; }
+    {LINE_WS}+         { return WSS; }
     {HEADER}           { return HEADER; }
     {SECTION}          { return SECTION; }
     {COMMENT}          { return COMMENT; }
     {NEGATION}         { return NEGATION; }
 
-    {AT}               { yypushback(1); yybegin(IN_TEAM_DEFINITION); }
+    {ATATAT}           { yypushback(yylength()); yybegin(IN_TEAM_DEFINITION); }
 
     {ENTRY_FIRST_CHARACTER}  { yypushback(1); yybegin(IN_ENTRY); }
 }
 
 <IN_TEAM_DEFINITION> {
     {AT}                { yybegin(IN_TEAM_DEFINITION); return AT; }
-    {VALUE}             { yybegin(IN_TEAM_DEFINITION); return VALUE; }
+    {NAME_}             { yybegin(IN_TEAM_DEFINITION); return NAME_; }
 //    {QUOTED_VALUE}      { return QUOTED_VALUE; }
-    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
+    {LINE_WS}+          { yybegin(IN_OWNERS); return WSS; }
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
 }
 
 <IN_ENTRY> {
 //    {QUOTE}             { yybegin(IN_WS_ENTRY); return QUOTE; }
-    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
+    {LINE_WS}+          { yybegin(IN_OWNERS); return WSS; }
     {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
 
 //  "@"                 { return AT; }
@@ -84,10 +87,10 @@ SPACES=\s+
 //}
 
 <IN_OWNERS> {
-    {COMMENT}           { yybegin(IN_OWNERS); return COMMENT; }
+    {COMMENT}           { yybegin(YYINITIAL); return COMMENT; }
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
-    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
-    {VALUE}             { yybegin(IN_OWNERS); return VALUE; }
+    {LINE_WS}+          { yybegin(IN_OWNERS); return WSS; }
+    {NAME_}             { yybegin(IN_OWNERS); return NAME_; }
 //    {SLASH}             { return SLASH; }
     {AT}                { yybegin(IN_OWNERS); return AT; }
 }
