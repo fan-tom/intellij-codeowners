@@ -25,8 +25,9 @@ TODO:
 -----
 - Proper syntax-aware highlighting
 - GoTo team declaration in [Bitbucket][bitbucket-syntax] files
-- Entries inspection (duplicated, covered, unused, incorrect syntax, relative entries) with quick-fix actions
+- Entries inspection (duplicated, covered, unused, incorrect syntax) with quick-fix actions
 - Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
+- Support spaces in file paths
 - Tests
 
 Supported syntaxes:
