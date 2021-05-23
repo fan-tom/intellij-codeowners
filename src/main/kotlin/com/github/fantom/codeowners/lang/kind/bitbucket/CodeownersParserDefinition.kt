@@ -46,7 +46,6 @@ class CodeownersParserDefinition : ParserDefinition {
         /** Whitespaces.  */
         val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
 
-
         /** Section comment started with ##  */
         val SECTIONS = TokenSet.create(CodeownersTypes.SECTION)
 
@@ -64,6 +63,9 @@ class CodeownersParserDefinition : ParserDefinition {
 
         /** All values - parts of paths  */
         val VALUES = TokenSet.create(CodeownersTypes.VALUE)
+
+        /** All values - parts of paths  */
+        val NAMES = TokenSet.create(CodeownersTypes.NAME_)
 
         /** Regular comment started with #  */
         val COMMENTS = TokenSet.create(CodeownersTypes.COMMENT)

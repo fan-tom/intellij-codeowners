@@ -27,7 +27,7 @@ class CodeownersColorSettingsPage : ColorSettingsPage {
 //            AttributesDescriptor(CodeownersBundle.message("highlighter.brackets"), CodeownersHighlighterColors.BRACKET),
             AttributesDescriptor(CodeownersBundle.message("highlighter.slash"), CodeownersHighlighterColors.SLASH),
             AttributesDescriptor(CodeownersBundle.message("highlighter.value"), CodeownersHighlighterColors.VALUE),
-            AttributesDescriptor(CodeownersBundle.message("highlighter.unused"), CodeownersHighlighterColors.UNUSED),
+            AttributesDescriptor(CodeownersBundle.message("highlighter.name"), CodeownersHighlighterColors.NAME),
         )
 
         /**

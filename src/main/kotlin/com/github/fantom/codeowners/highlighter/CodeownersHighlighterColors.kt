@@ -27,6 +27,9 @@ object CodeownersHighlighterColors {
     /** Default style for value element - part of entry */
     val VALUE = TextAttributesKey.createTextAttributesKey("CODEOWNERS.VALUE")
 
+    /** Default style for value element - part of entry */
+    val NAME = TextAttributesKey.createTextAttributesKey("CODEOWNERS.NAME")
+
     /** Default style for unused entry */
     val UNUSED = TextAttributesKey.createTextAttributesKey("CODEOWNERS.UNUSED_ENTRY")
 }
