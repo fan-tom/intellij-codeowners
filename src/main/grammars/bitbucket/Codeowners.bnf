@@ -42,7 +42,7 @@
 
 codeownersFile          ::= item_ *
 private item_           ::= HEADER | SECTION | COMMENT | value_item_ | CRLF
-private value_item_     ::= (Pattern | Reset | TeamDefinition) WSS? COMMENT?
+private value_item_     ::= (Pattern | TeamDefinition) WSS? COMMENT?
 
 NEGATION                ::= "!"
 Reset                   ::= NEGATION Entry

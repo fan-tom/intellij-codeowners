@@ -71,6 +71,7 @@ SPACES                = \s+
 
 <IN_ENTRY> {
 //    {QUOTE}             { yybegin(IN_WS_ENTRY); return QUOTE; }
+    {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
     {LINE_WS}+          { yybegin(IN_OWNERS); return WSS; }
     {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
 
