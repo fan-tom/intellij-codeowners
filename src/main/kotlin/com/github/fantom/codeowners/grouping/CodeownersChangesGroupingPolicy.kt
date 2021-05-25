@@ -15,7 +15,6 @@ import javax.swing.tree.DefaultTreeModel
 class SetCodeownersChangesGroupingAction : SetChangesGroupingAction() {
     override val groupingKey: String get() = "codeowners"
 
-
     override fun update(e: AnActionEvent): Unit = super.update(e).also {
         super.update(e)
         val manager = e.project?.service<CodeownersManager>()
@@ -23,7 +22,7 @@ class SetCodeownersChangesGroupingAction : SetChangesGroupingAction() {
     }
 }
 
-class CodeownersChangesBrowserNode(owners: OwnersSet): ChangesBrowserNode<OwnersSet>(owners) {
+class CodeownersChangesBrowserNode(owners: OwnersSet) : ChangesBrowserNode<OwnersSet>(owners) {
     override fun render(renderer: ChangesBrowserNodeRenderer, selected: Boolean, expanded: Boolean, hasFocus: Boolean) {
         super.render(renderer, selected, expanded, hasFocus)
         renderer.icon = CodeownersIcons.FILE
@@ -40,12 +39,12 @@ class CodeownersChangesBrowserNode(owners: OwnersSet): ChangesBrowserNode<Owners
 
     override fun compareUserObjects(o2: OwnersSet): Int {
         // unowned last
-        // TODO: sort also by owner type: i.e teams first
+        // TODO sort also by owner type: i.e teams first
         return o2.size - getUserObject().size
     }
 }
 
-class CodeownersChangesGroupingPolicy(val project: Project, private val model: DefaultTreeModel): BaseChangesGroupingPolicy() {
+class CodeownersChangesGroupingPolicy(val project: Project, private val model: DefaultTreeModel) : BaseChangesGroupingPolicy() {
     private val codeownersManager = project.service<CodeownersManager>()
 
     override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>): ChangesBrowserNode<*>? {
@@ -59,7 +58,7 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
             val owners = if (ownersRef.isEmpty()) {
                 emptySet()
             } else {
-                ownersRef.values.first().owners.toSet()
+                ownersRef.values.first().ref.owners.toSet()
             }
             CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
 
@@ -67,7 +66,7 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
                 it.markAsHelperNode()
                 model.insertNodeInto(it, grandParent, grandParent.childCount)
 
-                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) {mutableMapOf() }[owners] = it
+                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
                 return it
             }
         }

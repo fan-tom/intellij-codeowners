@@ -38,17 +38,19 @@ import com.jetbrains.rd.util.concurrentMapOf
 
 typealias OwnersList = List<OwnerString>
 typealias OwnersSet = Set<OwnerString>
-//data class OwnersSet(owners: Sequence<OwnerString>) {
-//    val owners = owners.sortedWith()
-//    override fun toString(): String {
-//        return super.toString()
-//    }
-//}
+
+// data class OwnersSet(owners: Sequence<OwnerString>) {
+//     val owners = owners.sortedWith()
+//     override fun toString(): String {
+//         return super.toString()
+//     }
+// }
 /**
  * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them
  */
 data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0)
 
+data class OwnersFileReference(val url: String? = null, val ref: OwnersReference = OwnersReference())
 /**
  * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
  */
@@ -71,9 +73,10 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private val commonRunnableListeners = CommonRunnableListeners(debouncedStatusesChanged)
     private var messageBus = project.messageBus.connect(this)
-    private val cachedCodeownersFilesIndex = CachedConcurrentMap.create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key -> CodeownersFilesIndex.getEntries(project, key) }
+    private val cachedCodeownersFilesIndex = CachedConcurrentMap
+                    .create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key -> CodeownersFilesIndex.getEntries(project, key) }
 
-    private val expiringStatusCache = ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersReference>?>(Time.SECOND)
+    private val expiringStatusCache = ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersFileReference>?>(Time.SECOND)
 
     private val debouncedExitDumbMode = object : Debounced<Boolean?>(3000) {
         override fun task(argument: Boolean?) {
@@ -137,7 +140,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
      * @return file owners list or null if cannot retrieve them due to project or IDE state (dumb mode, disposed)
      */
     @Suppress("ComplexCondition", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
-    fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersReference>? {
+    fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersFileReference>? {
         LOGGER.trace(">getFileOwners ${file.name}")
         expiringStatusCache[file]?.let {
             LOGGER.trace("<getFileOwners ${file.name} cached ${it.entries.joinToString(",")}")
@@ -158,7 +161,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             LOGGER.trace("<getFileOwners ${file.name} emptyList")
             return emptyMap()
         }
-        val ownersMap = mutableMapOf<CodeownersFileType, OwnersReference>()
+        val ownersMap = mutableMapOf<CodeownersFileType, OwnersFileReference>()
 //        var matched = false
         for (fileType in FILE_TYPES) {
             ProgressManager.checkCanceled()
@@ -181,8 +184,9 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         return expiringStatusCache.set(file, ownersMap)
     }
 
-    private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence): OwnersReference? {
-        var relativePath = codeownersFile.file?.let {
+    private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence): OwnersFileReference? {
+        val codeownersVirtualFile = codeownersFile.file
+        var relativePath = codeownersVirtualFile?.let {
             Utils.getRelativePath(it.parent, file)
         } ?: return null
 
@@ -205,13 +209,13 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 //                return@lastOrNull false
         }?.let {
             LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
-            return@let it.second
+            return@let OwnersFileReference(codeownersVirtualFile.url, it.second)
         }
                 ?: file.parent.let { directory ->
                     vcsRoots.forEach { vcsRoot ->
                         ProgressManager.checkCanceled()
                         if (directory == vcsRoot.path) {
-                            return@let OwnersReference()
+                            return@let OwnersFileReference()
                         }
                     }
                     return@let getFileOwners(file.parent, codeownersFile)
@@ -220,7 +224,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
 
-    // TODO: think about how to avoid this calculation and use index?
+    // TODO think about how to avoid this calculation and use index?
     private fun codeownersFilesExist(): Boolean? {
         val projectDir = project.guessProjectDir() ?: return null
         val directory = PsiManager.getInstance(project).findDirectory(projectDir) ?: return null
