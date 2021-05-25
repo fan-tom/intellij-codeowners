@@ -4,5 +4,23 @@
 formatting:
   Indentation:
     continuationIndentSize: 8
-  ParameterListWrapping:
-    indentSize: 8
+  NoWildcardImports:
+    active: false
+  MaximumLineLength:
+    maxLineLength: 140
+
+naming:
+  VariableNaming:
+    active: false
+
+style:
+  MaxLineLength:
+    maxLineLength: 140
+
+exceptions:
+  PrintStackTrace:
+    active: false
+  SwallowedException:
+    active: false
+  TooGenericExceptionCaught:
+    active: false
