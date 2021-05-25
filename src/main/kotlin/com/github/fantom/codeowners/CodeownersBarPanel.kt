@@ -43,22 +43,27 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         val ownersMap = getFileOwners(file)
                 ?: return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
 
-        val (toolTipText, panelText) = when (ownersMap.size) {
-            0 -> Pair("No CODEOWNERS files found", "<No CODEOWNERS>")
+        val (toolTipText, panelText, actionIsAvailable) = when (ownersMap.size) {
+            0 -> Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
             1 -> {
                 val owners = ownersMap.first().value.ref.owners
                 when (owners.size) {
-                    0 -> Pair("No owners are set for current file", "<No owners>")
-                    1 -> Pair("Owner: ${owners[0]}", owners[0].owner)
-                    else -> Pair("""All owners: ${owners.joinToString(", ")}""", "${owners[0].owner}...")
+                    0 -> Triple("No owners are set for current file", "<No owners>", true)
+                    1 -> Triple("Owner: ${owners[0]}", owners[0].owner, true)
+                    else -> Triple("""All owners: ${owners.joinToString(", ")}""", "${owners[0].owner}...", true)
                 }
             }
-            else -> Pair("""All owners: ${ownersMap.entries.joinToString(", ")}""", ownersMap.first().value.ref.owners[0].owner)
+            else ->
+                Triple(
+                        """All owners: ${ownersMap.entries.joinToString(", ")}""",
+                        ownersMap.first().value.ref.owners[0].owner,
+                        true
+                )
         }
 //        val lineSeparator = FileDocumentManager.getInstance().getLineSeparator(file, project)
 //        val toolTipText = IdeBundle.message("tooltip.line.separator", StringUtil.escapeLineBreak(lineSeparator))
 //        val panelText = LineSeparator.fromString(lineSeparator).toString()
-        return getWidgetStateWithIcon(WidgetState(toolTipText, panelText, true))
+        return getWidgetStateWithIcon(WidgetState(toolTipText, panelText, actionIsAvailable))
     }
 
     private fun goToOwner(codeownersFileUrl: String, offset: Int) {

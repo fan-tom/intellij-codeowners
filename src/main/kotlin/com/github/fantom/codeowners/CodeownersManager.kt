@@ -50,7 +50,7 @@ typealias OwnersSet = Set<OwnerString>
  */
 data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0)
 
-data class OwnersFileReference(val url: String? = null, val ref: OwnersReference = OwnersReference())
+data class OwnersFileReference(val url: String?, val ref: OwnersReference)
 /**
  * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
  */
@@ -215,7 +215,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
                     vcsRoots.forEach { vcsRoot ->
                         ProgressManager.checkCanceled()
                         if (directory == vcsRoot.path) {
-                            return@let OwnersFileReference()
+                            return@let OwnersFileReference(codeownersVirtualFile.url, OwnersReference())
                         }
                     }
                     return@let getFileOwners(file.parent, codeownersFile)
