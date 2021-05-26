@@ -20,19 +20,22 @@ Features:
 - Comments support
 - Navigation to entries in Project view
 - Navigation to Github user/team by ctrl-click on owner
+- Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
 
 TODO:
 -----
 - Proper syntax-aware highlighting
 - GoTo team declaration in [Bitbucket][bitbucket-syntax] files
 - Entries inspection (duplicated, covered, unused, incorrect syntax) with quick-fix actions
-- Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
 - Support spaces in file paths
 - Tests
 
 Supported syntaxes:
 - [Github][github-syntax]
 - [Bitbucket][bitbucket-syntax]
+
+[github-syntax]: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
+[bitbucket-syntax]: https://mibexsoftware.atlassian.net/wiki/spaces/CODEOWNERS/pages/222822413/Usage
 
 <!-- Plugin description end -->
 
@@ -48,6 +51,4 @@ Supported syntaxes:
   Download the [latest release](https://github.com/fan-tom/intellij-codeowners/releases/latest) and install it manually using
   <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
-[github-syntax]: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
-[bitbucket-syntax]: https://mibexsoftware.atlassian.net/wiki/spaces/CODEOWNERS/pages/222822413/Usage
 

@@ -3,6 +3,11 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+## [v0.2.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.2.0) (2021-05-25)
+### Added
+- Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
+
+## [v0.1.0-eap.1](https://github.com/fan-tom/intellij-codeowners/tree/v0.1.0) (2021-05-24)
 ### Added
 - Files syntax highlight (lexical)
 - Show owner of currently opened file in IDE status bar
