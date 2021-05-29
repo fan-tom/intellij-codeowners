@@ -27,7 +27,7 @@ abstract class CodeownersEntryExtImpl(node: ASTNode) : CodeownersElementImpl(nod
      * @return is directory
      */
     override val isDirectory
-        get() = this is CodeownersEntryDirectory
+        get() = this.entryDirectory != null
 
     /**
      * Returns entry value without leading `!` if entry is negated.

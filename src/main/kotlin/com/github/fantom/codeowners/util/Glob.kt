@@ -1,5 +1,6 @@
 package com.github.fantom.codeowners.util
 
+import com.github.fantom.codeowners.lang.CodeownersEntryBase
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
@@ -23,7 +24,7 @@ object Glob {
      * @param entry ignore entry
      * @return search result
      */
-    fun findOne(root: VirtualFile, entry: CodeownersEntry, matcher: CodeownersMatcher) =
+    fun findOne(root: VirtualFile, entry: CodeownersEntryBase, matcher: CodeownersMatcher) =
         find(root, listOf(entry), matcher, false)[entry]?.firstOrNull()
 
     /**
@@ -34,9 +35,9 @@ object Glob {
      * @param includeNested attach children to the search result
      * @return search result
      */
-    fun find(root: VirtualFile, entries: List<CodeownersEntry>, matcher: CodeownersMatcher, includeNested: Boolean) =
-        concurrentMapOf<CodeownersEntry, MutableList<VirtualFile>>().apply {
-            val map = concurrentMapOf<CodeownersEntry, Pattern>()
+    fun find(root: VirtualFile, entries: List<CodeownersEntryBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
+        concurrentMapOf<CodeownersEntryBase, MutableList<VirtualFile>>().apply {
+            val map = concurrentMapOf<CodeownersEntryBase, Pattern>()
 
             entries.forEach {
                 this[it] = mutableListOf()
@@ -45,13 +46,13 @@ object Glob {
                 }
             }
 
-            val visitor = object : VirtualFileVisitor<Map<CodeownersEntry, Pattern?>>(NO_FOLLOW_SYMLINKS) {
+            val visitor = object : VirtualFileVisitor<Map<CodeownersEntryBase, Pattern?>>(NO_FOLLOW_SYMLINKS) {
                 @Suppress("ReturnCount")
                 override fun visitFile(file: VirtualFile): Boolean {
                     if (root == file) {
                         return true
                     }
-                    val current = mutableMapOf<CodeownersEntry, Pattern?>()
+                    val current = mutableMapOf<CodeownersEntryBase, Pattern?>()
                     val path = getRelativePath(root, file)
                     if (currentValue.isEmpty() || path == null) {
                         return false
@@ -83,7 +84,7 @@ object Glob {
      * @param includeNested attach children to the search result
      * @return search result
      */
-    fun findAsPaths(root: VirtualFile, entries: List<CodeownersEntry>, matcher: CodeownersMatcher, includeNested: Boolean) =
+    fun findAsPaths(root: VirtualFile, entries: List<CodeownersEntryBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
         find(root, entries, matcher, includeNested).mapValues { (_, value) ->
             value
                 .asSequence()
@@ -99,13 +100,13 @@ object Glob {
      * @param acceptChildren Matches directory children
      * @return regex [Pattern]
      */
-    fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) = createPattern(entry.value, acceptChildren, supportSquareBrackets)
+    fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) =
+            createPattern(entry.value, acceptChildren, supportSquareBrackets)
 
     /**
      * Creates regex [Pattern] using glob rule.
      *
      * @param rule   rule value
-     * @param syntax rule syntax
      * @return regex [Pattern]
      */
     fun createPattern(rule: String, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) =

@@ -1,8 +1,7 @@
 package com.github.fantom.codeowners.daemon
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntryDirectory
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntryFile
+import com.github.fantom.codeowners.lang.CodeownersEntryBase
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.components.service
@@ -28,10 +27,10 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
      */
     @Suppress("ReturnCount")
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
-        if (element !is CodeownersEntryFile) {
+        if (element !is CodeownersEntryBase) {
             return null
         }
-        var isDirectory = element is CodeownersEntryDirectory
+        var isDirectory = element.isDirectory
 
         if (!isDirectory) {
             val key = element.getText()
@@ -48,8 +47,7 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
             }
         }
 
-        return when {
-            isDirectory -> LineMarkerInfo(
+        return if (isDirectory) LineMarkerInfo(
                 element.getFirstChild(),
                 element.getTextRange(),
                 PlatformIcons.FOLDER_ICON,
@@ -57,8 +55,7 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
                 null,
                 GutterIconRenderer.Alignment.CENTER,
                 CodeownersBundle.messagePointer("daemon.lineMarker.directory")
-            )
-            else -> null
-        }
+        )
+        else null
     }
 }
