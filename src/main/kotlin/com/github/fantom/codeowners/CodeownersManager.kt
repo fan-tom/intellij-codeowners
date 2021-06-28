@@ -93,7 +93,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     private val vcsRoots = mutableListOf<VcsRoot>()
 
     /**
-     * Checks if ignored files watching is enabled.
+     * Checks if CODEOWNERS files watching is enabled.
      *
      * @return enabled
      */

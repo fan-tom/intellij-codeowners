@@ -16,10 +16,7 @@ import com.intellij.util.ProcessingContext
 /**
  * Codeowners [Language] definition
  */
-open class CodeownersLanguage protected constructor(
-        name: String,
-        val directory: String? = null,
-): Language(name) {
+open class CodeownersLanguage protected constructor(name: String, val directory: String? = null) : Language(name) {
     val filename = "CODEOWNERS"
 
     override fun getDisplayName() = "$filename ($id)"
@@ -36,9 +33,12 @@ open class CodeownersLanguage protected constructor(
     fun createFile(viewProvider: FileViewProvider) = CodeownersFile(viewProvider, fileType)
 
     open fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>): PsiElementVisitor? = null
-    open fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference>? =
-            when (psiElement) {
-                is CodeownersEntryBase -> CodeownersEntryReferenceSet(psiElement).allReferences
-                else -> null
-            }
+    open fun getReferencesByElement(
+        psiElement: PsiElement,
+        processingContext: ProcessingContext
+    ): Array<out PsiReference>? =
+        when (psiElement) {
+            is CodeownersEntryBase -> CodeownersEntryReferenceSet(psiElement).allReferences
+            else -> null
+        }
 }

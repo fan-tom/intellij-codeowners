@@ -14,7 +14,11 @@ import com.intellij.util.IncorrectOperationException
 class CodeownersNamedOwnerManipulator : AbstractElementManipulator<CodeownersNamedOwner>() {
 
     @Throws(IncorrectOperationException::class)
-    override fun handleContentChange(owner: CodeownersNamedOwner, range: TextRange, newContent: String): CodeownersNamedOwner {
+    override fun handleContentChange(
+        owner: CodeownersNamedOwner,
+        range: TextRange,
+        newContent: String
+    ): CodeownersNamedOwner {
         val language = owner.language as? CodeownersLanguage ?: return owner
         val fileType = (language.associatedFileType as CodeownersFileType)
         val file = PsiFileFactory.getInstance(owner.project)

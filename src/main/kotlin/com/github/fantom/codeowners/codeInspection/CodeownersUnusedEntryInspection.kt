@@ -53,7 +53,10 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
                     }
                 }
                 if (!resolved && !isEntryExcluded(entry, holder.project)) {
-                    (entry.parent.parent as CodeownersFile).containingDirectory?.virtualFile?.findFileByRelativePath(entry.text)
+                    (entry.parent.parent as CodeownersFile)
+                            .containingDirectory
+                            ?.virtualFile
+                            ?.findFileByRelativePath(entry.text)
                         ?: holder.registerProblem(
                             entry,
                             CodeownersBundle.message("codeInspection.unusedEntry.message"),

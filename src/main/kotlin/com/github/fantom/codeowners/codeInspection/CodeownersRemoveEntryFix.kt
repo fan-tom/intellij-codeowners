@@ -25,11 +25,14 @@ class CodeownersRemoveEntryFix(pattern: com.github.fantom.codeowners.lang.kind.g
 
     private fun removeCrlf(startElement: PsiElement) {
         (
-            TreeUtil.findSibling(startElement.node, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF) ?: TreeUtil.findSiblingBackward(
-                startElement.node,
-                com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF
-            )
-            )?.psi?.delete()
+                TreeUtil.findSibling(
+                        startElement.node,
+                        com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF)
+                        ?: TreeUtil.findSiblingBackward(
+                                startElement.node,
+                                com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF
+                        )
+                )?.psi?.delete()
     }
 
     override fun getText(): String = CodeownersBundle.message("quick.fix.remove.entry")

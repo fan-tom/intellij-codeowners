@@ -27,11 +27,13 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
 
     private val matcher = element.project.service<CodeownersMatcher>()
 
-    override fun createFileReference(range: TextRange, index: Int, text: String) = CodeownersEntryReference(this, range, index, text)
+    override fun createFileReference(range: TextRange, index: Int, text: String) =
+        CodeownersEntryReference(this, range, index, text)
 
     override fun isEndingSlashNotAllowed() = false
 
-    override fun computeDefaultContexts() = element.containingFile.parent?.let(::listOf) ?: super.computeDefaultContexts()
+    override fun computeDefaultContexts() =
+        element.containingFile.parent?.let(::listOf) ?: super.computeDefaultContexts()
 
     override fun getLastReference() = super.getLastReference()?.let {
         when {
@@ -84,7 +86,12 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
         myReferences = referencesList.toTypedArray()
     }
 
-    inner class CodeownersEntryReference(fileReferenceSet: FileReferenceSet, range: TextRange?, index: Int, text: String?) :
+    inner class CodeownersEntryReference(
+        fileReferenceSet: FileReferenceSet,
+        range: TextRange?,
+        index: Int,
+        text: String?
+    ) :
         FileReference(fileReferenceSet, range, index, text) {
         private val cacheMap = concurrentMapOf<String, Collection<VirtualFile>>()
 
@@ -107,9 +114,11 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
                 else -> return
             }
             if (contextVirtualFile != null) {
-                val entry = fileReferenceSet.element// as com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
+                val entry =
+                    fileReferenceSet.element// as com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
                 val current = canonicalText
-                val pattern = Glob.createPattern(current, acceptChildren = false, supportSquareBrackets = false) ?: return
+                val pattern =
+                    Glob.createPattern(current, acceptChildren = false, supportSquareBrackets = false) ?: return
                 val root = element.containingFile.parent?.virtualFile
                 val psiManager = element.manager
 

@@ -22,11 +22,9 @@ class CreateFileCommandAction(project: Project, val directory: PsiDirectory, val
     override fun compute() = createFromTemplate()
 //            CodeownersTemplatesFactory(fileType).createFromTemplate(directory)
 
-
     /**
      * Creates new CODEOWNERS file or uses an existing one.
      *
-     * @param directory working directory
      * @return file
      */
     @Throws(IncorrectOperationException::class)

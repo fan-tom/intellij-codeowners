@@ -44,10 +44,13 @@ class CodeownersChangesBrowserNode(owners: OwnersSet) : ChangesBrowserNode<Owner
     }
 }
 
-class CodeownersChangesGroupingPolicy(val project: Project, private val model: DefaultTreeModel) : BaseChangesGroupingPolicy() {
+class CodeownersChangesGroupingPolicy(val project: Project, private val model: DefaultTreeModel) :
+        BaseChangesGroupingPolicy() {
     private val codeownersManager = project.service<CodeownersManager>()
 
-    override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>): ChangesBrowserNode<*>? {
+    @Suppress("ReturnCount")
+    override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>):
+            ChangesBrowserNode<*>? {
         val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, subtreeRoot)
         if (!codeownersManager.isAvailable) return nextPolicyParent
 
@@ -74,7 +77,8 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
     }
 
     internal class Factory : ChangesGroupingPolicyFactory() {
-        override fun createGroupingPolicy(project: Project, model: DefaultTreeModel) = CodeownersChangesGroupingPolicy(project, model)
+        override fun createGroupingPolicy(project: Project, model: DefaultTreeModel) =
+                CodeownersChangesGroupingPolicy(project, model)
     }
 
     companion object {

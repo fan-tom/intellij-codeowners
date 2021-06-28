@@ -17,8 +17,8 @@ class CodeownersReferenceContributor : PsiReferenceContributor() {
 
     override fun registerReferenceProviders(psiReferenceRegistrar: PsiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(
-                PlatformPatterns.psiElement().inFile(PlatformPatterns.psiFile(CodeownersFile::class.java)),
-                CodeownersReferenceProvider()
+            PlatformPatterns.psiElement().inFile(PlatformPatterns.psiFile(CodeownersFile::class.java)),
+            CodeownersReferenceProvider()
         )
     }
 

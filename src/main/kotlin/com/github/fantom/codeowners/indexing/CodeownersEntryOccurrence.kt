@@ -22,6 +22,7 @@ inline class OwnerString(val owner: String) {
  * Entry containing information about the [VirtualFile] instance of the codeowners file mapped with the collection
  * of codeowners entries with line numbers for better performance. Class is used for indexing.
  */
+@Suppress("SerialVersionUIDInSerializableClass")
 class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<PatternString, OwnersReference>>) : Serializable {
 
     /**

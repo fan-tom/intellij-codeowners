@@ -27,7 +27,9 @@ class CodeownersDuplicateEntryInspection : LocalInspectionTool() {
         val entries = MultiMap.create<String, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern>()
         file.acceptChildren(
             object : CodeownersVisitor() {
-                override fun visitPattern(pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
+                override fun visitPattern(
+                        pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
+                ) {
                     val entry = pattern.entryFile
                     LOG.warn("Remembering entry ${entry.text}")
                     entries.putValue(entry.text, pattern)

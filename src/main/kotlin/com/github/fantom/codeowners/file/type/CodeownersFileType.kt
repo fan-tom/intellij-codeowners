@@ -7,7 +7,9 @@ import com.intellij.openapi.fileTypes.ex.FileTypeIdentifiableByVirtualFile
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.annotations.NonNls
 
-open class CodeownersFileType protected constructor(val codeownersLanguage: CodeownersLanguage = CodeownersLanguage.INSTANCE) : LanguageFileType(codeownersLanguage), FileTypeIdentifiableByVirtualFile {
+open class CodeownersFileType protected constructor(
+    val codeownersLanguage: CodeownersLanguage = CodeownersLanguage.INSTANCE
+) : LanguageFileType(codeownersLanguage), FileTypeIdentifiableByVirtualFile {
 
     companion object {
         val INSTANCE = CodeownersFileType()

@@ -15,7 +15,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.util.ProcessingContext
 
-class GithubLanguage: CodeownersLanguage("Github", ".github"){
+class GithubLanguage : CodeownersLanguage("Github", ".github") {
     companion object {
         val INSTANCE = GithubLanguage()
     }
@@ -24,15 +24,17 @@ class GithubLanguage: CodeownersLanguage("Github", ".github"){
         get() = GithubFileType.INSTANCE
 
     override fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>) =
-            object : CodeownersVisitor() {
-                override fun visitPattern(entry: CodeownersPattern) {
-                    val regex = entry.entryFile.regex(false)
-                    items.add(Pair(
-                            PatternString(regex),
-                            OwnersReference(entry.owners.ownerList.map{ OwnerString(it.text) }, entry.textOffset)
-                    ))
-                }
+        object : CodeownersVisitor() {
+            override fun visitPattern(entry: CodeownersPattern) {
+                val regex = entry.entryFile.regex(false)
+                items.add(
+                    Pair(
+                        PatternString(regex),
+                        OwnersReference(entry.owners.ownerList.map { OwnerString(it.text) }, entry.textOffset)
+                    )
+                )
             }
+        }
 
     override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference>?  =
             when (psiElement) {

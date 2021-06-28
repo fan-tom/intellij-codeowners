@@ -41,7 +41,6 @@ class CodeownersParserDefinition : ParserDefinition {
         /** Whitespaces.  */
         val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
 
-
         /** Section comment started with ##  */
         val SECTIONS = TokenSet.create(CodeownersTypes.SECTION)
 
