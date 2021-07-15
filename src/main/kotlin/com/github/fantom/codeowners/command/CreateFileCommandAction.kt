@@ -15,7 +15,7 @@ class CreateFileCommandAction(project: Project, val directory: PsiDirectory, val
     CommandAction<PsiFile>(project) {
 
     /**
-     * Creates a new file using [CodeownersTemplatesFactory.createFromTemplate] to fill it with content.
+     * Creates a new CODEOWNERS file
      *
      * @return created file
      */

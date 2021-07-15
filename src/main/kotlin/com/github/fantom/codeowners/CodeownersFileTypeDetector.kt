@@ -22,11 +22,9 @@ class CodeownersFileTypeDetector : FileTypeRegistry.FileTypeDetector {
         if (file.name == CodeownersLanguage.INSTANCE.filename) {
             if (firstCharsIfText != null) {
                 if (
-                    firstCharsIfText.contains("\n@@@") // team definition
-                    ||
-                    firstCharsIfText.contains("\nCODEOWNERS.") // settings
-                    ||
-                    firstCharsIfText.contains("\n!") // negation. TODO: WARN, may be imprecise
+                    firstCharsIfText.contains("\n@@@") || // team definition
+                    firstCharsIfText.contains("\nCODEOWNERS.") || // settings
+                    firstCharsIfText.contains("\n!") // negation. TODO WARN, may be imprecise
                 ) {
                     LOGGER.trace("Detected lang: bb")
                     BitbucketFileType.INSTANCE

@@ -152,7 +152,8 @@ class CodeownersSettingsPanel : Disposable {
 //                        AllIcons.Actions.Install
 //                    ) {
 //                        override fun actionPerformed(event: AnActionEvent) {
-//                            val descriptor: FileChooserDescriptor = object : FileChooserDescriptor(true, false, true, false, true, false) {
+//                            val descriptor: FileChooserDescriptor =
+//                            object : FileChooserDescriptor(true, false, true, false, true, false) {
 //                                override fun isFileVisible(file: VirtualFile, showHiddenFiles: Boolean) =
 //                                    super.isFileVisible(file, showHiddenFiles) &&
 //                                        (file.isDirectory || file.extension == "xml" || file.fileType === FileTypes.ARCHIVE)
@@ -305,14 +306,14 @@ class CodeownersSettingsPanel : Disposable {
 //
 //    /** Editor panel class that displays document editor or label if no template is selected. */
 //    private inner class EditorPanel : JPanel(BorderLayout()) {
-////        /** Preview editor. */
-////        val preview: Editor
+// //        /** Preview editor. */
+// //        val preview: Editor
 //
 //        /** `No templates is selected` label. */
 //        private val label = JBLabel(message("settings.userTemplates.noTemplateSelected"), JBLabel.CENTER)
-////
-////        /** Preview document. */
-////        private val previewDocument = EditorFactory.getInstance().createDocument("")
+// //
+// //        /** Preview document. */
+// //        private val previewDocument = EditorFactory.getInstance().createDocument("")
 //
 //        /**
 //         * Shows or hides label and editor.
@@ -322,38 +323,38 @@ class CodeownersSettingsPanel : Disposable {
 //        override fun setEnabled(enabled: Boolean) {
 //            if (enabled) {
 //                remove(label)
-////                add(preview.component)
+// //                add(preview.component)
 //            } else {
 //                add(label)
-////                remove(preview.component)
+// //                remove(preview.component)
 //            }
 //            revalidate()
 //            repaint()
 //        }
-////
-////        /**
-////         * Sets new content to the editor component.
-////         *
-////         * @param content new content
-////         */
-////        fun setContent(content: String) {
-////            ApplicationManager.getApplication().runWriteAction {
-////                CommandProcessor.getInstance()
-////                    .runUndoTransparentAction { previewDocument.replaceString(0, previewDocument.textLength, content) }
-////            }
-////        }
+// //
+// //        /**
+// //         * Sets new content to the editor component.
+// //         *
+// //         * @param content new content
+// //         */
+// //        fun setContent(content: String) {
+// //            ApplicationManager.getApplication().runWriteAction {
+// //                CommandProcessor.getInstance()
+// //                    .runUndoTransparentAction { previewDocument.replaceString(0, previewDocument.textLength, content) }
+// //            }
+// //        }
 //
 //        /** Constructor that creates document editor, empty content label. */
 //        init {
-////            preview = createPreviewEditor(previewDocument, null, false).apply {
-////                document.addDocumentListener(
-////                    object : DocumentListener {
-////                        override fun documentChanged(event: DocumentEvent) {
-////                            templatesListPanel.updateContent(event.document.text)
-////                        }
-////                    }
-////                )
-////            }
+// //            preview = createPreviewEditor(previewDocument, null, false).apply {
+// //                document.addDocumentListener(
+// //                    object : DocumentListener {
+// //                        override fun documentChanged(event: DocumentEvent) {
+// //                            templatesListPanel.updateContent(event.document.text)
+// //                        }
+// //                    }
+// //                )
+// //            }
 //            isEnabled = false
 //        }
 //    }

@@ -3,7 +3,7 @@ package com.github.fantom.codeowners.util
 /**
  * [MutableList] wrapper with additional ability to cache values.
  */
-class CachedList<V>(private val fetcher: DataFetcher<V>): Iterable<V> {
+class CachedList<V>(private val fetcher: DataFetcher<V>) : Iterable<V> {
 
     private var _list: List<V>? = null
 

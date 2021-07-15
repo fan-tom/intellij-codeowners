@@ -45,6 +45,7 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
 
     override fun couldBeConvertedTo(relative: Boolean) = false
 
+    @Suppress("ComplexMethod")
     override fun reparse() {
         ProgressManager.checkCanceled()
         val str = StringUtil.trimEnd(pathString, separatorString)
@@ -95,7 +96,7 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
         FileReference(fileReferenceSet, range, index, text) {
         private val cacheMap = concurrentMapOf<String, Collection<VirtualFile>>()
 
-        @Suppress("ComplexMethod", "NestedBlockDepth", "ReturnCount")
+        @Suppress("ComplexMethod", "NestedBlockDepth", "ReturnCount", "LongMethod")
         override fun innerResolveInContext(
             text: String,
             context: PsiFileSystemItem,
@@ -115,7 +116,7 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
             }
             if (contextVirtualFile != null) {
                 val entry =
-                    fileReferenceSet.element// as com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
+                    fileReferenceSet.element // as com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
                 val current = canonicalText
                 val pattern =
                     Glob.createPattern(current, acceptChildren = false, supportSquareBrackets = false) ?: return

@@ -35,13 +35,14 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         return manager.getFileOwners(file)
     }
 
+    @Suppress("ReturnCount")
     override fun getWidgetState(file: VirtualFile?): WidgetState {
         LOGGER.trace("getWidgetState")
         if (file == null) {
             return getWidgetStateWithIcon(WidgetState.HIDDEN)
         }
         val ownersMap = getFileOwners(file)
-                ?: return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
+            ?: return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
 
         val (toolTipText, panelText, actionIsAvailable) = when (ownersMap.size) {
             0 -> Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
@@ -55,9 +56,9 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
             }
             else ->
                 Triple(
-                        """All owners: ${ownersMap.entries.joinToString(", ")}""",
-                        ownersMap.first().value.ref.owners[0].owner,
-                        true
+                    """All owners: ${ownersMap.entries.joinToString(", ")}""",
+                    ownersMap.first().value.ref.owners[0].owner,
+                    true
                 )
         }
 //        val lineSeparator = FileDocumentManager.getInstance().getLineSeparator(file, project)
@@ -71,6 +72,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         OpenFileDescriptor(project, codeownersFile, offset).navigate(true)
     }
 
+    @Suppress("ReturnCount")
     override fun createPopup(context: DataContext?): ListPopup? {
         val owners = getFileOwners(selectedFile ?: return null)
         when {
@@ -83,14 +85,14 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
             else -> {
                 data class Ref(val url: String, val offset: Int)
                 return JBPopupFactory.getInstance().createListPopup(
-                        object : BaseListPopupStep<Ref>("All CODEOWNERS Files", owners.values.map { Ref(it.url!!, it.ref.offset) }) {
-                            override fun onChosen(selectedValue: Ref?, finalChoice: Boolean): PopupStep<*>? {
-                                selectedValue?.also {
-                                    goToOwner(it.url, it.offset)
-                                }
-                                return super.onChosen(selectedValue, finalChoice)
+                    object : BaseListPopupStep<Ref>("All CODEOWNERS Files", owners.values.map { Ref(it.url!!, it.ref.offset) }) {
+                        override fun onChosen(selectedValue: Ref?, finalChoice: Boolean): PopupStep<*>? {
+                            selectedValue?.also {
+                                goToOwner(it.url, it.offset)
                             }
+                            return super.onChosen(selectedValue, finalChoice)
                         }
+                    }
                 )
             }
         }
@@ -99,11 +101,14 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
     override fun createInstance(project: Project) = CodeownersBarPanel(project)
 
     override fun registerCustomListeners() {
-        myConnection.subscribe(DumbService.DUMB_MODE, object : DumbService.DumbModeListener {
-            override fun exitDumbMode() {
-                LOGGER.trace("exitDumbMode")
-                update()
+        myConnection.subscribe(
+            DumbService.DUMB_MODE,
+            object : DumbService.DumbModeListener {
+                override fun exitDumbMode() {
+                    LOGGER.trace("exitDumbMode")
+                    update()
+                }
             }
-        })
+        )
     }
 }

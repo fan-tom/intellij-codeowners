@@ -24,10 +24,12 @@ class CodeownersReferenceContributor : PsiReferenceContributor() {
 
     private class CodeownersReferenceProvider : PsiReferenceProvider() {
         override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference> =
-                (psiElement.language as? CodeownersLanguage)?.getReferencesByElement(psiElement, processingContext) ?: PsiReference.EMPTY_ARRAY
+            (psiElement.language as? CodeownersLanguage)?.getReferencesByElement(psiElement, processingContext) ?: PsiReference.EMPTY_ARRAY
 //        when (psiElement) {
-//            is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry -> CodeownersEntryReferenceSet(psiElement).allReferences
-//            is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner -> arrayOf(CodeownersGithubOwnerReference(psiElement))
+//            is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry ->
+        //            CodeownersEntryReferenceSet(psiElement).allReferences
+//            is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner ->
+        //            arrayOf(CodeownersGithubOwnerReference(psiElement))
 //            else -> PsiReference.EMPTY_ARRAY
 //        }
     }

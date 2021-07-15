@@ -1,0 +1,13 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+tab_width = 4
+
+[*.{kt,kts}]
+disabled_rules = no-wildcard-imports
+
+[*.java]
+ij_java_doc_do_not_wrap_if_one_line = true

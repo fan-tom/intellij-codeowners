@@ -2,11 +2,11 @@ package com.github.fantom.codeowners.lang
 
 import com.github.fantom.codeowners.CodeownersException
 import com.github.fantom.codeowners.OwnersReference
-import com.intellij.psi.FileViewProvider
 import com.github.fantom.codeowners.file.type.CodeownersFileType
 import com.github.fantom.codeowners.indexing.PatternString
 import com.intellij.lang.Language
 import com.intellij.lang.LanguageParserDefinitions
+import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.impl.source.PsiFileImpl
 

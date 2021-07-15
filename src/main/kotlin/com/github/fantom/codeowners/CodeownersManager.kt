@@ -6,12 +6,18 @@ import com.github.fantom.codeowners.indexing.CodeownersFilesIndex
 import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.services.CodeownersMatcher
+import com.github.fantom.codeowners.settings.CodeownersSettings
 import com.github.fantom.codeowners.util.*
 import com.intellij.ProjectTopics
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.fileTypes.ExactFileNameMatcher
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.*
 import com.intellij.openapi.project.DumbService.DumbModeListener
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
@@ -24,16 +30,10 @@ import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
+import com.intellij.psi.PsiManager
 import com.intellij.util.Time
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.messages.Topic
-import com.github.fantom.codeowners.settings.CodeownersSettings
-import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.fileTypes.ExactFileNameMatcher
-import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.project.*
-import com.intellij.psi.PsiManager
 import com.jetbrains.rd.util.concurrentMapOf
 
 typealias OwnersList = List<OwnerString>
@@ -74,7 +74,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     private val commonRunnableListeners = CommonRunnableListeners(debouncedStatusesChanged)
     private var messageBus = project.messageBus.connect(this)
     private val cachedCodeownersFilesIndex = CachedConcurrentMap
-                    .create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key -> CodeownersFilesIndex.getEntries(project, key) }
+        .create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key -> CodeownersFilesIndex.getEntries(project, key) }
 
     private val expiringStatusCache = ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersFileReference>?>(Time.SECOND)
 
@@ -155,8 +155,8 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             return emptyMap()
         }
         if (ApplicationManager.getApplication().isDisposed || project.isDisposed ||
-                /*|| !isEnabled  || */
-                NoAccessDuringPsiEvents.isInsideEventProcessing()
+            /*|| !isEnabled  || */
+            NoAccessDuringPsiEvents.isInsideEventProcessing()
         ) {
             LOGGER.trace("<getFileOwners ${file.name} emptyList")
             return emptyMap()
@@ -184,6 +184,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         return expiringStatusCache.set(file, ownersMap)
     }
 
+    @Suppress("ReturnCount")
     private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence): OwnersFileReference? {
         val codeownersVirtualFile = codeownersFile.file
         var relativePath = codeownersVirtualFile?.let {
@@ -211,20 +212,21 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
             return@let OwnersFileReference(codeownersVirtualFile.url, it.second)
         }
-                ?: file.parent.let { directory ->
-                    vcsRoots.forEach { vcsRoot ->
-                        ProgressManager.checkCanceled()
-                        if (directory == vcsRoot.path) {
-                            return@let OwnersFileReference(codeownersVirtualFile.url, OwnersReference())
-                        }
+            ?: file.parent.let { directory ->
+                vcsRoots.forEach { vcsRoot ->
+                    ProgressManager.checkCanceled()
+                    if (directory == vcsRoot.path) {
+                        return@let OwnersFileReference(codeownersVirtualFile.url, OwnersReference())
                     }
-                    return@let getFileOwners(file.parent, codeownersFile)
                 }
+                return@let getFileOwners(file.parent, codeownersFile)
+            }
     }
 
     val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
 
     // TODO think about how to avoid this calculation and use index?
+    @Suppress("ReturnCount")
     private fun codeownersFilesExist(): Boolean? {
         val projectDir = project.guessProjectDir() ?: return null
         val directory = PsiManager.getInstance(project).findDirectory(projectDir) ?: return null
@@ -243,24 +245,24 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         settings.addListener(settingsListener)
 
         messageBus.subscribe(
-                VirtualFileManager.VFS_CHANGES,
-                bulkFileListener
+            VirtualFileManager.VFS_CHANGES,
+            bulkFileListener
         )
         messageBus.subscribe(
-                ProjectLevelVcsManager.VCS_CONFIGURATION_CHANGED,
-                VcsListener {
-                    vcsRoots.clear()
-                    vcsRoots.addAll(projectLevelVcsManager.allVcsRoots)
-                }
+            ProjectLevelVcsManager.VCS_CONFIGURATION_CHANGED,
+            VcsListener {
+                vcsRoots.clear()
+                vcsRoots.addAll(projectLevelVcsManager.allVcsRoots)
+            }
         )
         messageBus.subscribe(
-                DumbService.DUMB_MODE,
-                object : DumbModeListener {
-                    override fun enteredDumbMode() = Unit
-                    override fun exitDumbMode() {
-                        debouncedExitDumbMode.run()
-                    }
+            DumbService.DUMB_MODE,
+            object : DumbModeListener {
+                override fun enteredDumbMode() = Unit
+                override fun exitDumbMode() {
+                    debouncedExitDumbMode.run()
                 }
+            }
         )
         messageBus.subscribe(ProjectTopics.PROJECT_ROOTS, commonRunnableListeners)
         messageBus.subscribe(RefreshStatusesListener.REFRESH_STATUSES, commonRunnableListeners)
@@ -323,13 +325,13 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             if (application.isDispatchThread) {
                 val fileTypeManager = FileTypeManager.getInstance()
                 application.invokeLater(
-                        {
-                            application.runWriteAction {
-                                fileTypeManager.associate(fileType, ExactFileNameMatcher(fileName))
-                                FILE_TYPES_ASSOCIATION_QUEUE.remove(fileName)
-                            }
-                        },
-                        ModalityState.NON_MODAL
+                    {
+                        application.runWriteAction {
+                            fileTypeManager.associate(fileType, ExactFileNameMatcher(fileName))
+                            FILE_TYPES_ASSOCIATION_QUEUE.remove(fileName)
+                        }
+                    },
+                    ModalityState.NON_MODAL
                 )
             } else if (!FILE_TYPES_ASSOCIATION_QUEUE.containsKey(fileName)) {
                 FILE_TYPES_ASSOCIATION_QUEUE[fileName] = fileType

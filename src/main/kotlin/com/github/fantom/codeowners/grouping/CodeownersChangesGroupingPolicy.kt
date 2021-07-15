@@ -45,49 +45,49 @@ class CodeownersChangesBrowserNode(owners: OwnersSet) : ChangesBrowserNode<Owner
 }
 
 class CodeownersChangesGroupingPolicy(val project: Project, private val model: DefaultTreeModel) :
-        BaseChangesGroupingPolicy() {
+    BaseChangesGroupingPolicy() {
     private val codeownersManager = project.service<CodeownersManager>()
 
     @Suppress("ReturnCount")
     override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>):
-            ChangesBrowserNode<*>? {
-        val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, subtreeRoot)
-        if (!codeownersManager.isAvailable) return nextPolicyParent
+        ChangesBrowserNode<*>? {
+            val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, subtreeRoot)
+            if (!codeownersManager.isAvailable) return nextPolicyParent
 
-        val file = resolveVirtualFile(nodePath)
-        file?.let { codeownersManager.getFileOwners(it) }?.let { ownersRef ->
-            val grandParent = nextPolicyParent ?: subtreeRoot
-            val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
-            val owners = if (ownersRef.isEmpty()) {
-                emptySet()
-            } else {
-                ownersRef.values.first().ref.owners.toSet()
+            val file = resolveVirtualFile(nodePath)
+            file?.let { codeownersManager.getFileOwners(it) }?.let { ownersRef ->
+                val grandParent = nextPolicyParent ?: subtreeRoot
+                val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
+                val owners = if (ownersRef.isEmpty()) {
+                    emptySet()
+                } else {
+                    ownersRef.values.first().ref.owners.toSet()
+                }
+                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
+
+                CodeownersChangesBrowserNode(owners).let {
+                    it.markAsHelperNode()
+                    model.insertNodeInto(it, grandParent, grandParent.childCount)
+
+                    CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
+                    return it
+                }
             }
-            CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
-
-            CodeownersChangesBrowserNode(owners).let {
-                it.markAsHelperNode()
-                model.insertNodeInto(it, grandParent, grandParent.childCount)
-
-                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
-                return it
-            }
+            return nextPolicyParent
         }
-        return nextPolicyParent
-    }
 
     internal class Factory : ChangesGroupingPolicyFactory() {
         override fun createGroupingPolicy(project: Project, model: DefaultTreeModel) =
-                CodeownersChangesGroupingPolicy(project, model)
+            CodeownersChangesGroupingPolicy(project, model)
     }
 
     companion object {
         val CODEOWNERS_CACHE = NotNullLazyKey.create<
-                        MutableMap<
-                                ChangesBrowserNode<*>,
-                                MutableMap<Set<OwnerString>, ChangesBrowserNode<*>>,
-                                >,
-                        ChangesBrowserNode<*>
-                >("ChangesTree.CodeownersCache") { mutableMapOf() }
+            MutableMap<
+                ChangesBrowserNode<*>,
+                MutableMap<Set<OwnerString>, ChangesBrowserNode<*>>,
+                >,
+            ChangesBrowserNode<*>
+            >("ChangesTree.CodeownersCache") { mutableMapOf() }
     }
 }

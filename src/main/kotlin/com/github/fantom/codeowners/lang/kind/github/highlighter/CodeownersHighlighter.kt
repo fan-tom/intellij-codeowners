@@ -11,6 +11,7 @@ import com.intellij.psi.tree.IElementType
 /**
  * Syntax highlighter definition.
  */
+@Suppress("UnusedPrivateMember")
 class CodeownersHighlighter(private val virtualFile: VirtualFile?) : SyntaxHighlighterBase() {
 
     companion object {

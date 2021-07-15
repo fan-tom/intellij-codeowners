@@ -1,8 +1,9 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.lang.CodeownersEntryBase
 import com.github.fantom.codeowners.lang.CodeownersFile
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Glob
@@ -47,7 +48,7 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
         val map = mutableMapOf<com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern, Set<String>>()
 
         val patterns = file
-                .findChildrenByClass(com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern::class.java)
+            .findChildrenByClass(com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern::class.java)
         val matcher = file.project.service<CodeownersMatcher>()
         val matchedMap = getPathsSet(contextDirectory, patterns.map { it.entryFile }, matcher)
 
@@ -70,11 +71,11 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
                     return@recent
                 }
 //                if (entry.isNegated == recent.isNegated) {
-                    if (recentValues.containsAll(matched)) {
-                        result.add(Pair.create(recent, pattern))
-                    } else if (matched.containsAll(recentValues)) {
-                        result.add(Pair.create(pattern, recent))
-                    }
+                if (recentValues.containsAll(matched)) {
+                    result.add(Pair.create(recent, pattern))
+                } else if (matched.containsAll(recentValues)) {
+                    result.add(Pair.create(pattern, recent))
+                }
 //                } else if (intersection.containsAll(recentValues)) {
 //                    result.add(Pair.create(entry, recent))
 //                }
@@ -126,9 +127,9 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
      * @return generated message [String]
      */
     private fun message(
-            coveringEntry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry,
-            virtualFile: VirtualFile,
-            onTheFly: Boolean
+        coveringEntry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry,
+        virtualFile: VirtualFile,
+        onTheFly: Boolean
     ): String {
         val document = FileDocumentManager.getInstance().getDocument(virtualFile)
 
@@ -138,7 +139,7 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
             CodeownersBundle.message(
                 "codeInspection.coverEntry.message",
                 "<a href=\"" + virtualFile.url + Constants.HASH + coveringEntry.textRange.startOffset + "\">" +
-                        coveringEntry.text + "</a>"
+                    coveringEntry.text + "</a>"
             )
         }
     }

@@ -2,15 +2,16 @@ package com.github.fantom.codeowners.daemon
 
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.lang.CodeownersEntryBase
+import com.github.fantom.codeowners.services.CodeownersMatcher
+import com.github.fantom.codeowners.util.Glob
+import com.github.fantom.codeowners.util.Utils
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.nextLeafs
 import com.intellij.util.PlatformIcons
-import com.github.fantom.codeowners.services.CodeownersMatcher
-import com.github.fantom.codeowners.util.Glob
-import com.github.fantom.codeowners.util.Utils
 
 /**
  * [LineMarkerProvider] that marks entry lines with directory icon if they point to the directory in virtual system.
@@ -48,13 +49,13 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
         }
 
         return if (isDirectory) LineMarkerInfo(
-                element.getFirstChild(),
-                element.getTextRange(),
-                PlatformIcons.FOLDER_ICON,
-                null,
-                null,
-                GutterIconRenderer.Alignment.CENTER,
-                CodeownersBundle.messagePointer("daemon.lineMarker.directory")
+            element.nextLeafs.first(),
+            element.getTextRange(),
+            PlatformIcons.FOLDER_ICON,
+            null,
+            null,
+            GutterIconRenderer.Alignment.CENTER,
+            CodeownersBundle.messagePointer("daemon.lineMarker.directory")
         )
         else null
     }

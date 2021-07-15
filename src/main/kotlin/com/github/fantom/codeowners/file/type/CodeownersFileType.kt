@@ -17,8 +17,8 @@ open class CodeownersFileType protected constructor(
 
     override fun isMyFileType(file: VirtualFile): Boolean {
         val res =
-                file.nameSequence == codeownersLanguage.filename
-                        && file.parent.name == codeownersLanguage.directory
+            file.nameSequence == codeownersLanguage.filename &&
+                file.parent.name == codeownersLanguage.directory
 //        LOGGER.trace("Detected ${codeownersLanguage.id} lang: $res")
         return res
     }
@@ -29,7 +29,7 @@ open class CodeownersFileType protected constructor(
     val languageName
         get() = codeownersLanguage.id
 
-    override fun getDescription() = codeownersLanguage.displayName //"Codeowners file"
+    override fun getDescription() = codeownersLanguage.displayName // "Codeowners file"
 
     override fun getDefaultExtension() = "CODEOWNERS"
 

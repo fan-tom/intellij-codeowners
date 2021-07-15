@@ -21,12 +21,13 @@ import java.util.Collections
  * Implementation of [AbstractCodeownersFilesIndex] that allows to index all codeowners files content using native
  * IDE mechanisms and increase indexing performance.
  */
+@Suppress("TooManyFunctions")
 class CodeownersFilesIndex :
-        FileBasedIndexExtension<CodeownersFileType, CodeownersEntryOccurrence>(),
-        KeyDescriptor<CodeownersFileType>,
-        DataIndexer<CodeownersFileType, CodeownersEntryOccurrence, FileContent?>,
-        InputFilter,
-        DumbAware {
+    FileBasedIndexExtension<CodeownersFileType, CodeownersEntryOccurrence>(),
+    KeyDescriptor<CodeownersFileType>,
+    DataIndexer<CodeownersFileType, CodeownersEntryOccurrence, FileContent?>,
+    InputFilter,
+    DumbAware {
     override fun getIndexer() = this
 
     override fun getKeyDescriptor() = this
@@ -98,8 +99,8 @@ class CodeownersFilesIndex :
 //        )
 
         return Collections.singletonMap(
-                (inputData.fileType as CodeownersFileType),
-                CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getPatternsList())
+            (inputData.fileType as CodeownersFileType),
+            CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getPatternsList())
         )
     }
 
@@ -112,18 +113,18 @@ class CodeownersFilesIndex :
     @Synchronized
     @Throws(IOException::class)
     override fun read(input: DataInput): CodeownersFileType = // CodeownersFileType.INSTANCE
-            input.readUTF().run {
-                CodeownersBundle.LANGUAGES
-                        .asSequence()
-                        .map { it.fileType }
-                        .firstOrNull { it.languageName == this }
-                        .let { it ?: CodeownersFileType.INSTANCE }
-            }
+        input.readUTF().run {
+            CodeownersBundle.LANGUAGES
+                .asSequence()
+                .map { it.fileType }
+                .firstOrNull { it.languageName == this }
+                .let { it ?: CodeownersFileType.INSTANCE }
+        }
 
     override fun getValueExternalizer() = DATA_EXTERNALIZER
 
     override fun getVersion() = VERSION
 
     override fun acceptInput(file: VirtualFile) =
-            file.fileType is CodeownersFileType // || CodeownersManager.FILE_TYPES_ASSOCIATION_QUEUE.containsKey(file.name)
+        file.fileType is CodeownersFileType // || CodeownersManager.FILE_TYPES_ASSOCIATION_QUEUE.containsKey(file.name)
 }

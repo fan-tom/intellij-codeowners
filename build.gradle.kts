@@ -82,9 +82,11 @@ intellij {
 
 changelog {
     headerParserRegex.set("\\[?v\\d(\\.\\d+)+\\]?.*".toRegex())
-    header.set(provider {
-        "[v$version] (https://github.com/fan-tom/intellij-codeowners/tree/v$version) (${date()})"
-    })
+    header.set(
+        provider {
+            "[v$version] (https://github.com/fan-tom/intellij-codeowners/tree/v$version) (${date()})"
+        }
+    )
     version.set(properties("pluginVersion"))
     groups.set(emptyList())
 }

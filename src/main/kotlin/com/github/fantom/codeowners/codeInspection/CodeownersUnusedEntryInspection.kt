@@ -54,9 +54,9 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
                 }
                 if (!resolved && !isEntryExcluded(entry, holder.project)) {
                     (entry.parent.parent as CodeownersFile)
-                            .containingDirectory
-                            ?.virtualFile
-                            ?.findFileByRelativePath(entry.text)
+                        .containingDirectory
+                        ?.virtualFile
+                        ?.findFileByRelativePath(entry.text)
                         ?: holder.registerProblem(
                             entry,
                             CodeownersBundle.message("codeInspection.unusedEntry.message"),
@@ -74,7 +74,7 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
              * @return entry is excluded in current project
              */
             @Suppress("ReturnCount")
-            private fun isEntryExcluded(entry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry, project: Project): Boolean {
+            private fun isEntryExcluded(entry: CodeownersEntry, project: Project): Boolean {
                 val pattern = entry.pattern() ?: return false
                 val moduleRoot = Utils.getModuleRootForFile(entry.containingFile.virtualFile, project) ?: return false
                 val files = MatcherUtil.getFilesForPattern(project, pattern)

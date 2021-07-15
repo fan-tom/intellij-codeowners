@@ -1,12 +1,12 @@
 package com.github.fantom.codeowners.settings
 
 import com.github.fantom.codeowners.CodeownersBundle
+import com.github.fantom.codeowners.ui.CodeownersSettingsPanel
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Comparing
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.VcsConfigurableProvider
-import com.github.fantom.codeowners.ui.CodeownersSettingsPanel
 
 /**
  * Configuration interface for [CodeownersSettings].
@@ -25,7 +25,7 @@ class CodeownersSettingsConfigurable : SearchableConfigurable, VcsConfigurablePr
 
     override fun isModified() = settingsPanel.run {
         !Comparing.equal(settings.missingCodeowners, missingCodeowners) ||
-            !Comparing.equal(settings.insertAtCursor, insertAtCursor) //||
+            !Comparing.equal(settings.insertAtCursor, insertAtCursor) // ||
 //            !languagesSettings.equalSettings(settings.languagesSettings)
     }
 

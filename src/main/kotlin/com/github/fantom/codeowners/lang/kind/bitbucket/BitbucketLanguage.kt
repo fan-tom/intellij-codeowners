@@ -17,13 +17,15 @@ class BitbucketLanguage : CodeownersLanguage("Bitbucket", ".bitbucket") {
         get() = BitbucketFileType.INSTANCE
 
     override fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>) =
-            object : CodeownersVisitor() {
-                override fun visitPattern(entry: CodeownersPattern) {
-                    val regex = entry.entry.regex(false)
-                    items.add(Pair(
-                            PatternString(regex),
-                            OwnersReference(entry.owners.map{ OwnerString(it.text) }, entry.textOffset)
-                    ))
-                }
+        object : CodeownersVisitor() {
+            override fun visitPattern(entry: CodeownersPattern) {
+                val regex = entry.entry.regex(false)
+                items.add(
+                    Pair(
+                        PatternString(regex),
+                        OwnersReference(entry.owners.map { OwnerString(it.text) }, entry.textOffset)
+                    )
+                )
             }
+        }
 }

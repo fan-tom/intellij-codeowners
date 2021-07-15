@@ -22,7 +22,7 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //        LANGUAGES_ID("id"),
         CODEOWNERS_FILE_STATUS("codeownersFileStatus"),
         INSERT_AT_CURSOR("insertAtCursor")
-;
+        ;
 
         override fun toString() = key
     }
@@ -51,17 +51,18 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //    /** Settings related to the [CodeownersLanguage]. */
 //    var languagesSettings = object : CodeownersLanguagesSettings() {
 //        init {
-////            CodeownersBundle.LANGUAGES.forEach {
+// //            CodeownersBundle.LANGUAGES.forEach {
 //                put(
 //                    CodeownersLanguage.INSTANCE,
 //                    object : TreeMap<KEY, Any>() {
 //                        init {
 //                            put(KEY.NEW_FILE, true)
-////                            put(KEY.ENABLE, CodeownersLanguage.INSTANCE.isVCS && !CodeownersBundle.isExcludedFromHighlighting((CodeownersLanguage.INSTANCE)))
+// //                            put(KEY.ENABLE, CodeownersLanguage.INSTANCE.isVCS &&
+// !CodeownersBundle.isExcludedFromHighlighting((CodeownersLanguage.INSTANCE)))
 //                        }
 //                    }
 //                )
-////            }
+// //            }
 //        }
 //    }
 //        set(value) {

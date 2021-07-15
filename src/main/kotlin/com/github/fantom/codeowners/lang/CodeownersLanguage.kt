@@ -2,9 +2,7 @@ package com.github.fantom.codeowners.lang
 
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
-import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.indexing.PatternString
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.github.fantom.codeowners.reference.CodeownersEntryReferenceSet
 import com.intellij.lang.Language
 import com.intellij.psi.FileViewProvider

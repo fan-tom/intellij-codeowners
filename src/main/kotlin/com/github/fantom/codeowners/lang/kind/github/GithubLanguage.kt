@@ -36,11 +36,10 @@ class GithubLanguage : CodeownersLanguage("Github", ".github") {
             }
         }
 
-    override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference>?  =
-            when (psiElement) {
-                is CodeownersEntry -> CodeownersEntryReferenceSet(psiElement).allReferences
-                is CodeownersNamedOwner -> arrayOf(CodeownersGithubOwnerReference(psiElement))
-                else -> null
-            }
-
+    override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference>? =
+        when (psiElement) {
+            is CodeownersEntry -> CodeownersEntryReferenceSet(psiElement).allReferences
+            is CodeownersNamedOwner -> arrayOf(CodeownersGithubOwnerReference(psiElement))
+            else -> null
+        }
 }

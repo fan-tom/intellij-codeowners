@@ -2,13 +2,13 @@ package com.github.fantom.codeowners.util
 
 import com.github.fantom.codeowners.lang.CodeownersEntryBase
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
+import com.github.fantom.codeowners.services.CodeownersMatcher
+import com.github.fantom.codeowners.util.Utils.getRelativePath
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.jetbrains.rd.util.concurrentMapOf
-import com.github.fantom.codeowners.services.CodeownersMatcher
-import com.github.fantom.codeowners.util.Utils.getRelativePath
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
@@ -101,7 +101,7 @@ object Glob {
      * @return regex [Pattern]
      */
     fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) =
-            createPattern(entry.value, acceptChildren, supportSquareBrackets)
+        createPattern(entry.value, acceptChildren, supportSquareBrackets)
 
     /**
      * Creates regex [Pattern] using glob rule.
@@ -232,7 +232,7 @@ object Glob {
                     escape = false
                 }
                 ch in arrayOf('.', '(', ')', '{', '}', '+', '|', '^', '$', '@', '%')
-                        || (!supportSquareBrackets && ch in arrayOf('[', ']')) -> {
+                    || (!supportSquareBrackets && ch in arrayOf('[', ']')) -> {
                     sb.append('\\')
                     sb.append(ch)
                     escape = false

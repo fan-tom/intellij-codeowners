@@ -4,10 +4,10 @@
 formatting:
   Indentation:
     continuationIndentSize: 8
-  NoWildcardImports:
-    active: false
   MaximumLineLength:
     maxLineLength: 140
+  NoWildcardImports:
+    active: false
 
 naming:
   VariableNaming:
@@ -16,6 +16,8 @@ naming:
 style:
   MaxLineLength:
     maxLineLength: 140
+  WildcardImport:
+    active: false
 
 exceptions:
   PrintStackTrace:

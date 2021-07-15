@@ -1,9 +1,9 @@
 package com.github.fantom.codeowners.lang
 //
-//import com.intellij.psi.PsiElement
-//import java.util.regex.Pattern
+// import com.intellij.psi.PsiElement
+// import java.util.regex.Pattern
 //
-//interface CodeownersEntryBase : PsiElement {
+// interface CodeownersEntryBase : PsiElement {
 //    /**
 //     * Returns current value.
 //     *
@@ -26,4 +26,4 @@ package com.github.fantom.codeowners.lang
 //     * @return pattern
 //     */
 //    fun pattern(acceptChildren: Boolean = false): Pattern?
-//}
+// }

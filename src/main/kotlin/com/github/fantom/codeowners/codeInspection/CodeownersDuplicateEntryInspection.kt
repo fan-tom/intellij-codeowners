@@ -28,7 +28,7 @@ class CodeownersDuplicateEntryInspection : LocalInspectionTool() {
         file.acceptChildren(
             object : CodeownersVisitor() {
                 override fun visitPattern(
-                        pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
+                    pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
                 ) {
                     val entry = pattern.entryFile
                     LOG.warn("Remembering entry ${entry.text}")
