@@ -3,6 +3,9 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+## [v0.2.1](https://github.com/fan-tom/intellij-codeowners/tree/v0.2.1) (2021-08-01)
+### Fixed
+- Support IDEA 2021.2
 ## [v0.2.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.2.0) (2021-05-25)
 ### Added
 - Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
