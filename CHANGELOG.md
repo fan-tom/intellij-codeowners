@@ -3,6 +3,7 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+## [vextension 'changelog' property 'version'] (https://github.com/fan-tom/intellij-codeowners/tree/vextension 'changelog' property 'version') (2021-08-08)
 ## [v0.3.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.0) (2021-08-09)
 ### Added
 - Group by owner in usage find results
