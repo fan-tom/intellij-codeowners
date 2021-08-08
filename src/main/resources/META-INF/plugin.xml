@@ -133,7 +133,16 @@
 
         <changesGroupingPolicy key="codeowners" id="codeowners"
                                implementationClass="com.github.fantom.codeowners.grouping.changes.CodeownersChangesGroupingPolicy$Factory"/>
+        <usageGroupingRuleProvider implementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageGroupingRuleProviderImpl" order="first"/>
+        <applicationService serviceImplementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageViewSettings"/>
     </extensions>
+
+    <application-components>
+        <component>
+            <implementation-class>com.github.fantom.codeowners.grouping.usage.CodeownersUsageGroupingRuleProviderImpl</implementation-class>
+        </component>
+    </application-components>
+
     <actions>
         <action id="ChangesView.GroupBy.Codeowner"
                 class="com.github.fantom.codeowners.grouping.changes.SetCodeownersChangesGroupingAction"
@@ -142,6 +151,17 @@
         >
             <add-to-group group-id="ChangesView.GroupBy" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="meta O"/>
+        </action>
+<!--        <action id="UsageGrouping.Codeowner"-->
+<!--                class="com.github.fantom.codeowners.grouping.SetCodeownersChangesGroupingAction"-->
+<!--                text="Codeowner"-->
+<!--                description="Group by code owner"-->
+<!--        >-->
+<!--&lt;!&ndash;            <add-to-group group-id="ChangesView.GroupBy" anchor="last"/>&ndash;&gt;-->
+<!--&lt;!&ndash;            <keyboard-shortcut keymap="$default" first-keystroke="meta O"/>&ndash;&gt;-->
+<!--        </action>-->
+        <action class="com.github.fantom.codeowners.grouping.usage.GroupByCodeownerAction" id="UsageGrouping.Codeowner">
+            <add-to-group group-id="UsageGroupingActionGroup"/>
         </action>
     </actions>
 </idea-plugin>
