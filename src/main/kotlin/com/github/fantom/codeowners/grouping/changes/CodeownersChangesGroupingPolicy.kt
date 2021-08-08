@@ -1,26 +1,14 @@
-package com.github.fantom.codeowners.grouping
+package com.github.fantom.codeowners.grouping.changes
 
 import com.github.fantom.codeowners.CodeownersIcons
 import com.github.fantom.codeowners.CodeownersManager
 import com.github.fantom.codeowners.OwnersSet
 import com.github.fantom.codeowners.indexing.OwnerString
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.NotNullLazyKey
-import com.intellij.openapi.vcs.changes.actions.SetChangesGroupingAction
 import com.intellij.openapi.vcs.changes.ui.*
 import javax.swing.tree.DefaultTreeModel
-
-class SetCodeownersChangesGroupingAction : SetChangesGroupingAction() {
-    override val groupingKey: String get() = "codeowners"
-
-    override fun update(e: AnActionEvent): Unit = super.update(e).also {
-        super.update(e)
-        val manager = e.project?.service<CodeownersManager>()
-        e.presentation.isEnabledAndVisible = e.presentation.isEnabledAndVisible && manager?.isAvailable ?: false
-    }
-}
 
 class CodeownersChangesBrowserNode(owners: OwnersSet) : ChangesBrowserNode<OwnersSet>(owners) {
     override fun render(renderer: ChangesBrowserNodeRenderer, selected: Boolean, expanded: Boolean, hasFocus: Boolean) {
@@ -49,32 +37,31 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
     private val codeownersManager = project.service<CodeownersManager>()
 
     @Suppress("ReturnCount")
-    override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>):
-        ChangesBrowserNode<*>? {
-            val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, subtreeRoot)
-            if (!codeownersManager.isAvailable) return nextPolicyParent
+    override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>): ChangesBrowserNode<*>? {
+        val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, subtreeRoot)
+        if (!codeownersManager.isAvailable) return nextPolicyParent
 
-            val file = resolveVirtualFile(nodePath)
-            file?.let { codeownersManager.getFileOwners(it) }?.let { ownersRef ->
-                val grandParent = nextPolicyParent ?: subtreeRoot
-                val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
-                val owners = if (ownersRef.isEmpty()) {
-                    emptySet()
-                } else {
-                    ownersRef.values.first().ref.owners.toSet()
-                }
-                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
-
-                CodeownersChangesBrowserNode(owners).let {
-                    it.markAsHelperNode()
-                    model.insertNodeInto(it, grandParent, grandParent.childCount)
-
-                    CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
-                    return it
-                }
+        val file = resolveVirtualFile(nodePath)
+        file?.let { codeownersManager.getFileOwners(it) }?.let { ownersRef ->
+            val grandParent = nextPolicyParent ?: subtreeRoot
+            val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
+            val owners = if (ownersRef.isEmpty()) {
+                emptySet()
+            } else {
+                ownersRef.values.first().ref.owners.toSet()
             }
-            return nextPolicyParent
+            CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
+
+            CodeownersChangesBrowserNode(owners).let {
+                it.markAsHelperNode()
+                model.insertNodeInto(it, grandParent, grandParent.childCount)
+
+                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
+                return it
+            }
         }
+        return nextPolicyParent
+    }
 
     internal class Factory : ChangesGroupingPolicyFactory() {
         override fun createGroupingPolicy(project: Project, model: DefaultTreeModel) =
