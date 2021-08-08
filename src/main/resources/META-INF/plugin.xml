@@ -132,11 +132,11 @@
         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
 
         <changesGroupingPolicy key="codeowners" id="codeowners"
-                               implementationClass="com.github.fantom.codeowners.grouping.CodeownersChangesGroupingPolicy$Factory"/>
+                               implementationClass="com.github.fantom.codeowners.grouping.changes.CodeownersChangesGroupingPolicy$Factory"/>
     </extensions>
     <actions>
         <action id="ChangesView.GroupBy.Codeowner"
-                class="com.github.fantom.codeowners.grouping.SetCodeownersChangesGroupingAction"
+                class="com.github.fantom.codeowners.grouping.changes.SetCodeownersChangesGroupingAction"
                 text="Codeowner"
                 description="Group by code owner"
         >
