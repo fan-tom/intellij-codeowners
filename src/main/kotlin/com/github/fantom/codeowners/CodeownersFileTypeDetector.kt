@@ -14,19 +14,26 @@ class CodeownersFileTypeDetector : FileTypeRegistry.FileTypeDetector {
         private val LOGGER = Logger.getInstance(CodeownersFileTypeDetector::class.java)
     }
 
+    private fun detectBitbucketFileType(line: String): Boolean {
+        return line.startsWith("@@@") || // team definition
+            line.startsWith("CODEOWNERS.") || // settings
+            line.startsWith("!") // negation. TODO WARN, may be imprecise
+    }
+
     /**
      *  [com.intellij.openapi.fileTypes.ex.FileTypeIdentifiableByVirtualFile.isMyFileType] is already called here,
      *  so we check only file name and content
      */
-    override fun detect(file: VirtualFile, firstBytes: ByteSequence, firstCharsIfText: CharSequence?): FileType? =
-        if (file.name == CodeownersLanguage.INSTANCE.filename) {
+    override fun detect(file: VirtualFile, firstBytes: ByteSequence, firstCharsIfText: CharSequence?): FileType? {
+        LOGGER.trace("Detecting lang: ${file.path}")
+        return if (file.name == CodeownersLanguage.INSTANCE.filename) {
             if (firstCharsIfText != null) {
-                if (
-                    firstCharsIfText.contains("\n@@@") || // team definition
-                    firstCharsIfText.contains("\nCODEOWNERS.") || // settings
-                    firstCharsIfText.contains("\n!") // negation. TODO WARN, may be imprecise
-                ) {
-                    LOGGER.trace("Detected lang: bb")
+                if (firstCharsIfText.lineSequence().any(::detectBitbucketFileType)) {
+                    LOGGER.trace("Detected lang using firstCharsIfText: bb")
+                    BitbucketFileType.INSTANCE
+                    // firstCharsIfText may be not enough to find bb-specific pattern, so check whole file content
+                } else if (file.inputStream.reader().useLines { it.any(::detectBitbucketFileType) }) {
+                    LOGGER.trace("Detected lang using file content: bb")
                     BitbucketFileType.INSTANCE
                 } else {
                     LOGGER.trace("Detected lang: gh")
@@ -41,4 +48,5 @@ class CodeownersFileTypeDetector : FileTypeRegistry.FileTypeDetector {
             LOGGER.trace("Detected lang: non-codeowners")
             null
         }
+    }
 }
