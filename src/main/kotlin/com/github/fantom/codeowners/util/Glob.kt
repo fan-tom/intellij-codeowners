@@ -231,8 +231,8 @@ object Glob {
                     bracket = false
                     escape = false
                 }
-                ch in arrayOf('.', '(', ')', '{', '}', '+', '|', '^', '$', '@', '%')
-                    || (!supportSquareBrackets && ch in arrayOf('[', ']')) -> {
+                ch in arrayOf('.', '(', ')', '{', '}', '+', '|', '^', '$', '@', '%') ||
+                    (!supportSquareBrackets && ch in arrayOf('[', ']')) -> {
                     sb.append('\\')
                     sb.append(ch)
                     escape = false
