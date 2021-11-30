@@ -1,8 +1,8 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
-import org.jetbrains.grammarkit.tasks.GenerateLexer
-import org.jetbrains.grammarkit.tasks.GenerateParser
+import org.jetbrains.grammarkit.tasks.GenerateLexerTask
+import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -20,7 +20,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.19.0"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    id("org.jetbrains.grammarkit") version "2021.1.3"
+    id("org.jetbrains.grammarkit") version "2021.2.1"
 }
 
 group = properties("pluginGroup")
@@ -37,34 +37,34 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 }
 
-val generateGithubLexer = task<GenerateLexer>("generateGithubLexer") {
-    source = "src/main/grammars/github/CodeownersLexer.flex"
-    targetDir = "src/main/gen/com/github/fantom/codeowners/lang/kind/github/lexer"
-    targetClass = "CodeownersLexer"
-    purgeOldFiles = true
+val generateGithubLexer = task<GenerateLexerTask>("generateGithubLexer") {
+    source.set("src/main/grammars/github/CodeownersLexer.flex")
+    targetDir.set("src/main/gen/com/github/fantom/codeowners/lang/kind/github/lexer")
+    targetClass.set("CodeownersLexer")
+    purgeOldFiles.set(true)
 }
 
-val generateGithubParser = task<GenerateParser>("generateGithubParser") {
-    source = "src/main/grammars/github/Codeowners.bnf"
-    targetRoot = "src/main/gen"
-    pathToParser = "/com/github/fantom/codeowners/lang/kind/github/parser/CodeownersParser.java"
-    pathToPsiRoot = "/com/github/fantom/codeowners/lang/kind/github/psi"
-    purgeOldFiles = true
+val generateGithubParser = task<GenerateParserTask>("generateGithubParser") {
+    source.set("src/main/grammars/github/Codeowners.bnf")
+    targetRoot.set("src/main/gen")
+    pathToParser.set("/com/github/fantom/codeowners/lang/kind/github/parser/CodeownersParser.java")
+    pathToPsiRoot.set("/com/github/fantom/codeowners/lang/kind/github/psi")
+    purgeOldFiles.set(true)
 }
 
-val generateBitbucketLexer = task<GenerateLexer>("generateBitbucketLexer") {
-    source = "src/main/grammars/bitbucket/CodeownersLexer.flex"
-    targetDir = "src/main/gen/com/github/fantom/codeowners/lang/kind/bitbucket/lexer"
-    targetClass = "CodeownersLexer"
-    purgeOldFiles = true
+val generateBitbucketLexer = task<GenerateLexerTask>("generateBitbucketLexer") {
+    source.set("src/main/grammars/bitbucket/CodeownersLexer.flex")
+    targetDir.set("src/main/gen/com/github/fantom/codeowners/lang/kind/bitbucket/lexer")
+    targetClass.set("CodeownersLexer")
+    purgeOldFiles.set(true)
 }
 
-val generateBitbucketParser = task<GenerateParser>("generateBitbucketParser") {
-    source = "src/main/grammars/bitbucket/Codeowners.bnf"
-    targetRoot = "src/main/gen"
-    pathToParser = "/com/github/fantom/codeowners/lang/kind/bitbucket/parser/CodeownersParser.java"
-    pathToPsiRoot = "/com/github/fantom/codeowners/lang/kind/bitbucket/psi"
-    purgeOldFiles = true
+val generateBitbucketParser = task<GenerateParserTask>("generateBitbucketParser") {
+    source.set("src/main/grammars/bitbucket/Codeowners.bnf")
+    targetRoot.set("src/main/gen")
+    pathToParser.set("/com/github/fantom/codeowners/lang/kind/bitbucket/parser/CodeownersParser.java")
+    pathToPsiRoot.set("/com/github/fantom/codeowners/lang/kind/bitbucket/psi")
+    purgeOldFiles.set(true)
 }
 
 // Configure gradle-intellij-plugin plugin.
