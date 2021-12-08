@@ -81,10 +81,10 @@ intellij {
 }
 
 changelog {
-    headerParserRegex.set("\\[?v\\d(\\.\\d+)+\\]?.*".toRegex())
+    headerParserRegex.set("\\[?v(\\d(?:\\.\\d+)+)]?.*".toRegex())
     header.set(
         provider {
-            "[v${version.get()}] (https://github.com/fan-tom/intellij-codeowners/tree/v${version.get()}) (${date()})"
+            "[v${version.get()}](https://github.com/fan-tom/intellij-codeowners/tree/v${version.get()}) (${date()})"
         }
     )
     version.set(properties("pluginVersion"))
@@ -149,7 +149,9 @@ tasks {
         // Get the latest available change notes from the changelog file
         changeNotes.set(
             provider {
-                changelog.getLatest().toHTML()
+                changelog.run {
+                    getOrNull(properties("pluginVersion")) ?: getLatest()
+                }.toHTML()
             }
         )
     }
