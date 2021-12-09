@@ -14,14 +14,14 @@ import com.intellij.openapi.vfs.VirtualFile
 object Utils {
 
     /**
-     * Gets relative path of given @{link VirtualFile} and root directory.
+     * Gets relative path of given [VirtualFile] and root directory.
      *
      * @param directory root directory
      * @param file      file to get it's path
      * @return relative path
      */
     fun getRelativePath(directory: VirtualFile, file: VirtualFile) =
-        VfsUtilCore.getRelativePath(file, directory, '/')?.let {
+        VfsUtilCore.getRelativePath(file, directory)?.let {
             it + ('/'.takeIf { file.isDirectory } ?: "")
         }
 
