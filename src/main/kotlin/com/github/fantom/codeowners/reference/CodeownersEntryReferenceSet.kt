@@ -18,7 +18,6 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferen
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceSet
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.rd.util.concurrentMapOf
-import java.util.ArrayList
 
 /**
  * [FileReferenceSet] definition class.
@@ -105,12 +104,10 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
         ) {
             ProgressManager.checkCanceled()
             super.innerResolveInContext(text, context, result, caseSensitive)
-            val containingFile = containingFile as? CodeownersFile ?: return
-            val contextVirtualFile: VirtualFile?
-
-            when {
-                Utils.isInProject(containingFile.virtualFile, element.project) -> {
-                    contextVirtualFile = context.virtualFile
+            val codeownersFile = containingFile as? CodeownersFile ?: return
+            val contextVirtualFile = when {
+                Utils.isInProject(codeownersFile.virtualFile, element.project) -> {
+                    context.virtualFile
                 }
                 else -> return
             }
@@ -120,7 +117,8 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
                 val current = canonicalText
                 val pattern =
                     Glob.createPattern(current, acceptChildren = false, supportSquareBrackets = false) ?: return
-                val root = element.containingFile.parent?.virtualFile
+                // TODO think about how to make it more precise. We need to know vcs root to resolve root dir properly
+                val root = (element.containingFile as CodeownersFile).fileType.getRoot(element.containingFile.virtualFile)
                 val psiManager = element.manager
 
                 ContainerUtil.createConcurrentList<VirtualFile>().run {

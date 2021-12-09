@@ -8,7 +8,7 @@ import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersVisitor
 
-class BitbucketLanguage : CodeownersLanguage("Bitbucket", ".bitbucket") {
+class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") {
     companion object {
         val INSTANCE = BitbucketLanguage()
     }

@@ -25,6 +25,7 @@ import com.intellij.openapi.vcs.FileStatusManager
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
 import com.intellij.openapi.vcs.VcsListener
 import com.intellij.openapi.vcs.VcsRoot
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -51,6 +52,7 @@ typealias OwnersSet = Set<OwnerString>
 data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0)
 
 data class OwnersFileReference(val url: String?, val ref: OwnersReference)
+
 /**
  * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
  */
@@ -74,9 +76,15 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     private val commonRunnableListeners = CommonRunnableListeners(debouncedStatusesChanged)
     private var messageBus = project.messageBus.connect(this)
     private val cachedCodeownersFilesIndex = CachedConcurrentMap
-        .create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key -> CodeownersFilesIndex.getEntries(project, key) }
+        .create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key ->
+            CodeownersFilesIndex.getEntries(
+                project,
+                key
+            )
+        }
 
-    private val expiringStatusCache = ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersFileReference>?>(Time.SECOND)
+    private val expiringStatusCache =
+        ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersFileReference>?>(Time.SECOND)
 
     private val debouncedExitDumbMode = object : Debounced<Boolean?>(3000) {
         override fun task(argument: Boolean?) {
@@ -137,7 +145,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
      * Checks if file has owners.
      *
      * @param file current file
-     * @return file owners list or null if cannot retrieve them due to project or IDE state (dumb mode, disposed)
+     * @return file owners by codeowner file type or null if cannot retrieve them due to project or IDE state (dumb mode, disposed)
      */
     @Suppress("ComplexCondition", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
     fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersFileReference>? {
@@ -186,12 +194,13 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     @Suppress("ReturnCount")
     private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence): OwnersFileReference? {
-        val codeownersVirtualFile = codeownersFile.file
-        var relativePath = codeownersVirtualFile?.let {
-            Utils.getRelativePath(it.parent, file)
+        val codeownersVirtualFile = codeownersFile.file ?: return null
+        var relativePath = getRoot(codeownersVirtualFile)?.let {
+            Utils.getRelativePath(it, file)
         } ?: return null
 
-        relativePath = StringUtil.trimEnd(StringUtil.trimStart(relativePath, "/"), "/")
+        relativePath =
+            StringUtil.trimEnd(StringUtil.trimStart(relativePath, VfsUtilCore.VFS_SEPARATOR), VfsUtilCore.VFS_SEPARATOR)
         if (StringUtil.isEmpty(relativePath)) {
             return null
         }
@@ -221,6 +230,16 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
                 }
                 return@let getFileOwners(file.parent, codeownersFile)
             }
+    }
+
+    private fun getRoot(codeownersVirtualFile: VirtualFile): VirtualFile? {
+        val vcsRoot = vcsRoots
+            .minByOrNull {
+                VfsUtilCore.getRelativePath(it.path, codeownersVirtualFile)?.run {
+                    split(VfsUtilCore.VFS_SEPARATOR_CHAR).count()
+                } ?: 0
+            } ?: return null
+        return (codeownersVirtualFile.fileType as CodeownersFileType).getRoot(vcsRoot, codeownersVirtualFile)
     }
 
     val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false

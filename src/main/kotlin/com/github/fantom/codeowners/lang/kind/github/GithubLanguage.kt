@@ -15,7 +15,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.util.ProcessingContext
 
-class GithubLanguage : CodeownersLanguage("Github", ".github") {
+class GithubLanguage private constructor() : CodeownersLanguage("Github") {
     companion object {
         val INSTANCE = GithubLanguage()
     }
