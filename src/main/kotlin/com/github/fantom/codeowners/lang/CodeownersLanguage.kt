@@ -14,7 +14,7 @@ import com.intellij.util.ProcessingContext
 /**
  * Codeowners [Language] definition
  */
-open class CodeownersLanguage protected constructor(name: String, val directory: String? = null) : Language(name) {
+open class CodeownersLanguage protected constructor(name: String) : Language(name) {
     val filename = "CODEOWNERS"
 
     override fun getDisplayName() = "$filename ($id)"
