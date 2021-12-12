@@ -24,7 +24,7 @@ import static com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTyp
 //EOL=\R
 //WHITE_SPACE={SPACES}
 
-CRLF="\r" | "\n" | "\r\n"
+CRLF            = "\r" | "\n" | "\r\n"
 LINE_WS         = [\ \t\f]
 WHITE_SPACE     = ({LINE_WS}*{CRLF}+)+
 
@@ -36,16 +36,27 @@ SLASH           = \/
 ATATAT          = @@@
 AT              = @
 QUOTE           = \"
+DOT             = "."
+
+CODEOWNERS_DOT              = CODEOWNERS\.
+CODEOWNERS                  = CODEOWNERS
+DESTINATION_BRANCH_PATTERN  = destination_branch_pattern
+TOP_LEVEL                   = toplevel
+SUBDIRECTORY_OVERRIDES      = subdirectory_overrides
+CREATE_PULL_REQUEST_COMMENT = create_pull_request_comment
+ENABLE                      = enable
+DISABLE                     = disable
+BRANCH_PATTERN              = [^\s]+
 
 
 ENTRY_FIRST_CHARACTER = [^#\ ]
 //VALUE=[^@/\s\/]+
 VALUE                 = ("\\\["|"\\\]"|"\\\/"|[^\[\]\r\n\/\s])+
-NAME_                  = [^#@/\s\/]+
+NAME_                 = [^#@/\s\/]+
 //VALUES_LIST=[^@/]+
 SPACES                = \s+
 
-%state IN_ENTRY, IN_OWNERS, IN_TEAM_DEFINITION
+%state IN_CONFIGURATION_LINE, IN_BRANCH_PATTERN, IN_ENABLE_DISABLE, IN_ENTRY, IN_OWNERS, IN_TEAM_DEFINITION
 
 %%
 <YYINITIAL> {
@@ -58,7 +69,32 @@ SPACES                = \s+
 
     {ATATAT}           { yypushback(yylength()); yybegin(IN_TEAM_DEFINITION); }
 
+    {CODEOWNERS_DOT}         { yypushback(yylength()); yybegin(IN_CONFIGURATION_LINE); }
     {ENTRY_FIRST_CHARACTER}  { yypushback(1); yybegin(IN_ENTRY); }
+}
+
+<IN_CONFIGURATION_LINE> {
+    {CRLF}+                         { yybegin(YYINITIAL); return CRLF; }
+    {CODEOWNERS}                    { yybegin(IN_CONFIGURATION_LINE); return CODEOWNERS; }
+    {DOT}                           { yybegin(IN_CONFIGURATION_LINE); return DOT; }
+
+    {DESTINATION_BRANCH_PATTERN}    { yybegin(IN_BRANCH_PATTERN); return DESTINATION_BRANCH_PATTERN; }
+    {TOP_LEVEL}                     { yybegin(IN_CONFIGURATION_LINE); return TOPLEVEL; }
+    {SUBDIRECTORY_OVERRIDES}        { yybegin(IN_ENABLE_DISABLE); return SUBDIRECTORY_OVERRIDES; }
+    {CREATE_PULL_REQUEST_COMMENT}   { yybegin(IN_ENABLE_DISABLE); return CREATE_PULL_REQUEST_COMMENT; }
+}
+
+<IN_BRANCH_PATTERN> {
+    {CRLF}+                         { yybegin(YYINITIAL); return CRLF; }
+    {LINE_WS}+                      { yybegin(IN_BRANCH_PATTERN); return WSS; }
+    {BRANCH_PATTERN}                { yybegin(IN_BRANCH_PATTERN); return BRANCH_PATTERN; }
+}
+
+<IN_ENABLE_DISABLE> {
+    {CRLF}+                         { yybegin(YYINITIAL); return CRLF; }
+    {LINE_WS}+                      { yybegin(IN_ENABLE_DISABLE); return WSS; }
+    {ENABLE}                        { yybegin(IN_ENABLE_DISABLE); return ENABLE; }
+    {DISABLE}                       { yybegin(IN_ENABLE_DISABLE); return DISABLE; }
 }
 
 <IN_TEAM_DEFINITION> {

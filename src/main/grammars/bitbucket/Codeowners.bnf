@@ -21,12 +21,22 @@
     COMMENT                 = "regexp:#.*"
     SLASH                   = "/"
     AT                      = "@"
+    DOT                     = "."
 //    TEAMNAME                = "regexp:[\w-]+"
 //    USERNAME                = "regexp:[\w\d-]+"
 //    DOMAIN                  = "regexp:\w+(\.\w+)+"
 //    VALUE                   = "regexp:[^@/\s]+"
     VALUE                   = "regexp:(?![!#\s])(?![\[\]])(?:(?:\\[\[\]])|(?:\/\/)|[^\[\]\/\s])+"
     NAME_                   = "regexp:[^@/\s]+"
+    CODEOWNERS                  = "CODEOWNERS"
+    DESTINATION_BRANCH_PATTERN  = "destination_branch_pattern"
+    TOP_LEVEL                   = "toplevel"
+    SUBDIRECTORY_OVERRIDES      = "subdirectory_overrides"
+    CREATE_PULL_REQUEST_COMMENT = "create_pull_request_comment"
+    ENABLE                      = "enable"
+    DISABLE                     = "disable"
+    // TODO maybe make it more precise, like https://stackoverflow.com/a/12093994/7286194
+    BRANCH_PATTERN              = "regexp:[^\s]+"
     //QUOTED_VALUE            = 'regexp:"([^@/]+)+"'
 //    VALUES_LIST             = 'regexp:[^@/]+'
 //    SPACES                  = 'regexp:\s+'
@@ -41,8 +51,17 @@
 }
 
 codeownersFile          ::= item_ *
-private item_           ::= HEADER | SECTION | COMMENT | value_item_ | CRLF
+private item_           ::= HEADER | SECTION | COMMENT | ConfigurationLine | value_item_ | CRLF
 private value_item_     ::= (Pattern | TeamDefinition) WSS? COMMENT?
+
+ConfigurationLine       ::= CODEOWNERS DOT Configuration
+Configuration           ::= DestinationBranch | TopLevelConfiguration
+
+DestinationBranch       ::= DESTINATION_BRANCH_PATTERN WSS BRANCH_PATTERN
+
+TopLevelConfiguration   ::= TOPLEVEL DOT TopLevelSettings
+TopLevelSettings        ::= (SUBDIRECTORY_OVERRIDES | CREATE_PULL_REQUEST_COMMENT) WSS EnableOrDisable
+EnableOrDisable         ::= ENABLE | DISABLE
 
 NEGATION                ::= "!"
 Reset                   ::= NEGATION Entry
