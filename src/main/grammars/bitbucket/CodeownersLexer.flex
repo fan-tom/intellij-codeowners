@@ -19,7 +19,6 @@ import static com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTyp
 %function advance
 %type IElementType
 %unicode
-%debug
 
 //EOL=\R
 //WHITE_SPACE={SPACES}
