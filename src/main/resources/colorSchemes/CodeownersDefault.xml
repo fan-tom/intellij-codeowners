@@ -52,6 +52,16 @@
             <option name="FOREGROUND" value="5C9F30" />
         </value>
     </option>
+    <option name="CODEOWNERS.CONFIG_VALUE">
+        <value>
+            <option name="FOREGROUND" value="CC7832" />
+        </value>
+    </option>
+    <option name="CODEOWNERS.CONFIG_NAME">
+        <value>
+            <option name="FOREGROUND" value="08FF00" />
+        </value>
+    </option>
     <option name="CODEOWNERS.UNUSED_ENTRY">
         <value>
             <option name="FOREGROUND" value="808080" />
