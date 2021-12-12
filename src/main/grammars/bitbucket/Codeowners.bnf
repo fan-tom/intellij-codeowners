@@ -27,6 +27,8 @@
 //    VALUE                   = "regexp:[^@/\s]+"
     VALUE                   = "regexp:(?![!#\s])(?![\[\]])(?:(?:\\[\[\]])|(?:\/\/)|[^\[\]\/\s])+"
     NAME_                   = "regexp:[^@/\s]+"
+    // TODO maybe make it more precise, like https://stackoverflow.com/a/12093994/7286194
+    BRANCH_PATTERN              = "regexp:[^\s]+"
     //QUOTED_VALUE            = 'regexp:"([^@/]+)+"'
 //    VALUES_LIST             = 'regexp:[^@/]+'
 //    SPACES                  = 'regexp:\s+'
@@ -41,8 +43,14 @@
 }
 
 codeownersFile          ::= item_ *
-private item_           ::= HEADER | SECTION | COMMENT | value_item_ | CRLF
+private item_           ::= HEADER | SECTION | COMMENT | ConfigurationLine | value_item_ | CRLF
 private value_item_     ::= (Pattern | TeamDefinition) WSS? COMMENT?
+
+ConfigurationLine              ::= DestinationBranchConfig | SubdirectoryOverridesConfig | CreatePullRequestCommentConfig
+DestinationBranchConfig        ::= DESTINATION_BRANCH WSS BRANCH_PATTERN
+SubdirectoryOverridesConfig    ::= SUBDIRECTORY_OVERRIDES WSS EnableOrDisable
+CreatePullRequestCommentConfig ::= CREATE_PULL_REQUEST_COMMENT WSS EnableOrDisable
+EnableOrDisable                ::= ENABLE | DISABLE
 
 NEGATION                ::= "!"
 Reset                   ::= NEGATION Entry

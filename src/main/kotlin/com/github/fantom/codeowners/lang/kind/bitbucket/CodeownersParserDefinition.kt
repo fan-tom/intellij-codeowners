@@ -67,6 +67,18 @@ class CodeownersParserDefinition : ParserDefinition {
         /** All values - parts of paths  */
         val NAMES = TokenSet.create(CodeownersTypes.NAME_)
 
+        val CONFIG_NAMES = TokenSet.create(
+            CodeownersTypes.DESTINATION_BRANCH,
+            CodeownersTypes.CREATE_PULL_REQUEST_COMMENT,
+            CodeownersTypes.SUBDIRECTORY_OVERRIDES,
+        )
+
+        val CONFIG_VALUES = TokenSet.create(
+            CodeownersTypes.BRANCH_PATTERN,
+            CodeownersTypes.ENABLE,
+            CodeownersTypes.DISABLE,
+        )
+
         /** Regular comment started with #  */
         val COMMENTS = TokenSet.create(CodeownersTypes.COMMENT)
 

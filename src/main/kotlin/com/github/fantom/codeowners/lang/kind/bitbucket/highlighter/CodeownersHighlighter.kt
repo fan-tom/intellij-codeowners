@@ -26,6 +26,8 @@ class CodeownersHighlighter(private val virtualFile: VirtualFile?) : SyntaxHighl
             fillMap(ATTRIBUTES, CodeownersParserDefinition.SLASHES, CodeownersHighlighterColors.SLASH)
             fillMap(ATTRIBUTES, CodeownersParserDefinition.VALUES, CodeownersHighlighterColors.VALUE)
             fillMap(ATTRIBUTES, CodeownersParserDefinition.NAMES, CodeownersHighlighterColors.NAME)
+            fillMap(ATTRIBUTES, CodeownersParserDefinition.CONFIG_NAMES, CodeownersHighlighterColors.CONFIG_NAME)
+            fillMap(ATTRIBUTES, CodeownersParserDefinition.CONFIG_VALUES, CodeownersHighlighterColors.CONFIG_VALUE)
         }
     }
 
