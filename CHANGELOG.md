@@ -3,9 +3,12 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+
+## [v0.3.2](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.2) (2021-12-13)
 ### Added
 - Support `docs`, `.github`, `.bitibucket` dirs as CODEOWNERS file locations
 - Support bitbucket config lines
+
 ## [v0.3.1](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.1) (2021-11-25)
 ### Fixed
 - Bitbucket filetype detection
