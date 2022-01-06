@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners
 
-import com.github.fantom.codeowners.file.type.CodeownersFileType
+import arrow.core.Either
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
@@ -16,10 +16,18 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.impl.status.EditorBasedStatusBarPopup
 import com.jetbrains.rd.util.first
 
+inline fun <E, T> Either<E, T>.unwrap(f: (E) -> Nothing): T =
+    when (this) {
+        is Either.Left -> f(this.value)
+        is Either.Right -> this.value
+    }
+
 class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, false) {
     companion object {
         private val LOGGER = Logger.getInstance(CodeownersBarPanel::class.java)
     }
+
+    private val manager = project.service<CodeownersManager>()
 
     override fun ID(): String {
         return "CodeownersPanel"
@@ -30,19 +38,24 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         return state
     }
 
-    private fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersFileReference>? {
-        val manager = project.service<CodeownersManager>()
-        return manager.getFileOwners(file)
-    }
-
+//    private fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersFileReference>? {
+//        return manager.getFileOwners(file)
+//    }
+//
     @Suppress("ReturnCount")
     override fun getWidgetState(file: VirtualFile?): WidgetState {
-        LOGGER.trace("getWidgetState")
+        LOGGER.trace("getWidgetState for file $file")
         if (file == null) {
             return getWidgetStateWithIcon(WidgetState.HIDDEN)
         }
-        val ownersMap = getFileOwners(file)
-            ?: return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
+        if (!manager.isAvailable) {
+            return getWidgetStateWithIcon(WidgetState.HIDDEN)
+//            return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Not available: "))
+        }
+        val ownersMap = manager.getFileOwners(file)
+            .unwrap {
+                return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners $it:"))
+            }
 
         val (toolTipText, panelText, actionIsAvailable) = when (ownersMap.size) {
             0 -> Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
@@ -74,9 +87,11 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
 
     @Suppress("ReturnCount")
     override fun createPopup(context: DataContext?): ListPopup? {
-        val owners = getFileOwners(selectedFile ?: return null)
+        val owners = manager
+            .getFileOwners(selectedFile ?: return null)
+            .unwrap { return null }
         when {
-            owners === null || owners.isEmpty() -> return null
+            owners.isEmpty() -> return null
             owners.size == 1 -> {
                 val ref = owners.entries.first().value
                 goToOwner(ref.url ?: return null, ref.ref.offset)
