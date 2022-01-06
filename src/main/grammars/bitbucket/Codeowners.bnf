@@ -39,7 +39,7 @@
   mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersEntryExtImpl"
   implements("Pattern")     = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPatternBase"
   mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPatternExtImpl"
-  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
+//  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
 }
 
 codeownersFile          ::= item_ *
@@ -80,7 +80,12 @@ Owners                  ::= Owner (WSS Owner)*
 Owner                   ::= Email | NamedOwner
 NamedOwner              ::= Team | User
 
-Team                    ::= '@''@' TeamName
+Team                    ::= '@''@' TeamName {
+//    mixin = "CodeownersTeamNameNamedElementImpl"
+//    implements = "CodeownersTeamNameNamedElement"
+    mixin = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
+//    methods = [ getName setName getNameIdentifier ]
+}
 User                    ::= '@' UserName
 
 Email                   ::= UserName '@' Domain
