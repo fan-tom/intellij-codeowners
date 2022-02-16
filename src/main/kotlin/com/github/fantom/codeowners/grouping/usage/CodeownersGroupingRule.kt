@@ -29,8 +29,14 @@ class CodeownersGroupingRule(project: Project) :
     }
 
     private fun getGroupForFile(virtualFile: VirtualFile): UsageGroup? {
-        // TODO need to return explicit error instead of null/empty map/empty owners list
-        return codeownersManager.getFileOwners(virtualFile)?.values?.firstOrNull()?.ref?.owners?.toSet()
+        return codeownersManager.getFileOwners(virtualFile)
+            // TODO handle error properly
+            .orNull()
+            ?.values
+            ?.firstOrNull()
+            ?.ref
+            ?.owners
+            ?.toSet()
             ?.let(::CodeownersGroup)
     }
 

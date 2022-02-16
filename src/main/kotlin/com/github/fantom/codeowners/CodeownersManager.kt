@@ -1,5 +1,8 @@
 package com.github.fantom.codeowners
 
+import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import com.github.fantom.codeowners.file.type.CodeownersFileType
 import com.github.fantom.codeowners.indexing.CodeownersEntryOccurrence
 import com.github.fantom.codeowners.indexing.CodeownersFilesIndex
@@ -17,8 +20,11 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.ExactFileNameMatcher
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.project.*
+import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.DumbService.DumbModeListener
+import com.intellij.openapi.project.NoAccessDuringPsiEvents
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vcs.FileStatusManager
@@ -31,7 +37,8 @@ import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
-import com.intellij.psi.PsiManager
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.ProjectScope
 import com.intellij.util.Time
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.messages.Topic
@@ -53,10 +60,17 @@ data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int
 
 data class OwnersFileReference(val url: String?, val ref: OwnersReference)
 
+sealed class GetFileOwnersError {
+    object InDumbMode : GetFileOwnersError()
+    object NotInProject : GetFileOwnersError()
+    object Disposed : GetFileOwnersError()
+    object NoVirtualFile : GetFileOwnersError()
+}
+
 /**
  * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
  */
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "TooManyFunctions")
 class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private val matcher = project.service<CodeownersMatcher>()
@@ -142,71 +156,79 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     }
 
     /**
+     * @return: list of CODEOWNERS files that can assign owners to given file.
+     * Might be no equal to the list of all existing CODEOWNERS files i.e in case of local overrides for Bitbucket
+     */
+    @Suppress("UnusedPrivateMember")
+    fun getApplicableCodeownersFiles(file: VirtualFile): Map<CodeownersFileType, List<CodeownersEntryOccurrence>> {
+        // TODO handle actual overrides
+        return FILE_TYPES
+            .mapNotNull { ty -> cachedCodeownersFilesIndex[ty]?.let { Pair(ty, it) } }
+            .associate { it }
+    }
+
+    /**
      * Checks if file has owners.
      *
      * @param file current file
-     * @return file owners by codeowner file type or null if cannot retrieve them due to project or IDE state (dumb mode, disposed)
+     * @return file owners by codeowner file type or error.
+     * Empty if no applicable CODEOWNERS files exist
+     * Each value of returned map contains a list of owners (if any) and reference to line in corresponding CODEOWNERS file
+     * (or first line if no owners defined in given file)
+     * Error if cannot retrieve them due to project or IDE state (dumb mode, disposed)
      */
     @Suppress("ComplexCondition", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
-    fun getFileOwners(file: VirtualFile): Map<CodeownersFileType, OwnersFileReference>? {
+    fun getFileOwners(file: VirtualFile): Either<GetFileOwnersError, Map<CodeownersFileType, OwnersFileReference>> {
         LOGGER.trace(">getFileOwners ${file.name}")
         expiringStatusCache[file]?.let {
             LOGGER.trace("<getFileOwners ${file.name} cached ${it.entries.joinToString(",")}")
-            return it
+            return Right(it)
         }
         if (DumbService.isDumb(project)) {
             LOGGER.trace("<getFileOwners ${file.name} dumbMode, null")
-            return null
+            return Left(GetFileOwnersError.InDumbMode)
         }
         if (!Utils.isInProject(file, project)) {
             LOGGER.trace("<getFileOwners ${file.name} not in project, emptyList")
-            return emptyMap()
+            return Left(GetFileOwnersError.NotInProject)
         }
         if (ApplicationManager.getApplication().isDisposed || project.isDisposed ||
             /*|| !isEnabled  || */
             NoAccessDuringPsiEvents.isInsideEventProcessing()
         ) {
             LOGGER.trace("<getFileOwners ${file.name} emptyList")
-            return emptyMap()
+            return Left(GetFileOwnersError.Disposed)
         }
         val ownersMap = mutableMapOf<CodeownersFileType, OwnersFileReference>()
 //        var matched = false
-        for (fileType in FILE_TYPES) {
+        for ((fileType, codeownersFiles) in getApplicableCodeownersFiles(file)) {
             ProgressManager.checkCanceled()
 //            if (CodeownersBundle.ENABLED_LANGUAGES[fileType] != true) {
 //                continue
 //            }
-            val codeownersFiles = cachedCodeownersFilesIndex[fileType] ?: emptyList()
+//            val codeownersFiles = cachedCodeownersFilesIndex[fileType] ?: continue
             val filesCount = codeownersFiles.size
             LOGGER.trace(">>getFileOwners ${file.name}, inspecting $fileType with $filesCount codeowners files")
 
             @Suppress("LoopWithTooManyJumpStatements")
             for (codeownersFile in codeownersFiles) {
                 ProgressManager.checkCanceled()
-                getFileOwners(file, codeownersFile)?.also {
-                    ownersMap[fileType] = it
+                getFileOwners(file, codeownersFile).map {
+                    ownersMap[fileType] = it ?: return@map
                 }
             }
         }
         LOGGER.trace("<getFileOwners ${file.name} '${ownersMap.entries.joinToString(",")}'")
-        return expiringStatusCache.set(file, ownersMap)
+        expiringStatusCache[file] = ownersMap
+        return Right(ownersMap)
     }
 
     @Suppress("ReturnCount")
-    private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence): OwnersFileReference? {
-        val codeownersVirtualFile = codeownersFile.file ?: return null
-        var relativePath = getRoot(codeownersVirtualFile)?.let {
-            Utils.getRelativePath(it, file)
-        } ?: return null
+    private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence):
+        Either<GetFileOwnersError, OwnersFileReference?> {
+        val codeownersVirtualFile = codeownersFile.file ?: return Left(GetFileOwnersError.NoVirtualFile)
+        val relativePath = getRelativePathToTheNearestVcsRoot(file, codeownersVirtualFile) ?: return Right(null)
 
-        relativePath =
-            StringUtil.trimEnd(StringUtil.trimStart(relativePath, VfsUtilCore.VFS_SEPARATOR), VfsUtilCore.VFS_SEPARATOR)
-        if (StringUtil.isEmpty(relativePath)) {
-            return null
-        }
-        if (file.isDirectory) {
-            relativePath += "/"
-        }
         return codeownersFile.items.lastOrNull {
             LOGGER.trace(">>>getFileOwners check pattern ${it.first} against $relativePath")
             val pattern = Glob.getPattern(it.first.pattern)
@@ -219,17 +241,34 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 //                return@lastOrNull false
         }?.let {
             LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
-            return@let OwnersFileReference(codeownersVirtualFile.url, it.second)
+            return@let Right(OwnersFileReference(codeownersVirtualFile.url, it.second))
         }
             ?: file.parent.let { directory ->
                 vcsRoots.forEach { vcsRoot ->
                     ProgressManager.checkCanceled()
                     if (directory == vcsRoot.path) {
-                        return@let OwnersFileReference(codeownersVirtualFile.url, OwnersReference())
+                        return@let Right(OwnersFileReference(codeownersVirtualFile.url, OwnersReference()))
                     }
                 }
                 return@let getFileOwners(file.parent, codeownersFile)
             }
+    }
+
+    @Suppress("ReturnCount")
+    private fun getRelativePathToTheNearestVcsRoot(file: VirtualFile, codeownersVirtualFile: VirtualFile): String? {
+        var relativePath = getRoot(codeownersVirtualFile)?.let {
+            Utils.getRelativePath(it, file)
+        } ?: return null
+
+        relativePath =
+            StringUtil.trimEnd(StringUtil.trimStart(relativePath, VfsUtilCore.VFS_SEPARATOR), VfsUtilCore.VFS_SEPARATOR)
+        if (StringUtil.isEmpty(relativePath)) {
+            return null
+        }
+        if (file.isDirectory) {
+            relativePath += "/"
+        }
+        return relativePath
     }
 
     private fun getRoot(codeownersVirtualFile: VirtualFile): VirtualFile? {
@@ -244,16 +283,22 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
 
-    // TODO think about how to avoid this calculation and use index?
     @Suppress("ReturnCount")
     private fun codeownersFilesExist(): Boolean? {
-        val projectDir = project.guessProjectDir() ?: return null
-        val directory = PsiManager.getInstance(project).findDirectory(projectDir) ?: return null
-
-        val filename = CodeownersFileType.INSTANCE.codeownersLanguage.filename
-        val file = directory.findFile(filename)
-
-        return file?.virtualFile ?: directory.virtualFile.findChild(filename) != null
+        return CodeownersBundle.LANGUAGES
+            .asSequence()
+            .map { it.filename }
+            .distinctBy { it }
+            .any {
+                FilenameIndex.getVirtualFilesByName(it, ProjectScope.getProjectScope(project)).isNotEmpty()
+            }
+//        val projectDir = project.guessProjectDir() ?: return null
+//        val directory = PsiManager.getInstance(project).findDirectory(projectDir) ?: return null
+//
+//        val filename = CodeownersFileType.INSTANCE.codeownersLanguage.filename
+//        val file = directory.findFile(filename)
+//
+//        return file?.virtualFile ?: directory.virtualFile.findChild(filename) != null
     }
 
     /** Enable manager. */

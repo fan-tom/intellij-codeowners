@@ -42,24 +42,27 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
         if (!codeownersManager.isAvailable) return nextPolicyParent
 
         val file = resolveVirtualFile(nodePath)
-        file?.let { codeownersManager.getFileOwners(it) }?.let { ownersRef ->
-            val grandParent = nextPolicyParent ?: subtreeRoot
-            val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
-            val owners = if (ownersRef.isEmpty()) {
-                emptySet()
-            } else {
-                ownersRef.values.first().ref.owners.toSet()
-            }
-            CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
+        file
+            // TODO handle error properly
+            ?.let { codeownersManager.getFileOwners(it).orNull() }
+            ?.let { ownersRef ->
+                val grandParent = nextPolicyParent ?: subtreeRoot
+                val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
+                val owners = if (ownersRef.isEmpty()) {
+                    emptySet()
+                } else {
+                    ownersRef.values.first().ref.owners.toSet()
+                }
+                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
 
-            CodeownersChangesBrowserNode(owners).let {
-                it.markAsHelperNode()
-                model.insertNodeInto(it, grandParent, grandParent.childCount)
+                CodeownersChangesBrowserNode(owners).let {
+                    it.markAsHelperNode()
+                    model.insertNodeInto(it, grandParent, grandParent.childCount)
 
-                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
-                return it
+                    CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners] = it
+                    return it
+                }
             }
-        }
         return nextPolicyParent
     }
 

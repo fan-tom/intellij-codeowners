@@ -6,10 +6,17 @@ import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.indexing.PatternString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeam
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeamReference
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersVisitor
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
+import com.intellij.util.ProcessingContext
 
 class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") {
     companion object {
+        private val LOGGER = Logger.getInstance(BitbucketLanguage::class.java)
         val INSTANCE = BitbucketLanguage()
     }
 
@@ -28,4 +35,18 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
                 )
             }
         }
+
+    override fun getReferencesByElement(
+        psiElement: PsiElement,
+        processingContext: ProcessingContext
+    ): Array<out PsiReference>? {
+        LOGGER.trace("> getReferencesByElement bb for $psiElement")
+        return if (psiElement is CodeownersTeam) {
+            arrayOf(CodeownersTeamReference(psiElement))
+        } else {
+            super.getReferencesByElement(psiElement, processingContext)
+        }.also {
+            LOGGER.trace("< getReferencesByElement bb: $it")
+        }
+    }
 }
