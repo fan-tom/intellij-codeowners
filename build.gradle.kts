@@ -22,6 +22,8 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     // gradle-grammar-kit-plugin - read more: https://github.com/JetBrains/gradle-grammar-kit-plugin
     id("org.jetbrains.grammarkit") version "2021.2.1"
+
+    id("org.barfuin.gradle.taskinfo") version "1.0.1"
 }
 
 group = properties("pluginGroup")
@@ -105,7 +107,7 @@ tasks {
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
             kotlinOptions.jvmTarget = "11"
-            kotlinOptions.freeCompilerArgs = listOf("-Xinline-classes")
+            kotlinOptions.freeCompilerArgs = listOf("-Xinline-classes", "-Xjvm-default=all")
 
             dependsOn(generateGithubLexer, generateGithubParser, generateBitbucketLexer, generateBitbucketParser)
         }
