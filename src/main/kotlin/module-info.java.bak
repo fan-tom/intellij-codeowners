@@ -1,0 +1,15 @@
+module com.github.fantom.codeowners.lang.kind.github {
+    requires platform.api;
+    requires platform.impl;
+    requires util;
+    requires kotlin.stdlib;
+    exports com.github.fantom.codeowners.lang.kind.github;
+};
+
+module com.github.fantom.codeowners.lang.kind.bitbucket {
+    requires platform.api;
+    requires platform.impl;
+    requires util;
+    requires kotlin.stdlib;
+    exports com.github.fantom.codeowners.lang.kind.github;
+}
