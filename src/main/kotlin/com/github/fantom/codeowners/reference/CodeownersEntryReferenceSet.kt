@@ -118,7 +118,7 @@ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(elemen
                 val pattern =
                     Glob.createPattern(current, acceptChildren = false, supportSquareBrackets = false) ?: return
                 // TODO think about how to make it more precise. We need to know vcs root to resolve root dir properly
-                val root = (element.containingFile as CodeownersFile).fileType.getRoot(element.containingFile.virtualFile)
+                val root = element.containingFile.virtualFile?.let { (element.containingFile as CodeownersFile).fileType.getRoot(it) }
                 val psiManager = element.manager
 
                 ContainerUtil.createConcurrentList<VirtualFile>().run {

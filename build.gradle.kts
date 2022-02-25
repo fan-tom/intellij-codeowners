@@ -32,6 +32,7 @@ sourceSets["main"].java.srcDirs("src/main/gen")
 // Configure project's dependencies
 repositories {
     mavenCentral()
+    maven { setUrl("https://www.jetbrains.com/intellij-repository/snapshots") }
 }
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0")
