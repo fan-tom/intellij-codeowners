@@ -281,6 +281,23 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         return (codeownersVirtualFile.fileType as CodeownersFileType).getRoot(vcsRoot, codeownersVirtualFile)
     }
 
+    /**
+     * Find root for given codeowners file relatively to the nearest VCS root, if any
+     */
+    private fun getRelativePathToTheNearestVcsRoot(codeownersVirtualFile: VirtualFile): String? {
+        return vcsRoots
+            .asSequence()
+            .mapNotNull {
+                val relativePath = VfsUtilCore.getRelativePath(it.path, codeownersVirtualFile)
+                    ?: return@mapNotNull null
+                val distance = relativePath.split(VfsUtilCore.VFS_SEPARATOR_CHAR).count()
+                Pair(relativePath, distance)
+            }
+            .minByOrNull { it.second }
+            ?.first
+            ?: return null
+    }
+
     val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
 
     @Suppress("ReturnCount")

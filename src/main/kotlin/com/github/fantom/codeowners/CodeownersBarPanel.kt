@@ -47,6 +47,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         LOGGER.trace("getWidgetState for file $file")
         if (file == null) {
             return getWidgetStateWithIcon(WidgetState.HIDDEN)
+//            return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "File is null: "))
         }
         if (!manager.isAvailable) {
             return getWidgetStateWithIcon(WidgetState.HIDDEN)
@@ -58,8 +59,13 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
             }
 
         val (toolTipText, panelText, actionIsAvailable) = when (ownersMap.size) {
-            0 -> Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
+            0 -> {
+//                return WidgetState.HIDDEN
+//                Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
+                Triple("No owners set for current file", "<No owners>", true)
+            }
             1 -> {
+                // TODO handle multiple codeowners files case
                 val owners = ownersMap.first().value.ref.owners
                 when (owners.size) {
                     0 -> Triple("No owners are set for current file", "<No owners>", true)
