@@ -1,0 +1,229 @@
+Index: src/main/grammars/bitbucket/Codeowners.bnf
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/grammars/bitbucket/Codeowners.bnf b/src/main/grammars/bitbucket/Codeowners.bnf
+--- a/src/main/grammars/bitbucket/Codeowners.bnf	
++++ b/src/main/grammars/bitbucket/Codeowners.bnf	
+@@ -39,7 +39,7 @@
+   mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersEntryExtImpl"
+   implements("Pattern")     = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPatternBase"
+   mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPatternExtImpl"
+-  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
++//  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
+ }
+ 
+ codeownersFile          ::= item_ *
+@@ -80,7 +80,12 @@
+ Owner                   ::= Email | NamedOwner
+ NamedOwner              ::= Team | User
+ 
+-Team                    ::= '@''@' TeamName
++Team                    ::= '@''@' TeamName {
++//    mixin = "CodeownersTeamNameNamedElementImpl"
++//    implements = "CodeownersTeamNameNamedElement"
++    mixin = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
++//    methods = [ getName setName getNameIdentifier ]
++}
+ User                    ::= '@' UserName
+ 
+ Email                   ::= UserName '@' Domain
+Index: src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/BitbucketLanguage.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/BitbucketLanguage.kt b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/BitbucketLanguage.kt
+--- a/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/BitbucketLanguage.kt	
++++ b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/BitbucketLanguage.kt	
+@@ -6,7 +6,12 @@
+ import com.github.fantom.codeowners.indexing.PatternString
+ import com.github.fantom.codeowners.lang.CodeownersLanguage
+ import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
++import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeam
++import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeamReference
+ import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersVisitor
++import com.intellij.psi.PsiElement
++import com.intellij.psi.PsiReference
++import com.intellij.util.ProcessingContext
+ 
+ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") {
+     companion object {
+@@ -28,4 +33,18 @@
+                 )
+             }
+         }
++
++    override fun getReferencesByElement(
++        psiElement: PsiElement,
++        processingContext: ProcessingContext
++    ): Array<out PsiReference>? {
++        println("> getReferencesByElement bb for $psiElement")
++        return if (psiElement is CodeownersTeam) {
++            arrayOf(CodeownersTeamReference(psiElement))
++        } else {
++            super.getReferencesByElement(psiElement, processingContext)
++        }.also {
++            println("< getReferencesByElement bb: $it")
++        }
++    }
+ }
+Index: src/main/resources/META-INF/plugin.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/META-INF/plugin.xml b/src/main/resources/META-INF/plugin.xml
+--- a/src/main/resources/META-INF/plugin.xml	
++++ b/src/main/resources/META-INF/plugin.xml	
+@@ -128,6 +128,8 @@
+         <lang.elementManipulator
+                 forClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner"
+                 implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwnerManipulator"/>
++        <lang.findUsagesProvider language="Bitbucket"
++                                 implementationClass="com.github.fantom.codeowners.lang.kind.bitbucket.CodeownersFindUsagesProvider"/>
+ 
+         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
+ 
+Index: src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/CodeownersTeamNameNamedElement.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/CodeownersTeamNameNamedElement.kt b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/CodeownersTeamNameNamedElement.kt
+new file mode 100644
+--- /dev/null	
++++ b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/CodeownersTeamNameNamedElement.kt	
+@@ -0,0 +1,60 @@
++package com.github.fantom.codeowners.lang.kind.bitbucket.psi
++
++import com.intellij.extapi.psi.ASTWrapperPsiElement
++import com.intellij.lang.ASTNode
++import com.intellij.psi.PsiElement
++import com.intellij.psi.PsiNameIdentifierOwner
++import com.intellij.psi.PsiReference
++import com.intellij.psi.PsiReferenceBase
++import com.intellij.psi.util.PsiTreeUtil
++
++interface CodeownersTeamNameNamedElement : PsiNameIdentifierOwner {
++    val teamName: CodeownersTeamName
++}
++
++// class CodeownersTeamNameNamedElementFactory
++
++abstract class CodeownersTeamNameNamedElementImpl(node: ASTNode) :
++    ASTWrapperPsiElement(node),
++    CodeownersTeamNameNamedElement {
++    override fun getName(): String? {
++        return teamName.text.also {
++            println("> getName: $it")
++        }
++    }
++
++    override fun setName(newName: String): PsiElement? {
++//        val teamNameNode = node.findChildByType(CodeownersTypes.TEAM_NAME)
++//        if (teamNameNode != null) {
++//            val property = SimpleElementFactory.createProperty(project, newName)
++//            val newTeamNameNode = property.getFirstChild().getNode()
++//            node.replaceChild(teamNameNode, newTeamNameNode)
++//        }
++        return this
++    }
++
++    override fun getNameIdentifier() = node.findChildByType(CodeownersTypes.TEAM_NAME)?.psi.also {
++        println("< getNameIdentifier: ${it?.text}")
++    }
++}
++
++class CodeownersTeamReference(element: CodeownersTeam) :
++    PsiReferenceBase<PsiElement>(
++        element,
++        element.teamName.textRangeInParent.also {
++            println("> textRange: $it")
++        }
++    ),
++    PsiReference {
++    override fun resolve(): PsiElement? {
++        println("> resolve: $this")
++        val teamDefinitions =
++            PsiTreeUtil.getChildrenOfType(element.containingFile, CodeownersTeamDefinition::class.java) ?: run {
++                println("> resolved to null")
++                return null
++            }
++        return teamDefinitions.firstOrNull { it.teamName.name_.text == (element as CodeownersTeam).teamName.text }.also {
++            println("> resolve: $it")
++        }
++    }
++}
+Index: src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/CodeownersFindUsagesProvider.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/CodeownersFindUsagesProvider.kt b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/CodeownersFindUsagesProvider.kt
+new file mode 100644
+--- /dev/null	
++++ b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/CodeownersFindUsagesProvider.kt	
+@@ -0,0 +1,41 @@
++package com.github.fantom.codeowners.lang.kind.bitbucket
++
++import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeamDefinition
++import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTypes
++import com.intellij.lang.cacheBuilder.DefaultWordsScanner
++import com.intellij.lang.cacheBuilder.WordsScanner
++import com.intellij.lang.findUsages.FindUsagesProvider
++import com.intellij.psi.PsiElement
++import com.intellij.psi.tree.TokenSet
++
++class CodeownersFindUsagesProvider : FindUsagesProvider {
++    override fun getWordsScanner(): WordsScanner {
++        return DefaultWordsScanner(
++            CodeownersLexerAdapter(),
++            TokenSet.create(CodeownersTypes.NAME_),
++            TokenSet.create(CodeownersTypes.COMMENT),
++            TokenSet.EMPTY
++        )
++    }
++
++    override fun canFindUsagesFor(psiElement: PsiElement): Boolean {
++        println("> canFindUsagesFor $psiElement")
++        return psiElement is CodeownersTeamDefinition
++    }
++
++    override fun getHelpId(psiElement: PsiElement): String? {
++        return null
++    }
++
++    override fun getType(element: PsiElement): String {
++        return "team"
++    }
++
++    override fun getDescriptiveName(element: PsiElement): String {
++        return (element as? CodeownersTeamDefinition)?.teamName?.text ?: ""
++    }
++
++    override fun getNodeText(element: PsiElement, useFullName: Boolean): String {
++        return (element as? CodeownersTeamDefinition)?.text ?: ""
++    }
++}
+Index: src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/impl/CodeownersNamedOwnerExtImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/impl/CodeownersNamedOwnerExtImpl.kt b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/impl/CodeownersNamedOwnerExtImpl.kt
+--- a/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/impl/CodeownersNamedOwnerExtImpl.kt	
++++ b/src/main/kotlin/com/github/fantom/codeowners/lang/kind/bitbucket/psi/impl/CodeownersNamedOwnerExtImpl.kt	
+@@ -1,10 +1,9 @@
+ package com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl
+ 
+ import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersElementImpl
+-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersNamedOwner
+ import com.intellij.lang.ASTNode
+ 
+ /**
+  * Custom [CodeownersElementImpl] implementation.
+  */
+-abstract class CodeownersNamedOwnerExtImpl(node: ASTNode) : CodeownersElementImpl(node), CodeownersNamedOwner
++abstract class CodeownersNamedOwnerExtImpl(node: ASTNode) : CodeownersElementImpl(node) // , CodeownersNamedOwner

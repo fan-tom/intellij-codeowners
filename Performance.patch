@@ -1,0 +1,91 @@
+Index: src/main/kotlin/com/github/fantom/codeowners/reference/CodeownersEntryReferenceSet.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/github/fantom/codeowners/reference/CodeownersEntryReferenceSet.kt b/src/main/kotlin/com/github/fantom/codeowners/reference/CodeownersEntryReferenceSet.kt
+--- a/src/main/kotlin/com/github/fantom/codeowners/reference/CodeownersEntryReferenceSet.kt	
++++ b/src/main/kotlin/com/github/fantom/codeowners/reference/CodeownersEntryReferenceSet.kt	
+@@ -7,6 +7,7 @@
+ import com.github.fantom.codeowners.util.MatcherUtil
+ import com.github.fantom.codeowners.util.Utils
+ import com.intellij.openapi.components.service
++import com.intellij.openapi.diagnostic.Logger
+ import com.intellij.openapi.progress.ProgressManager
+ import com.intellij.openapi.util.TextRange
+ import com.intellij.openapi.util.text.StringUtil
+@@ -18,12 +19,17 @@
+ import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceSet
+ import com.intellij.util.containers.ContainerUtil
+ import com.jetbrains.rd.util.concurrentMapOf
++import org.apache.commons.lang3.time.StopWatch
+ 
+ /**
+  * [FileReferenceSet] definition class.
+  */
+ class CodeownersEntryReferenceSet(element: PsiElement) : FileReferenceSet(element) {
+ 
++    companion object {
++        private val LOGGER = Logger.getInstance(CodeownersEntryReferenceSet::class.java)
++    }
++
+     private val matcher = element.project.service<CodeownersMatcher>()
+ 
+     override fun createFileReference(range: TextRange, index: Int, text: String) =
+@@ -47,6 +53,7 @@
+     @Suppress("ComplexMethod")
+     override fun reparse() {
+         ProgressManager.checkCanceled()
++        val sw = StopWatch(">reparse for $element").apply { start() }
+         val str = StringUtil.trimEnd(pathString, separatorString)
+         val referencesList: MutableList<FileReference?> = ArrayList()
+         val separatorString = separatorString // separator's length can be more then 1 char
+@@ -65,11 +72,22 @@
+         }
+         var index = 0
+         if (str == separatorString) {
+-            val fileReference = createFileReference(TextRange(startInElement, startInElement + sepLen), index++, separatorString)
++            sw.nanoTime.also {
++                LOGGER.trace(">reparse init took $it ns")
++            }
++            sw.reset()
++            sw.start()
++            val fileReference =
++                createFileReference(TextRange(startInElement, startInElement + sepLen), index++, separatorString)
++            sw.nanoTime.also {
++                LOGGER.trace(">reparse createFileReference took $it ns")
++            }
+             referencesList.add(fileReference)
+         }
+         while (true) {
+             ProgressManager.checkCanceled()
++            sw.reset()
++            sw.start()
+             val nextSlash = str.indexOf(separatorString, currentSlash + sepLen)
+             val subReferenceText = if (nextSlash > 0) str.substring(0, nextSlash) else str
+             val range = TextRange(
+@@ -103,7 +121,11 @@
+             caseSensitive: Boolean,
+         ) {
+             ProgressManager.checkCanceled()
++            val sw = StopWatch(">innerResolveInContext for $text").apply { start() }
+             super.innerResolveInContext(text, context, result, caseSensitive)
++            sw.nanoTime.also {
++                LOGGER.trace("super.innerResolveInContext took $it ns")
++            }
+             val codeownersFile = containingFile as? CodeownersFile ?: return
+             val contextVirtualFile = when {
+                 Utils.isInProject(codeownersFile.virtualFile, element.project) -> {
+@@ -122,7 +144,12 @@
+                 val psiManager = element.manager
+ 
+                 ContainerUtil.createConcurrentList<VirtualFile>().run {
++                    sw.reset()
++                    sw.start()
+                     addAll(MatcherUtil.getFilesForPattern(context.project, pattern))
++                    sw.nanoTime.also {
++                        LOGGER.trace("MatcherUtil.getFilesForPattern for ${pattern.pattern()} took $it ns")
++                    }
+                     if (isEmpty()) {
+                         addAll(context.virtualFile.children)
+                     } else if (current.endsWith(Constants.STAR) && current != entry.text) {
