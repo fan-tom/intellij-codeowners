@@ -7,6 +7,8 @@
   psiImplClassSuffix        = "Impl"
   psiPackage                = "com.github.fantom.codeowners.lang.kind.bitbucket.psi"
   psiImplPackage            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl"
+//  psiImplUtilClass          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPsiImplUtil"
+//  psiImplUtilClass          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPsiImplUtilJava"
 
   elementTypeHolderClass    = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTypes"
   elementTypeClass          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersElementType"
