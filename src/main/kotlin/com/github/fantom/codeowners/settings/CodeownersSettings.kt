@@ -34,7 +34,7 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
             field = value
         }
 
-    /** Enable CODEOWNERS file status coloring. */
+    /** Enable CODEOWNERS plugin? IDK if is it useful at all. */
     var codeownersFileStatus = true
         set(value) {
             notifyOnChange(KEY.CODEOWNERS_FILE_STATUS, codeownersFileStatus, value)
