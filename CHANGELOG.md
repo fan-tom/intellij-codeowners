@@ -3,6 +3,8 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+
+## [v0.3.3](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.3) (2022-03-20)
 ### Added
 - GoTo Team declaration for BitBucket files
 - Support IDEA 2022.1
