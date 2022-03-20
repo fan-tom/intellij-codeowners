@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Added
 - GoTo Team declaration for BitBucket files
+- Support IDEA 2022.1
 
 ## [v0.3.2](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.2) (2021-12-13)
 ### Added
