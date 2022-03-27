@@ -55,7 +55,9 @@ EnableOrDisable                ::= ENABLE | DISABLE
 NEGATION                ::= "!"
 Reset                   ::= NEGATION Entry
 
-TeamDefinition          ::= '@''@''@' TeamName WSS Owners
+TeamDefinition          ::= '@''@''@' TeamName WSS Owners {
+  mixin = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersTeamDefinitionExtImpl"
+}
 
 Assign                  ::= Entry /*SPACES*/ WSS Owners /*CRLF*/
 
