@@ -61,10 +61,18 @@ data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int
 data class OwnersFileReference(val url: String?, val ref: OwnersReference)
 
 sealed class GetFileOwnersError {
-    object InDumbMode : GetFileOwnersError()
-    object NotInProject : GetFileOwnersError()
-    object Disposed : GetFileOwnersError()
-    object NoVirtualFile : GetFileOwnersError()
+    object InDumbMode : GetFileOwnersError() {
+        override fun toString() = "dumb mode"
+    }
+    object NotInProject : GetFileOwnersError() {
+        override fun toString() = "file not in project"
+    }
+    object Disposed : GetFileOwnersError() {
+        override fun toString() = "application or project is disposed"
+    }
+    object NoVirtualFile : GetFileOwnersError() {
+        override fun toString() = "codeowners file has no associated virtual file"
+    }
 }
 
 /**

@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.impl.status.EditorBasedStatusBarPopup
 import com.jetbrains.rd.util.first
+import java.util.*
 
 inline fun <E, T> Either<E, T>.unwrap(f: (E) -> Nothing): T =
     when (this) {
@@ -54,7 +55,18 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         }
         val ownersMap = manager.getFileOwners(file)
             .unwrap {
-                return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners $it:"))
+                when (it) {
+                    GetFileOwnersError.InDumbMode -> return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
+                    GetFileOwnersError.NotInProject -> return getWidgetStateWithIcon(WidgetState("File not in project", "<Error>", true))
+                    GetFileOwnersError.Disposed,
+                    GetFileOwnersError.NoVirtualFile -> return getWidgetStateWithIcon(
+                        WidgetState(
+                            it.toString().replaceFirstChar { c -> if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString() },
+                            "<Error>",
+                            false,
+                        )
+                    )
+                }
             }
 
         val (toolTipText, panelText, actionIsAvailable) = when (ownersMap.size) {
