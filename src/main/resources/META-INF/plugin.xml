@@ -134,6 +134,14 @@
             language="Bitbucket"
             implementationClass="com.github.fantom.codeowners.structureview.StructureViewFactory"/>
 
+        <lang.commenter
+            language="Bitbucket"
+            implementationClass="com.github.fantom.codeowners.commenting.CodeownersCommenter"/>
+
+        <lang.commenter
+            language="Github"
+            implementationClass="com.github.fantom.codeowners.commenting.CodeownersCommenter"/>
+
         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
 
         <changesGroupingPolicy key="codeowners" id="codeowners"
