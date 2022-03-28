@@ -130,6 +130,9 @@
                 implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwnerManipulator"/>
         <lang.findUsagesProvider language="Bitbucket"
                                  implementationClass="com.github.fantom.codeowners.lang.kind.bitbucket.CodeownersFindUsagesProvider"/>
+        <lang.psiStructureViewFactory
+            language="Bitbucket"
+            implementationClass="com.github.fantom.codeowners.structureview.StructureViewFactory"/>
 
         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
 
