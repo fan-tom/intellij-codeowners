@@ -56,12 +56,17 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
         val ownersMap = manager.getFileOwners(file)
             .unwrap {
                 when (it) {
-                    GetFileOwnersError.InDumbMode -> return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
-                    GetFileOwnersError.NotInProject -> return getWidgetStateWithIcon(WidgetState("File not in project", "<Error>", true))
+                    GetFileOwnersError.InDumbMode ->
+                        return getWidgetStateWithIcon(WidgetState.getDumbModeState("Codeowners", "Codeowners:"))
+                    GetFileOwnersError.NotInProject ->
+                        return getWidgetStateWithIcon(WidgetState("File not in project", "<Error>", true))
                     GetFileOwnersError.Disposed,
                     GetFileOwnersError.NoVirtualFile -> return getWidgetStateWithIcon(
                         WidgetState(
-                            it.toString().replaceFirstChar { c -> if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString() },
+                            it.toString()
+                                .replaceFirstChar { c ->
+                                    if (c.isLowerCase()) c.titlecase(Locale.getDefault()) else c.toString()
+                                },
                             "<Error>",
                             false,
                         )
