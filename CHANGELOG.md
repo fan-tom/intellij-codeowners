@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Added
 - Structure view for Bitbucket files
+- Comment/uncomment actions
 
 ## [v0.3.3](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.3) (2022-03-20)
 ### Added

@@ -23,6 +23,7 @@ Features:
 - Navigation to Github user/team by ctrl-click on owner
 - Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
 - CODEOWNERS file structure view
+- Comment/uncomment actions
 
 TODO:
 -----
