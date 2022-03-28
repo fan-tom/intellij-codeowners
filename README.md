@@ -22,11 +22,11 @@ Features:
 - Navigation to entries in Project view
 - Navigation to Github user/team by ctrl-click on owner
 - Navigate from status bar to the line in CODEOWNERS file to know where code ownership is assigned
+- CODEOWNERS file structure view
 
 TODO:
 -----
 - Proper syntax-aware highlighting
-- GoTo team declaration in [Bitbucket][bitbucket-syntax] files
 - Entries inspection (duplicated, covered, unused, incorrect syntax) with quick-fix actions
 - Support spaces in file paths
 - Tests
