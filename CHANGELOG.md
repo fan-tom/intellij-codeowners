@@ -3,6 +3,8 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+
+## [v0.3.4](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.4) (2022-03-29)
 ### Added
 - Structure view for Bitbucket files
 - Comment/uncomment actions
