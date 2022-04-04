@@ -3,7 +3,9 @@ package com.github.fantom.codeowners.lang
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
 import com.github.fantom.codeowners.indexing.PatternString
-import com.github.fantom.codeowners.reference.CodeownersEntryReferenceSet
+import com.github.fantom.codeowners.reference.CodeownersEntryReferenceSetNew
+import com.github.fantom.codeowners.util.TimeTracerKey
+import com.github.fantom.codeowners.util.withNullableCloseable
 import com.intellij.lang.Language
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
@@ -35,8 +37,13 @@ open class CodeownersLanguage protected constructor(name: String) : Language(nam
         psiElement: PsiElement,
         processingContext: ProcessingContext
     ): Array<out PsiReference>? =
-        when (psiElement) {
-            is CodeownersEntryBase -> CodeownersEntryReferenceSet(psiElement).allReferences
-            else -> null
+        processingContext.get(TimeTracerKey).let {
+            it?.start()
+            withNullableCloseable(it) {
+            when (psiElement) {
+                is CodeownersEntryBase -> CodeownersEntryReferenceSetNew(psiElement, it?.nested()).allReferences
+                else -> null
+            }
+            }
         }
 }
