@@ -21,6 +21,8 @@
 
         <projectService serviceImplementation="com.github.fantom.codeowners.services.CodeownersMatcher"/>
         <projectService serviceImplementation="com.github.fantom.codeowners.CodeownersManager"/>
+        <projectService serviceImplementation="com.github.fantom.codeowners.reference.CodeownersPatternsMatchedFilesCache"/>
+        <projectService serviceImplementation="com.github.fantom.codeowners.services.PatternCache"/>
 
         <fileTypeDetector
                 order="LAST"
