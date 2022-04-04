@@ -1,8 +1,7 @@
 package com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl
 
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersElementImpl
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersEntry
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersNegation
+import com.github.fantom.codeowners.lang.CodeownersElementImpl
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.*
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.text.StringUtil

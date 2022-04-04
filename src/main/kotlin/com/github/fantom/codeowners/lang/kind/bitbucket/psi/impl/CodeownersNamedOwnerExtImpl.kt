@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl
 
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersElementImpl
+import com.github.fantom.codeowners.lang.CodeownersElementImpl
 import com.intellij.lang.ASTNode
 
 /**

@@ -1,6 +1,7 @@
 package com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl
 
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.*
+import com.github.fantom.codeowners.lang.CodeownersElementImpl
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeamDefinition
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
 import javax.swing.Icon

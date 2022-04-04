@@ -1,8 +1,7 @@
 package com.github.fantom.codeowners.lang.kind.github.psi.impl
 
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersElementImpl
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntryDirectory
+import com.github.fantom.codeowners.lang.CodeownersElementImpl
+import com.github.fantom.codeowners.lang.kind.github.psi.*
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.lang.ASTNode
 

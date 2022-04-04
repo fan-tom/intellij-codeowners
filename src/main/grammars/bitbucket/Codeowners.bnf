@@ -1,7 +1,7 @@
 // https://mibexsoftware.atlassian.net/wiki/spaces/CODEOWNERS/pages/222822413/Usage
 {
   parserClass               = "com.github.fantom.codeowners.lang.kind.bitbucket.parser.CodeownersParser"
-  extends                   = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends                   = "com.github.fantom.codeowners.lang.CodeownersElementImpl"
 
   psiClassPrefix            = "Codeowners"
   psiImplClassSuffix        = "Impl"
