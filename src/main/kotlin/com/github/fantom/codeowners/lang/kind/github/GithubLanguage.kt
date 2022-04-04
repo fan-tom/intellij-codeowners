@@ -5,11 +5,9 @@ import com.github.fantom.codeowners.file.type.kind.GithubFileType
 import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.indexing.PatternString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor
-import com.github.fantom.codeowners.reference.CodeownersEntryReferenceSet
 import com.github.fantom.codeowners.reference.CodeownersGithubOwnerReference
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
@@ -36,10 +34,13 @@ class GithubLanguage private constructor() : CodeownersLanguage("Github") {
             }
         }
 
-    override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<out PsiReference>? =
-        when (psiElement) {
-            is CodeownersEntry -> CodeownersEntryReferenceSet(psiElement).allReferences
-            is CodeownersNamedOwner -> arrayOf(CodeownersGithubOwnerReference(psiElement))
-            else -> null
+    override fun getReferencesByElement(
+        psiElement: PsiElement,
+        processingContext: ProcessingContext
+    ): Array<out PsiReference>? =
+        if (psiElement is CodeownersNamedOwner) {
+            arrayOf(CodeownersGithubOwnerReference(psiElement))
+        } else {
+            super.getReferencesByElement(psiElement, processingContext)
         }
 }

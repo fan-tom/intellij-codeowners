@@ -40,7 +40,7 @@ class MatcherUtil private constructor() {
          * @param path  to check
          * @return path contains any of the parts
          */
-        fun matchAnyPart(parts: Array<String>, path: String?) = parts.any { path?.contains(it) ?: false }
+        fun matchAnyPart(parts: Array<String>, path: String) = parts.any { path.contains(it) }
 
         /**
          * Extracts alphanumeric parts from  [Pattern].
@@ -82,7 +82,7 @@ class MatcherUtil private constructor() {
 
             projectFileIndex.iterateContent {
                 if (matchAnyPart(parts, it.name)) {
-                    FilenameIndex.getVirtualFilesByName(project, it.name, scope).forEach { file ->
+                    FilenameIndex.getVirtualFilesByName(it.name, scope).forEach { file ->
                         if (file.isValid && matchAllParts(parts, file.path)) {
                             files.add(file)
                         }

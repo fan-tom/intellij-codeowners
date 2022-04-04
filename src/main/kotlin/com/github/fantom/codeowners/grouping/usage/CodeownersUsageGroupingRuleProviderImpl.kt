@@ -24,7 +24,7 @@ import com.intellij.usages.rules.UsageGroupingRule
  *  And since these rules have nothing in common (no common base class or implemented interface), we cannot detect them
  *  to skip wrapping into [UsageGroupingRuleWrapper]. To workaround it, we manually disable this grouping before
  *  fetching rules from parent class and then add them manually,
- *  dropping [FileGroupingRule] (it returned because of changed settings)
+ *  dropping [FileGroupingRule] (it is returned because of changed settings)
  *  and partially replicating overridden method impl.
  */
 // TODO handle absence of CODEOWNERS file, so no need to group by owners
@@ -48,6 +48,7 @@ class CodeownersUsageGroupingRuleProviderImpl : UsageGroupingRuleProviderImpl() 
          * We override this method because even if [rule] was an instance of [SingleParentUsageGroupingRule], which
          * correctly handles this method, we are not, and default impl just throws [UnsupportedOperationException]
          */
+        @Deprecated("Deprecated in Java")
         override fun groupUsage(usage: Usage): UsageGroup? {
             return rule.groupUsage(usage)
         }

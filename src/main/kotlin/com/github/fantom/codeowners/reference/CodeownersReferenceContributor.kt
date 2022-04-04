@@ -3,11 +3,7 @@ package com.github.fantom.codeowners.reference
 import com.github.fantom.codeowners.lang.CodeownersFile
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.intellij.patterns.PlatformPatterns
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceContributor
-import com.intellij.psi.PsiReferenceProvider
-import com.intellij.psi.PsiReferenceRegistrar
+import com.intellij.psi.*
 import com.intellij.util.ProcessingContext
 
 /**

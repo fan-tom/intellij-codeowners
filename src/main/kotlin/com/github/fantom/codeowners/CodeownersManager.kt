@@ -282,6 +282,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     private fun getRoot(codeownersVirtualFile: VirtualFile): VirtualFile? {
         val vcsRoot = vcsRoots
             .minByOrNull {
+                // TODO consider VcsUtils.getVscRootFor(Project, VirtualFile)
                 VfsUtilCore.getRelativePath(it.path, codeownersVirtualFile)?.run {
                     split(VfsUtilCore.VFS_SEPARATOR_CHAR).count()
                 } ?: 0
