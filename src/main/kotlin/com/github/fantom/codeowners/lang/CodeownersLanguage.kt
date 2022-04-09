@@ -40,10 +40,10 @@ open class CodeownersLanguage protected constructor(name: String) : Language(nam
         processingContext.get(TimeTracerKey).let {
             it?.start()
             withNullableCloseable(it) {
-            when (psiElement) {
-                is CodeownersEntryBase -> CodeownersEntryReferenceSetNew(psiElement, it?.nested()).allReferences
-                else -> null
-            }
+                when (psiElement) {
+                    is CodeownersEntryBase -> CodeownersEntryReferenceSetNew(psiElement, it?.nested()).allReferences
+                    else -> null
+                }
             }
         }
 }

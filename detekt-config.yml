@@ -18,6 +18,8 @@ style:
     maxLineLength: 140
   WildcardImport:
     active: false
+  MagicNumber:
+    active: false
 
 exceptions:
   PrintStackTrace:

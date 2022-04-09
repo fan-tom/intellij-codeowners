@@ -27,8 +27,10 @@ import java.util.regex.Pattern
  * Cache that retrieves matching files using given [Pattern].
  * Cache population happened on demand in the background.
  * The cache eviction happen in the following cases:
- * * by using [VirtualFileListener] to handle filesystem changes and clean cache if needed for the specific pattern parts.
- * * after entries have been expired: entries becomes expired if no read/write operations happened with the corresponding key during some amount of time (10 minutes).
+ * * by using [VirtualFileListener] to handle filesystem changes
+ * and clean cache if needed for the specific pattern parts.
+ * * after entries have been expired: entries becomes expired if no read/write operations happened with the
+ * corresponding key during some amount of time (10 minutes).
  * * after project dispose
  */
 internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {

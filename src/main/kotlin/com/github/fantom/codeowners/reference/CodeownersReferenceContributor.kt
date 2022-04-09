@@ -38,9 +38,9 @@ class CodeownersReferenceContributor : PsiReferenceContributor() {
             }
 //        when (psiElement) {
 //            is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry ->
-        //            CodeownersEntryReferenceSet(psiElement).allReferences
+//              CodeownersEntryReferenceSet(psiElement).allReferences
 //            is com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner ->
-        //            arrayOf(CodeownersGithubOwnerReference(psiElement))
+//              arrayOf(CodeownersGithubOwnerReference(psiElement))
 //            else -> PsiReference.EMPTY_ARRAY
 //        }
         }
