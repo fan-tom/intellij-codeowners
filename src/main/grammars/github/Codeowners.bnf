@@ -43,7 +43,7 @@ Entry                   ::= '/' ? <<list_macro VALUE>>
 EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' { extends = "EntryFile"}
 EntryFile               ::= '/' ? <<list_macro VALUE>>     { extends = "Entry"}
 
-Owners                  ::= Owner (CRLF Owner)*
+Owners                  ::= Owner? (CRLF Owner)*
 Owner                   ::= Email | NamedOwner
 NamedOwner              ::= '@' OwnerName
 
