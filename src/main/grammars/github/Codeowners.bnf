@@ -37,7 +37,11 @@
 codeownersFile          ::= item_ *
 private item_           ::= HEADER | SECTION | COMMENT | Pattern | CRLF
 
-Pattern                 ::= (EntryDirectory | EntryFile) /*SPACES*/ CRLF Owners /*CRLF*/
+Reset                   ::= (EntryDirectory | EntryFile)
+
+Assign                  ::= (EntryDirectory | EntryFile) /*SPACES*/ CRLF Owners /*CRLF*/
+
+Pattern                 ::= Assign | Reset
 
 Entry                   ::= '/' ? <<list_macro VALUE>>
 EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' { extends = "EntryFile"}
