@@ -7,5 +7,10 @@ interface CodeownersPatternBase : PsiElement {
      * Returns fs path.
      */
     val entry: CodeownersEntry
+
+    /**
+     * Returns non-empty list if this pattern assigns owners
+     * and empty list if it resets them (negation case)
+     */
     val owners: List<CodeownersOwner>
 }

@@ -51,7 +51,7 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
                 val owners = if (ownersRef.isEmpty()) {
                     emptySet()
                 } else {
-                    ownersRef.values.first().ref.owners.toSet()
+                    ownersRef.values.first().ref?.owners?.toSet() ?: emptySet()
                 }
                 CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[owners]?.let { return it }
 

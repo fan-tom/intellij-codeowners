@@ -74,22 +74,35 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
                 }
             }
 
+        val unsetTriple = Triple("Owners are unset", "<Unset>", true)
+        val noOwnersTriple = Triple("No owners set for current file", "<No owners>", true)
+        val ownersMapper = { owners: OwnersList, allOwners: Collection<Any> ->
+            when (owners.size) {
+                0 -> unsetTriple
+                1 -> Triple("Owner: ${owners[0]}", owners[0].owner, true)
+                else -> Triple("""All owners: ${allOwners.joinToString(", ")}""", "${owners[0].owner}...", true)
+            }
+        }
         val (toolTipText, panelText, actionIsAvailable) = when (ownersMap.size) {
             0 -> Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
             1 -> {
-                val owners = ownersMap.first().value.ref.owners
-                when (owners.size) {
-                    0 -> Triple("No owners are set for current file", "<No owners>", true)
-                    1 -> Triple("Owner: ${owners[0]}", owners[0].owner, true)
-                    else -> Triple("""All owners: ${owners.joinToString(", ")}""", "${owners[0].owner}...", true)
+                ownersMap.first().value.ref?.let {
+                        ownersMapper(it.owners, it.owners)
+                } ?: noOwnersTriple
+            }
+            else -> {
+                val firstMatchingEntry = ownersMap.firstNotNullOfOrNull { it.value.ref }
+                val firstSetOwners = ownersMap
+                    .mapNotNull { it.value.ref?.owners }
+                    .firstOrNull { it.isNotEmpty() }
+                if (firstSetOwners != null) {
+                    ownersMapper(firstSetOwners, ownersMap.entries)
+                } else if (firstMatchingEntry != null) {
+                    unsetTriple
+                } else {
+                    noOwnersTriple
                 }
             }
-            else ->
-                Triple(
-                    """All owners: ${ownersMap.entries.joinToString(", ")}""",
-                    ownersMap.first().value.ref.owners[0].owner,
-                    true
-                )
         }
 //        val lineSeparator = FileDocumentManager.getInstance().getLineSeparator(file, project)
 //        val toolTipText = IdeBundle.message("tooltip.line.separator", StringUtil.escapeLineBreak(lineSeparator))
@@ -111,13 +124,13 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
             owners.isEmpty() -> return null
             owners.size == 1 -> {
                 val ref = owners.entries.first().value
-                goToOwner(ref.url ?: return null, ref.ref.offset)
+                goToOwner(ref.url, ref.ref?.offset ?: 0) // go to the beginning of file if no owners set
                 return null
             }
             else -> {
                 data class Ref(val url: String, val offset: Int)
                 return JBPopupFactory.getInstance().createListPopup(
-                    object : BaseListPopupStep<Ref>("All CODEOWNERS Files", owners.values.map { Ref(it.url!!, it.ref.offset) }) {
+                    object : BaseListPopupStep<Ref>("All CODEOWNERS Files", owners.values.map { Ref(it.url, it.ref?.offset ?: 0) }) {
                         override fun onChosen(selectedValue: Ref?, finalChoice: Boolean): PopupStep<*>? {
                             selectedValue?.also {
                                 goToOwner(it.url, it.offset)
