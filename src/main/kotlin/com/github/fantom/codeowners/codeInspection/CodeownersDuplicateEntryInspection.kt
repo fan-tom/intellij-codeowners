@@ -30,7 +30,7 @@ class CodeownersDuplicateEntryInspection : LocalInspectionTool() {
                 override fun visitPattern(
                     pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
                 ) {
-                    val entry = pattern.entryFile
+                    val entry = pattern.entry
                     LOG.warn("Remembering entry ${entry.text}")
                     entries.putValue(entry.text, pattern)
                     super.visitEntry(entry)

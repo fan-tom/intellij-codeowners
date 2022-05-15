@@ -23,12 +23,12 @@ class GithubLanguage private constructor() : CodeownersLanguage("Github") {
 
     override fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>) =
         object : CodeownersVisitor() {
-            override fun visitPattern(entry: CodeownersPattern) {
-                val regex = entry.entryFile.regex(false)
+            override fun visitPattern(pattern: CodeownersPattern) {
+                val regex = pattern.entry.regex(false)
                 items.add(
                     Pair(
                         PatternString(regex),
-                        OwnersReference(entry.owners.ownerList.map { OwnerString(it.text) }, entry.textOffset)
+                        OwnersReference(pattern.owners.map { OwnerString(it.text) }, pattern.textOffset)
                     )
                 )
             }

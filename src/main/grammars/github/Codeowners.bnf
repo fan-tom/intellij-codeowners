@@ -32,6 +32,8 @@
   mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersEntryExtImpl"
   mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersNamedOwnerExtImpl"
   implements("Entry")       = "com.github.fantom.codeowners.lang.CodeownersEntryBase"
+  implements("Pattern")     = "com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPatternBase"
+  mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersPatternExtImpl"
 }
 
 codeownersFile          ::= item_ *
