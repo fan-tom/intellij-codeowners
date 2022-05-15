@@ -19,4 +19,3 @@ interface CodeownersPatternBase<EntryType : CodeownersEntryBase, OwnersType> : P
      */
     val isExplicitlyUnowned: Boolean
 }
-

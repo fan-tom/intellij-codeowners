@@ -43,7 +43,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
 //        return manager.getFileOwners(file)
 //    }
 //
-    @Suppress("ReturnCount")
+    @Suppress("ReturnCount", "LongMethod", "ComplexMethod")
     override fun getWidgetState(file: VirtualFile?): WidgetState {
         LOGGER.trace("getWidgetState for file $file")
         if (file == null) {
@@ -87,7 +87,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
             0 -> Triple("No CODEOWNERS files found", "<No CODEOWNERS>", false)
             1 -> {
                 ownersMap.first().value.ref?.let {
-                        ownersMapper(it.owners, it.owners)
+                    ownersMapper(it.owners, it.owners)
                 } ?: noOwnersTriple
             }
             else -> {
