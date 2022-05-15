@@ -54,11 +54,17 @@ typealias OwnersSet = Set<OwnerString>
 //     }
 // }
 /**
- * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them
+ * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them.
+ *
+ * [owners] list is empty if reference points to an unset record
  */
 data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0)
 
-data class OwnersFileReference(val url: String?, val ref: OwnersReference)
+/**
+ * Represents a reference to given CODEOWNERS file together with reference to particular entry in this file, if any
+ * Reference may be null if no entry in given CODEOWNERS file matches some file for which this reference was created
+ */
+data class OwnersFileReference(val url: String, val ref: OwnersReference?)
 
 sealed class GetFileOwnersError {
     object InDumbMode : GetFileOwnersError() {
@@ -255,7 +261,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
                 vcsRoots.forEach { vcsRoot ->
                     ProgressManager.checkCanceled()
                     if (directory == vcsRoot.path) {
-                        return@let Right(OwnersFileReference(codeownersVirtualFile.url, OwnersReference()))
+                        return@let Right(OwnersFileReference(codeownersVirtualFile.url, null))
                     }
                 }
                 return@let getFileOwners(file.parent, codeownersFile)

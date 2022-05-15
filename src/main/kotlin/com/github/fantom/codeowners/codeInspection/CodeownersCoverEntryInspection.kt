@@ -50,11 +50,11 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
         val patterns = file
             .findChildrenByClass(com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern::class.java)
         val matcher = file.project.service<CodeownersMatcher>()
-        val matchedMap = getPathsSet(contextDirectory, patterns.map { it.entryFile }, matcher)
+        val matchedMap = getPathsSet(contextDirectory, patterns.mapNotNull { it.entry }, matcher)
 
         patterns.forEach entries@{ pattern ->
             ProgressManager.checkCanceled()
-            val matched = matchedMap[pattern.entryFile] ?: return@entries
+            val matched = matchedMap[pattern.entry] ?: return@entries
 //            val intersection: Collection<String>
 
             owned.addAll(matched)
@@ -86,7 +86,7 @@ class CodeownersCoverEntryInspection : LocalInspectionTool() {
         result.forEach { pair ->
             problemsHolder.registerProblem(
                 pair.second,
-                message(pair.first.entryFile, virtualFile, isOnTheFly),
+                message(pair.first.entry, virtualFile, isOnTheFly),
                 CodeownersRemoveEntryFix(pair.second)
             )
         }

@@ -35,7 +35,7 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
 
         return object : com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor() {
             override fun visitPattern(pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
-                val entry = pattern.entryFile
+                val entry = pattern.entry
                 val references = entry.references
                 var resolved = true
                 var previous = Int.MAX_VALUE
