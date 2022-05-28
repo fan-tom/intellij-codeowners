@@ -39,11 +39,10 @@
 <!--        <lang.parserDefinition language="CODEOWNERS"-->
 <!--                               implementationClass="com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition"/>-->
         <psi.referenceContributor
-                language="Github"
-                implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"/>
-        <psi.referenceContributor
-                language="Bitbucket"
-                implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"/>
+                language="CODEOWNERS"
+                implementation="com.github.fantom.codeowners.reference.CodeownersReferenceContributor"
+                order="last"
+        />
         <!-- End Common -->
 
         <!-- Github -->
@@ -76,12 +75,10 @@
         <!-- End Bitbucket -->
 
         <codeInsight.lineMarkerProvider
-                language="Github"
-                implementationClass="com.github.fantom.codeowners.daemon.CodeownersDirectoryMarkerProvider"/>
-
-        <codeInsight.lineMarkerProvider
-                language="Bitbucket"
-                implementationClass="com.github.fantom.codeowners.daemon.CodeownersDirectoryMarkerProvider"/>
+                language="CODEOWNERS"
+                implementationClass="com.github.fantom.codeowners.daemon.CodeownersDirectoryMarkerProvider"
+                order="last"
+        />
 
 <!--        <localInspection-->
 <!--                bundle="messages.CodeownersBundle"-->
@@ -137,12 +134,10 @@
             implementationClass="com.github.fantom.codeowners.structureview.StructureViewFactory"/>
 
         <lang.commenter
-            language="Bitbucket"
-            implementationClass="com.github.fantom.codeowners.commenting.CodeownersCommenter"/>
-
-        <lang.commenter
-            language="Github"
-            implementationClass="com.github.fantom.codeowners.commenting.CodeownersCommenter"/>
+            language="CODEOWNERS"
+            implementationClass="com.github.fantom.codeowners.commenting.CodeownersCommenter"
+            order="last"
+        />
 
         <documentationProvider implementation="com.github.fantom.codeowners.reference.CodeownersGithubOwnerDocumentationProvider"/>
 
