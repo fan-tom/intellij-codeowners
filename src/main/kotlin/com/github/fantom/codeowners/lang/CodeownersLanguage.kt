@@ -15,8 +15,9 @@ import com.intellij.util.ProcessingContext
 
 /**
  * Codeowners [Language] definition
+ * We pass CODEOWNERS as a base language to implement default common functionality for all codeowners languages
  */
-open class CodeownersLanguage protected constructor(name: String) : Language(name) {
+open class CodeownersLanguage protected constructor(name: String) : Language(INSTANCE, name) {
     val filename = "CODEOWNERS"
 
     override fun getDisplayName() = "$filename ($id)"
