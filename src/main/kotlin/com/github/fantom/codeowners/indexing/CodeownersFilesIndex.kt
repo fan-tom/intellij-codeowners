@@ -25,7 +25,7 @@ import java.util.Collections
 class CodeownersFilesIndex :
     FileBasedIndexExtension<CodeownersFileType, CodeownersEntryOccurrence>(),
     KeyDescriptor<CodeownersFileType>,
-    DataIndexer<CodeownersFileType, CodeownersEntryOccurrence, FileContent?>,
+    DataIndexer<CodeownersFileType, CodeownersEntryOccurrence, FileContent>,
     InputFilter,
     DumbAware {
     override fun getIndexer() = this

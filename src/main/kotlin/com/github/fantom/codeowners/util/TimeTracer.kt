@@ -1,9 +1,11 @@
 package com.github.fantom.codeowners.util
 
-import com.github.fantom.codeowners.util.TimeTracer.LogEntry.*
+import com.github.fantom.codeowners.util.TimeTracer.LogEntry.Log
+import com.github.fantom.codeowners.util.TimeTracer.LogEntry.Nested
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Key
 import org.apache.commons.lang3.time.StopWatch
-import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class TimeTracerStub(val upper: TimeTracer) {
     fun start(name: String): TimeTracer {
@@ -31,7 +33,7 @@ class TimeTracer(val name: String, val isRoot: Boolean = false) : AutoCloseable 
             override fun toString() = "${tracer}\n"
         }
     }
-    private val logs: MutableList<LogEntry> = mutableListOf()
+    private val logs: ConcurrentLinkedQueue<LogEntry> = ConcurrentLinkedQueue()
 
     private val sw = StopWatch()
 
@@ -74,7 +76,7 @@ class TimeTracer(val name: String, val isRoot: Boolean = false) : AutoCloseable 
     }
 
     companion object {
-        val logger = LoggerFactory.getLogger(TimeTracer::class.java)
+        val logger = Logger.getInstance(TimeTracer::class.java)
 
         fun <T> wrap(name: String, f: (TimeTracer) -> T): T {
             val tracer = TimeTracer(name, true)

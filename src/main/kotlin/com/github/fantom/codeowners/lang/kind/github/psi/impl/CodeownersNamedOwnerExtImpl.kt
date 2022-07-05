@@ -7,4 +7,5 @@ import com.intellij.lang.ASTNode
 /**
  * Custom [CodeownersElementImpl] implementation.
  */
+@Suppress("UnnecessaryAbstractClass")
 abstract class CodeownersNamedOwnerExtImpl(node: ASTNode) : CodeownersElementImpl(node), CodeownersNamedOwner
