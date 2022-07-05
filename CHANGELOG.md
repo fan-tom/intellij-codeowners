@@ -3,9 +3,12 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+
+## [v0.3.5](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.5) (2022-07-05)
 ### Added
 - Support codeowners unsetting for Github files, see https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
 - Support IDEA 2022.2
+
 ### Fixed
 - Speedup file references resolution (navigation through file tree using CTRL-click on CODEOWNERS file paths parts)
 
