@@ -29,7 +29,7 @@ TODO:
 -----
 - Proper syntax-aware highlighting
 - Entries inspection (duplicated, covered, unused, incorrect syntax) with quick-fix actions
-- Support spaces in file paths
+- Support spaces in file paths for Bitbucket syntax
 - Tests
 
 Supported syntaxes:
