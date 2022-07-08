@@ -24,8 +24,9 @@
 //    TEAMNAME                = "regexp:[\w-]+"
 //    USERNAME                = "regexp:[\w\d-]+"
 //    DOMAIN                  = "regexp:\w+(\.\w+)+"
-    VALUE                   = "regexp:[^@/\s]+"
-//    SPACES                  = 'regexp:\s+'
+    VALUE                   = "regexp:[^@\s/]+"
+    PATHNAME                = "regexp:([^\s/]|\\\s)+"
+    SPACES                  = 'regexp:[\s\t\f]+'
   ]
 
   name("Entry.*")           = "entry"
@@ -41,15 +42,15 @@ private item_           ::= HEADER | SECTION | COMMENT | Pattern | CRLF
 
 Reset                   ::= (EntryDirectory | EntryFile)
 
-Assign                  ::= (EntryDirectory | EntryFile) /*SPACES*/ CRLF Owners /*CRLF*/
+Assign                  ::= (EntryDirectory | EntryFile) SPACES Owners
 
 Pattern                 ::= Assign | Reset
 
-Entry                   ::= '/' ? <<list_macro VALUE>>
-EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' { extends = "EntryFile"}
-EntryFile               ::= '/' ? <<list_macro VALUE>>     { extends = "Entry"}
+Entry                   ::= '/' ? <<list_macro PATHNAME>>
+EntryDirectory          ::= '/' ? <<list_macro PATHNAME>> '/' { extends = "EntryFile"}
+EntryFile               ::= '/' ? <<list_macro PATHNAME>>     { extends = "Entry"}
 
-Owners                  ::= Owner (CRLF Owner)*
+Owners                  ::= Owner (SPACES Owner)*
 Owner                   ::= Email | NamedOwner
 NamedOwner              ::= '@' OwnerName
 

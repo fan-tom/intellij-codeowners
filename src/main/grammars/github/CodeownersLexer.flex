@@ -20,10 +20,7 @@ import static com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.
 %type IElementType
 %unicode
 
-//EOL=\R
-//WHITE_SPACE={SPACES}
-
-CRLF="\r" | "\n" | "\r\n"
+CRLF            = "\r" | "\n" | "\r\n"
 LINE_WS         = [\ \t\f]
 WHITE_SPACE     = ({LINE_WS}*{CRLF}+)+
 
@@ -34,9 +31,9 @@ SLASH           = \/
 AT              = @
 
 
-FIRST_CHARACTER = [^# ]
-VALUE=[^@/\s\/]+
-SPACES=\s+
+FIRST_CHARACTER = [^#\s]
+VALUE           = [^@\s/]+
+PATHNAME        = ([^\s/]|\\\s)+
 
 %state IN_ENTRY, IN_OWNERS
 
@@ -52,18 +49,16 @@ SPACES=\s+
 }
 
 <IN_ENTRY> {
-    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
+    {LINE_WS}+          { yybegin(IN_OWNERS); return SPACES; }
     {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
 
-//  "@"                 { return AT; }
-
-    {VALUE}             { yybegin(IN_ENTRY); return VALUE; }
-//  {SPACES}           { return SPACES; }
+    {PATHNAME}          { yybegin(IN_ENTRY); return PATHNAME; }
+    {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
 }
 
 <IN_OWNERS> {
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
-    {LINE_WS}+          { yybegin(IN_OWNERS); return CRLF; }
+    {LINE_WS}+          { yybegin(IN_OWNERS); return SPACES; }
     {VALUE}             { yybegin(IN_OWNERS); return VALUE; }
     {SLASH}             { yybegin(IN_OWNERS); return SLASH; }
     {AT}                { yybegin(IN_OWNERS); return AT; }
