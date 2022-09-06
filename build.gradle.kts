@@ -34,7 +34,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.21.0")
     implementation(kotlin("stdlib-jdk8"))
     implementation("io.arrow-kt:arrow-core:1.1.2")
 }
