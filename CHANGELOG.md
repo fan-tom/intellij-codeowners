@@ -4,7 +4,7 @@
 
 ## [Unreleased]
 ### Added
-- Support of file paths for GitHub syntax
+- Support of file paths with spaces and `@` for GitHub syntax
 
 ### Fixed
 - Incorrect parsing of paths without owners (reset ownership) for GitHub syntax
