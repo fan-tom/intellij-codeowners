@@ -1,4 +1,5 @@
 // https://mibexsoftware.atlassian.net/wiki/spaces/CODEOWNERS/pages/222822413/Usage
+// playground: https://mibexsoftware.bitbucket.io/codeowners-playground/
 {
   parserClass               = "com.github.fantom.codeowners.lang.kind.bitbucket.parser.CodeownersParser"
   extends                   = "com.github.fantom.codeowners.lang.CodeownersElementImpl"

@@ -20,7 +20,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReference
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceSet
-import com.intellij.util.containers.ContainerUtil
 import com.intellij.vcsUtil.VcsUtil
 
 class CodeownersEntryReferenceSetNew(element: CodeownersEntryBase, val tracerStub: TimeTracerStub? = null) :
@@ -60,15 +59,14 @@ class CodeownersEntryReferenceSetNew(element: CodeownersEntryBase, val tracerStu
      * @return contexts collection
      */
     override fun computeDefaultContexts(): Collection<PsiFileSystemItem> {
-        val containingFile = element.containingFile
-        var containingDirectory = if (containingFile.parent != null)
-            containingFile.parent else containingFile.originalFile.containingDirectory
+        val codeownersFile = element.containingFile
+        var containingDirectory = codeownersFile.parent ?: codeownersFile.originalFile.containingDirectory
         if (containingDirectory == null) {
-            val language = containingFile.language
+            val language = codeownersFile.language
             if (language is CodeownersLanguage) {
-                val affectedRoot = language.fileType.getRoot(containingFile.originalFile.virtualFile)
+                val affectedRoot = language.fileType.getRoot(codeownersFile.originalFile.virtualFile)
 //                if (affectedRoot != null) {
-                containingDirectory = containingFile.manager.findDirectory(affectedRoot)
+                containingDirectory = codeownersFile.manager.findDirectory(affectedRoot)
 //                }
             }
         }
@@ -189,6 +187,8 @@ class CodeownersEntryReferenceSetNew(element: CodeownersEntryBase, val tracerStu
          * @param context       filesystem context
          * @param result        result references collection
          * @param caseSensitive is ignored
+         *
+         * copied from com.intellij.openapi.vcs.changes.ignore.reference.IgnoreReferenceSet.IgnoreReference
          */
         override fun innerResolveInContext(
             text: String,
@@ -197,7 +197,7 @@ class CodeownersEntryReferenceSetNew(element: CodeownersEntryBase, val tracerStu
             caseSensitive: Boolean
         ) {
             ProgressManager.checkCanceled()
-            val tracer = tracerStub?.start("CodeownersEntryReference.innerResolveInContext $text (in $context)")
+            val tracer = tracerStub?.start("CodeownersEntryReference.innerResolveInContext '$text' (in $context)")
             withNullableCloseable(tracer) {
                 super.innerResolveInContext(text, context, result, caseSensitive)
                 val containingFile = containingFile as? CodeownersFile ?: return
@@ -217,7 +217,7 @@ class CodeownersEntryReferenceSetNew(element: CodeownersEntryBase, val tracerStu
                         tracer?.log("getFilesForPattern($pattern) = ${files.size}")
                         if (files.isEmpty()) {
                             files.addAll(
-                                ContainerUtil.filter(context.virtualFile.children) { virtualFile: VirtualFile ->
+                                context.virtualFile.children.filter { virtualFile: VirtualFile ->
                                     isFileUnderSameVcsRoot(context.project, codeownersFileVcsRoot, virtualFile)
                                 }
                             )

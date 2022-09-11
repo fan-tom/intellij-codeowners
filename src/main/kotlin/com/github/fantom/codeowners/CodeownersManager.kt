@@ -126,6 +126,9 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     }
 
     private var working = false
+
+    // TODO: init with current value instead of relying to the fact that instance of this class is created
+    // before VCS is taken into account and corresponding event sent
     private val vcsRoots = mutableListOf<VcsRoot>()
 
     /**
@@ -171,7 +174,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     /**
      * @return: list of CODEOWNERS files that can assign owners to given file.
-     * Might be no equal to the list of all existing CODEOWNERS files i.e in case of local overrides for Bitbucket
+     * Might be no equal to the list of all existing CODEOWNERS files i.e. in case of local overrides for Bitbucket
      */
     @Suppress("UnusedPrivateMember")
     fun getApplicableCodeownersFiles(file: VirtualFile): Map<CodeownersFileType, List<CodeownersEntryOccurrence>> {

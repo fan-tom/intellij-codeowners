@@ -8,21 +8,19 @@ import com.intellij.openapi.components.Storage
 import com.intellij.util.containers.ContainerUtil
 import org.jdom.Element
 
-/**
- * Persistent global settings object for the Codeowners plugin.
- */
+/** Persistent global settings object for the Codeowners plugin. */
 @State(name = "CodeownersSettings", storages = [Storage("codeowners.xml")])
 class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<CodeownersSettings.Listener> {
 
     enum class KEY(private val key: String) {
         ROOT("CodeownersSettings"),
         MISSING_CODEOWNERS("missingCodeowners"),
+
 //        LANGUAGES("languages"),
 //        LANGUAGES_LANGUAGE("language"),
 //        LANGUAGES_ID("id"),
         CODEOWNERS_FILE_STATUS("codeownersFileStatus"),
-        INSERT_AT_CURSOR("insertAtCursor")
-        ;
+        INSERT_AT_CURSOR("insertAtCursor");
 
         override fun toString() = key
     }
@@ -47,22 +45,22 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
             notifyOnChange(KEY.INSERT_AT_CURSOR, insertAtCursor, value)
             field = value
         }
-//
-//    /** Settings related to the [CodeownersLanguage]. */
+
+    //    /** Settings related to the [CodeownersLanguage]. */
 //    var languagesSettings = object : CodeownersLanguagesSettings() {
 //        init {
-// //            CodeownersBundle.LANGUAGES.forEach {
-//                put(
-//                    CodeownersLanguage.INSTANCE,
-//                    object : TreeMap<KEY, Any>() {
-//                        init {
-//                            put(KEY.NEW_FILE, true)
-// //                            put(KEY.ENABLE, CodeownersLanguage.INSTANCE.isVCS &&
-// !CodeownersBundle.isExcludedFromHighlighting((CodeownersLanguage.INSTANCE)))
-//                        }
+//            //            CodeownersBundle.LANGUAGES.forEach {
+//            put(
+//                CodeownersLanguage.INSTANCE,
+//                object : TreeMap<KEY, Any>() {
+//                    init {
+//                        put(KEY.NEW_FILE, true)
+//                        //                            put(KEY.ENABLE, CodeownersLanguage.INSTANCE.isVCS &&
+//                        !CodeownersBundle.isExcludedFromHighlighting((CodeownersLanguage.INSTANCE)))
 //                    }
-//                )
-// //            }
+//                }
+//            )
+//            //            }
 //        }
 //    }
 //        set(value) {
@@ -76,29 +74,29 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
     companion object {
         fun getInstance(): CodeownersSettings = ServiceManager.getService(CodeownersSettings::class.java)
     }
-//
+
     override fun getState() = Element(KEY.ROOT.toString()).apply {
         setAttribute(KEY.MISSING_CODEOWNERS.toString(), missingCodeowners.toString())
         setAttribute(KEY.CODEOWNERS_FILE_STATUS.toString(), codeownersFileStatus.toString())
 
-//        addContent(
-//            Element(KEY.LANGUAGES.toString()).apply {
-//                languagesSettings.forEach { (key, value) ->
-//                    if (key == null) {
-//                        return@forEach
-//                    }
-//                    addContent(
-//                        Element(KEY.LANGUAGES_LANGUAGE.toString()).apply {
-//                            setAttribute(KEY.LANGUAGES_ID.toString(), key.id)
-//                            value.forEach {
-//                                setAttribute(it.key.name, it.value.toString())
-//                            }
+//            addContent(
+//                Element(KEY.LANGUAGES.toString()).apply {
+//                    languagesSettings.forEach { (key, value) ->
+//                        if (key == null) {
+//                            return@forEach
 //                        }
-//                    )
+//                        addContent(
+//                            Element(KEY.LANGUAGES_LANGUAGE.toString()).apply {
+//                                setAttribute(KEY.LANGUAGES_ID.toString(), key.id)
+//                                value.forEach {
+//                                    setAttribute(it.key.name, it.value.toString())
+//                                }
+//                            }
+//                        )
+//                    }
 //                }
-//            }
-//        )
-//        addContent(createTemplatesElement(userTemplates))
+//            )
+//            addContent(createTemplatesElement(userTemplates))
     }
 
     override fun loadState(element: Element) {
@@ -120,10 +118,14 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //                val language = CodeownersBundle.LANGUAGES[id]
 //                languagesSettings[language] = data
 //            }
-
+//
 //            CodeownersBundle.LANGUAGES
 //                .filter { !it.isVCS || CodeownersBundle.isExcludedFromHighlighting(it) }
-//                .forEach { languagesSettings[it]?.apply { this[CodeownersLanguagesSettings.KEY.ENABLE] = false } }
+//                .forEach {
+//                    languagesSettings[it]?.apply {
+//                        this[CodeownersLanguagesSettings.KEY.ENABLE] = false
+//                    }
+//                }
         }
     }
 
@@ -147,7 +149,8 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
     }
 //
 //    /** Helper class for the [CodeownersLanguage] settings. */
-//    open class CodeownersLanguagesSettings : LinkedHashMap<CodeownersLanguage?, TreeMap<CodeownersLanguagesSettings.KEY, Any>>() {
+//    open class CodeownersLanguagesSettings : LinkedHashMap<CodeownersLanguage?,
+//        TreeMap<CodeownersLanguagesSettings.KEY, Any>>() {
 //
 //        enum class KEY {
 //            NEW_FILE, ENABLE
