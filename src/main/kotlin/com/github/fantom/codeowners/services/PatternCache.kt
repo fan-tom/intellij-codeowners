@@ -23,6 +23,8 @@ class PatternCache(project: Project) : Disposable {
      */
     private val PATTERNS_CACHE: ConcurrentMap<String, Pattern> = ConcurrentHashMap()
 
+    private val GLOB_TO_REGEX_CACHE: ConcurrentMap<Triple<CharSequence, Boolean, Boolean>, Regex> = ConcurrentHashMap()
+
     init {
         Disposer.register(project, this)
     }
@@ -94,6 +96,19 @@ class PatternCache(project: Project) : Disposable {
     fun clearCache() {
         GLOBS_CACHE.clear()
         PATTERNS_CACHE.clear()
+        GLOB_TO_REGEX_CACHE.clear()
+    }
+
+    fun createRelativePattern(text: CharSequence, caseSensitive: Boolean): Regex {
+        // TODO cache?
+        return Regex(Glob.createFragmentRegex(text), if (caseSensitive) setOf() else setOf(RegexOption.IGNORE_CASE))
+    }
+
+    fun getOrCreatePrefixRegex(prefixGlob: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Regex {
+        val key = Triple(prefixGlob, atAnyLevel, dirOnly)
+        return GLOB_TO_REGEX_CACHE.computeIfAbsent(key) {
+            Glob.createPrefixRegex(it.first, it.second, it.third)
+        }
     }
 
     companion object {

@@ -33,6 +33,9 @@ import java.util.regex.Pattern
  * corresponding key during some amount of time (10 minutes).
  * * after project dispose
  */
+typealias AtAnyLevel = Boolean
+typealias DirOnly = Boolean
+
 internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {
     private val projectFileIndex = ProjectFileIndex.getInstance(project)
 
@@ -40,6 +43,11 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
         Caffeine.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .build<String, Collection<VirtualFile>>()
+
+    private val cacheByPrefix =
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>() // CharSequence as a key to be able to lookup by substring without instantiation
 
     private val updateQueue = MergingUpdateQueue(
         "CodeownersPatternsMatchedFilesCacheUpdateQueue",
@@ -57,7 +65,10 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                 VirtualFileManager.VFS_CHANGES,
                 object : BulkFileListener {
                     override fun after(events: List<VFileEvent>) {
-                        if (cache.estimatedSize() == 0L) {
+//                        if (cache.estimatedSize() == 0L) {
+//                            return
+//                        }
+                        if (cacheByPrefix.estimatedSize() == 0L) {
                             return
                         }
 
@@ -78,12 +89,25 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                     }
 
                     private fun cleanupCache(path: String) {
-                        val cacheMap = cache.asMap()
+                        // TODO: implement cleanup
+                        // clean all keys that match the prefix of the path
+                        // turn key into regex, taking atAnyLevel and dirOnly into account
+                        // try to match this regex with the beginning of the path
+
+//                        val cacheMap = cache.asMap()
+//                        val globCache = PatternCache.getInstance(project)
+//                        for (key in cacheMap.keys) {
+//                            val pattern = globCache.getPattern(key) ?: continue
+//                            val parts = MatcherUtil.getParts(pattern)
+//                            if (MatcherUtil.matchAnyPart(parts, path)) {
+//                                cacheMap.remove(key)
+//                            }
+//                        }
+                        val cacheMap = cacheByPrefix.asMap()
                         val globCache = PatternCache.getInstance(project)
                         for (key in cacheMap.keys) {
-                            val pattern = globCache.getPattern(key) ?: continue
-                            val parts = MatcherUtil.getParts(pattern)
-                            if (MatcherUtil.matchAnyPart(parts, path)) {
+                            val regex = globCache.getOrCreatePrefixRegex(key.first, key.second, key.third)
+                            if (regex.containsMatchIn(path)) {
                                 cacheMap.remove(key)
                             }
                         }
@@ -94,6 +118,7 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
 
     override fun dispose() {
         cache.invalidateAll()
+        cacheByPrefix.invalidateAll()
         updateQueue.cancelAllUpdates()
     }
 
@@ -111,6 +136,21 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
             runSearchRequest(key, pattern)
         }
         return files
+    }
+
+    fun getFilesByPrefix(prefix: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Collection<VirtualFile> {
+        val files = cacheByPrefix.getIfPresent(Triple(prefix, atAnyLevel, dirOnly)) ?: emptyList()
+
+//        if (files.isEmpty()) {
+//            val regex = Glob.createRegex(prefix, false, false)
+//            runSearchRequest(prefix, Pattern.compile(regex))
+//        }
+
+        return files
+    }
+
+    fun addFilesByPrefix(prefix: CharSequence, atAnyLevel: AtAnyLevel, dirOnly: DirOnly, files: Collection<VirtualFile>) {
+        cacheByPrefix.put(Triple(prefix, atAnyLevel, dirOnly), files)
     }
 
     private fun runSearchRequest(key: String, pattern: Pattern) =

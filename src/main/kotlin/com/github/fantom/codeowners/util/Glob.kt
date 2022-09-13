@@ -124,6 +124,21 @@ object Glob {
         null
     }
 
+    // TODO handle escaping
+    fun createFragmentRegex(fragment: CharSequence): String {
+        // don't put start/end anchors to reuse this function in glob -> regex conversion
+        val sb = StringBuilder()
+        fragment.forEach {
+            when (it) {
+                '?' -> sb.append(".")
+                '*' -> sb.append(".*")
+                '\\' -> {} // skip escaping characters
+                else -> sb.append(it)
+            }
+        }
+        return sb.toString()
+    }
+
     /**
      * Creates regex [String] using glob rule.
      *
@@ -274,5 +289,34 @@ object Glob {
 //        }
         sb.append('$')
         return sb.toString()
+    }
+
+    fun unescape(text: CharSequence): CharSequence {
+        val (_, res) = text.fold(Pair(false, StringBuilder())) { (escape, sb), ch ->
+            when (ch) {
+                '\\' -> if (escape) {
+                    Pair(false, sb.append(ch)) // if already escaping, add char without backslash
+                } else {
+                    Pair(true, sb) // just started escaping, skip backslash
+                }
+                else -> Pair(false, sb.append(ch)) // simply add char
+            }
+        }
+        return res
+    }
+
+    fun createPrefixRegex(prefixGlob: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Regex {
+        val sb = StringBuilder("^")
+        // TODO can we take dirOnly into account? How dir paths are passed in events?
+        val regexStr = prefixGlob.split('/').joinToString(
+            "/",
+            prefix = if (atAnyLevel) {
+                ".*"
+            } else {
+                ""
+            },
+            transform = ::createFragmentRegex
+        )
+        return Regex(sb.append(regexStr).toString())
     }
 }
