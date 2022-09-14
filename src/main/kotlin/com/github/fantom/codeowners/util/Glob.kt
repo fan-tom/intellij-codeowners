@@ -1,7 +1,6 @@
 package com.github.fantom.codeowners.util
 
 import com.github.fantom.codeowners.lang.CodeownersEntryBase
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Utils.getRelativePath
 import com.intellij.openapi.util.text.StringUtil
@@ -94,16 +93,6 @@ object Glob {
         }
 
     /**
-     * Creates regex [Pattern] using [CodeownersEntry].
-     *
-     * @param entry          [CodeownersEntry]
-     * @param acceptChildren Matches directory children
-     * @return regex [Pattern]
-     */
-    fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) =
-        createPattern(entry.value, acceptChildren, supportSquareBrackets)
-
-    /**
      * Creates regex [Pattern] using glob rule.
      *
      * @param rule   rule value
@@ -122,6 +111,20 @@ object Glob {
         Pattern.compile(regex)
     } catch (e: PatternSyntaxException) {
         null
+    }
+
+    fun createFragmentRegex(fragment: CharSequence): String {
+        // don't put start/end anchors to reuse this function in glob -> regex conversion
+        val sb = StringBuilder()
+        fragment.forEach {
+            when (it) {
+                '?' -> sb.append(".")
+                '*' -> sb.append(".*")
+                '\\' -> {} // skip escaping characters
+                else -> sb.append(it)
+            }
+        }
+        return sb.toString()
     }
 
     /**
@@ -274,5 +277,40 @@ object Glob {
 //        }
         sb.append('$')
         return sb.toString()
+    }
+
+    fun unescape(text: CharSequence): CharSequence {
+        val (_, res) = text.fold(Pair(false, StringBuilder())) { (escape, sb), ch ->
+            when (ch) {
+                '\\' -> if (escape) {
+                    Pair(false, sb.append(ch)) // if already escaping, add char without backslash
+                } else {
+                    Pair(true, sb) // just started escaping, skip backslash
+                }
+                else -> Pair(false, sb.append(ch)) // simply add char
+            }
+        }
+        return res
+    }
+
+    @Suppress("UnusedPrivateMember")
+    fun createPrefixRegex(prefixGlob: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Regex {
+        val sb = StringBuilder("^")
+        // TODO can we take dirOnly into account? How dir paths are passed in events?
+        val fragments = prefixGlob.split('/')
+        val (head, tail) = if (fragments.size > 1) {
+            Pair(fragments.first(), fragments.drop(1))
+        } else {
+            Pair(fragments.first(), emptyList())
+        }
+        val tailRegex = tail.foldRight("") { fragment, suffix ->
+            val fragmentRegex = createFragmentRegex(fragment)
+            "($fragmentRegex/$suffix)?"
+        }
+        var regexStr = "$head/$tailRegex"
+        if (atAnyLevel) {
+            regexStr = ".*$regexStr"
+        }
+        return Regex(sb.append(regexStr).toString())
     }
 }

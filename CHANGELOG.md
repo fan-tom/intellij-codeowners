@@ -4,10 +4,11 @@
 
 ## [Unreleased]
 ### Added
-- Support of file paths for GitHub syntax
+- Support of file paths with spaces and `@` for GitHub syntax
 
 ### Fixed
 - Incorrect parsing of paths without owners (reset ownership) for GitHub syntax
+- Resolving files from file patterns
 
 ## [v0.3.5](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.5) (2022-07-05)
 ### Added

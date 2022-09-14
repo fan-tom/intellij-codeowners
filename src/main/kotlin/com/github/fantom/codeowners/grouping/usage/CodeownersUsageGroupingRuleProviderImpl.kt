@@ -12,7 +12,7 @@ import com.intellij.usages.rules.UsageGroupingRule
 /**
  * This class is one big hack.
  * We need to place our rule right before file level.
- * Rules are sorted by rank, the lesser the rank the close to tree root
+ * Rules are sorted by rank, the lesser the rank the closer to tree root
  * But all standard rules have the same rank [Int.MAX_VALUE], so we cannot just set our rank to `FileGroupingRule#getRank()-1`
  * and, since this sorting is stable, rules with the same rank are applied in order they appear in returned array from provider
  * So what we are doing here is:

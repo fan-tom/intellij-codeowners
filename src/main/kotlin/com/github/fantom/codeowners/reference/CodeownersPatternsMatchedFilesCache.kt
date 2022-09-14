@@ -1,30 +1,21 @@
 package com.github.fantom.codeowners.reference
 
+import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.fantom.codeowners.services.PatternCache
-import com.github.fantom.codeowners.util.MatcherUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.*
-import com.intellij.psi.search.FilenameIndex
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.Alarm
-import com.intellij.util.ui.update.DisposableUpdate
-import com.intellij.util.ui.update.MergingUpdateQueue
-import com.intellij.util.ui.update.Update
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 
 /**
- * Cache that retrieves matching files using given [Pattern].
+ * Cache that retrieves matching files using given glob prefix, taking at an level/dir only into account.
  * Cache population happened on demand in the background.
  * The cache eviction happen in the following cases:
  * * by using [VirtualFileListener] to handle filesystem changes
@@ -33,23 +24,12 @@ import java.util.regex.Pattern
  * corresponding key during some amount of time (10 minutes).
  * * after project dispose
  */
+typealias AtAnyLevel = Boolean
+typealias DirOnly = Boolean
+typealias Root = String
+
 internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {
-    private val projectFileIndex = ProjectFileIndex.getInstance(project)
-
-    private val cache =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build<String, Collection<VirtualFile>>()
-
-    private val updateQueue = MergingUpdateQueue(
-        "CodeownersPatternsMatchedFilesCacheUpdateQueue",
-        500,
-        true,
-        null,
-        this,
-        null,
-        Alarm.ThreadToUse.POOLED_THREAD
-    )
+    private val cacheByPrefix = ConcurrentHashMap<Root, Cache<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>>()
 
     init {
         ApplicationManager.getApplication().messageBus.connect(this)
@@ -57,7 +37,7 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                 VirtualFileManager.VFS_CHANGES,
                 object : BulkFileListener {
                     override fun after(events: List<VFileEvent>) {
-                        if (cache.estimatedSize() == 0L) {
+                        if (cacheByPrefix.isEmpty()) {
                             return
                         }
 
@@ -78,13 +58,33 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                     }
 
                     private fun cleanupCache(path: String) {
-                        val cacheMap = cache.asMap()
-                        val globCache = PatternCache.getInstance(project)
-                        for (key in cacheMap.keys) {
-                            val pattern = globCache.getPattern(key) ?: continue
-                            val parts = MatcherUtil.getParts(pattern)
-                            if (MatcherUtil.matchAnyPart(parts, path)) {
-                                cacheMap.remove(key)
+                        val caches = cacheByPrefix.filterKeys {
+                            path.startsWith(it)
+                        }
+                        // in practice there should be only one cache for given path
+                        caches.forEach { (root, cache) ->
+                            val relativePath = path.removePrefix(root).let {
+                                // TODO check if this condition can be false
+                                if (!it.endsWith('/')) {
+                                    StringBuilder(it).append('/') // glob compiled to regex always contains trailing slash
+                                } else {
+                                    it
+                                }
+                            }
+                            val cacheMap = cache.asMap()
+                            val globCache = PatternCache.getInstance(project)
+                            for (key in cacheMap.keys) {
+                                // TODO think about how to take the fact that path may point to a file into account.
+                                // In this case we shouldn't assume that atAnyLevel glob may point
+                                // to some subtree of this path and so shouldn't invalidate such a glob
+                                val regex = globCache.getOrCreatePrefixRegex(key.first, key.second, key.third)
+                                val match = regex.find(relativePath) ?: continue
+                                // if relative path matched only partially, it means
+                                // it points to a tree that is not covered by this glob,
+                                // even if they have common prefix
+                                if (match.range.last >= relativePath.indices.last) {
+                                    cacheMap.remove(key)
+                                }
                             }
                         }
                     }
@@ -93,53 +93,23 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
     }
 
     override fun dispose() {
-        cache.invalidateAll()
-        updateQueue.cancelAllUpdates()
+        cacheByPrefix.values.forEach { it.invalidateAll() }
+        cacheByPrefix.clear()
     }
 
-    /**
-     * Finds [VirtualFile] instances in project for the specific [Pattern] and caches them.
-     *
-     * @param pattern to match
-     * @return matched files list
-     */
-    fun getFilesForPattern(pattern: Pattern): Collection<VirtualFile> {
-        val key = pattern.toString()
-        val files = cache.getIfPresent(key) ?: emptyList()
-
-        if (files.isEmpty()) {
-            runSearchRequest(key, pattern)
-        }
-        return files
+    private fun getCache(context: String) = cacheByPrefix.computeIfAbsent(context) {
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build() // CharSequence as a key to be able to lookup by substring without instantiation
     }
 
-    private fun runSearchRequest(key: String, pattern: Pattern) =
-        updateQueue.queue(object : DisposableUpdate(project, key) {
-            override fun canEat(update: Update) = true
-            override fun doRun() = cache.put(key, doSearch(pattern))
-        })
+    fun getFilesByPrefix(context: String, prefix: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Collection<VirtualFile> {
+        return getCache(context)
+            .getIfPresent(Triple(prefix, atAnyLevel, dirOnly)) ?: emptyList()
+    }
 
-    private fun doSearch(pattern: Pattern): Set<VirtualFile> {
-        val files = HashSet<VirtualFile>(1000)
-        val parts = MatcherUtil.getParts(pattern)
-        if (parts.isEmpty()) {
-            return files
-        }
-
-        val projectScope = GlobalSearchScope.projectScope(project)
-        projectFileIndex.iterateContent { fileOrDir ->
-            ProgressManager.checkCanceled()
-            val name = fileOrDir.name
-            if (MatcherUtil.matchAnyPart(parts, name)) {
-                for (file in runReadAction { FilenameIndex.getVirtualFilesByName(name, projectScope) }) {
-                    if (file.isValid && MatcherUtil.matchAllParts(parts, file.path)) {
-                        files.add(file)
-                    }
-                }
-            }
-            return@iterateContent true
-        }
-        return files
+    fun addFilesByPrefix(context: String, prefix: CharSequence, atAnyLevel: AtAnyLevel, dirOnly: DirOnly, files: Collection<VirtualFile>) {
+        getCache(context).put(Triple(prefix, atAnyLevel, dirOnly), files)
     }
 
     companion object {
