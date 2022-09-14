@@ -303,13 +303,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     fragment == null -> resolveFragment(prefix, context, result, caseSensitive, dirOnly)
                     // trailing slash is excluded on input text normalization
                     fragment == "" -> TODO("unreachable")
-                    // impossible as leading slash is trimmed from the very beginning
-//                    prefix == "" -> { // /foo leads to that case, need to resolve fragment as a fragment
-//                        resolveFragment(fragment, context, result, caseSensitive, dirOnly)
-//                    }
                     else -> {
-                        // TODO remove after verification
-                        assert(prefix.isNotEmpty())
                         val contexts = mutableListOf<ResolveResult>()
                         // on recursive call we should resolve strictly in context and to all variants
                         innerResolveInContextRecursive(prefix.toString(), context, contexts, caseSensitive, false, false)
@@ -333,9 +327,6 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                 caseSensitive: Boolean,
                 dirOnly: Boolean
             ) {
-                // TODO remove as leading slashes are trimmed from the very beginning
-                val nameOnly = text.trimStart('/')
-                assert(nameOnly == text)
                 val project = context.project
 
                 val scope = if (dirOnly) {
@@ -349,8 +340,8 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     GlobalSearchScope.allScope(project)
                 }
 
-                if (nameOnly.containsMetasymbols()) {
-                    val regex = myPatternCache.createRelativePattern(nameOnly, caseSensitive)
+                if (text.containsMetasymbols()) {
+                    val regex = myPatternCache.createRelativePattern(text, caseSensitive)
                     val names = mutableSetOf<String>()
                     FilenameIndex.processAllFileNames({
                         if (it.matches(regex)) {
@@ -369,7 +360,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                 } else { // TODO think about utilizing FilenameIndex.getAllFilesByExt in case of *.ext pattern
                     result.addAll(
                         FilenameIndex
-                            .getVirtualFilesByName(nameOnly.toString(), caseSensitive, scope)
+                            .getVirtualFilesByName(text.toString(), caseSensitive, scope)
                             .toResolveResults()
                     )
                 }
@@ -377,7 +368,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
 
             // only this method should be called recursively from other methods in this class
             fun innerResolveInContextRecursive(
-                normalizedText: CharSequence, // can have only middle slashes, can be empty
+                normalizedText: CharSequence, // can have only middle slashes, shouldn't be empty
                 context: PsiFileSystemItem,
                 result: MutableCollection<ResolveResult>,
                 caseSensitive: Boolean,
@@ -388,21 +379,12 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                 val tracer =
                     tracerStub?.start("CodeownersEntryReference.innerResolveInContextRecursive '$normalizedText' (in $context)")
                 withNullableCloseable(tracer) {
-                    val cachedResult = myCodeownersPatternsMatchedFilesCache.getFilesByPrefix(normalizedText, atAnyLevel, dirOnly)
+                    val cachedResult = myCodeownersPatternsMatchedFilesCache.getFilesByPrefix(context.virtualFile.path, normalizedText, atAnyLevel, dirOnly)
                     if (cachedResult.isNotEmpty()) {
                         result.addAll(cachedResult.toResolveResults())
                         return
                     }
 
-                    // here we should go only if we resolve the first ref
-                    // bc IDEA should have resolved all the prev refs in the set and we cached them already
-                    // TODO but it might be not the case if cache is invalidated and IDEA didn't re-resolve prev ref
-                    // in this case we have two possibilities:
-                    // 1. we are resolving ref in context of prev ref (call from outside)
-                    // 2. we are resolving ref in context of itself (recursive call from resolveStrictlyUnderContext)
-                    // In 1st case we should resolve the last fragment in context
-                    // In 2nd case we should return the context itself and resolve the last fragment in this context
-                    // when returned from this call
                     if (atAnyLevel) {
                         resolveAtAnyLevel(normalizedText, context, result, caseSensitive, dirOnly)
                     } else {
@@ -410,6 +392,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     }
 
                     myCodeownersPatternsMatchedFilesCache.addFilesByPrefix(
+                        context.virtualFile.path,
                         normalizedText,
                         atAnyLevel,
                         dirOnly,

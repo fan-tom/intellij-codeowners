@@ -296,15 +296,20 @@ object Glob {
     fun createPrefixRegex(prefixGlob: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Regex {
         val sb = StringBuilder("^")
         // TODO can we take dirOnly into account? How dir paths are passed in events?
-        val regexStr = prefixGlob.split('/').joinToString(
-            "/",
-            prefix = if (atAnyLevel) {
-                ".*"
-            } else {
-                ""
-            },
-            transform = ::createFragmentRegex
-        )
+        val fragments = prefixGlob.split('/')
+        val (head, tail) = if (fragments.size > 1) {
+            Pair(fragments.first(), fragments.drop(1))
+        } else {
+            Pair(fragments.first(), emptyList())
+        }
+        val tailRegex = tail.foldRight("") { fragment, suffix ->
+            val fragmentRegex = createFragmentRegex(fragment)
+            "($fragmentRegex/$suffix)?"
+        }
+        var regexStr = "$head/$tailRegex"
+        if (atAnyLevel) {
+            regexStr = ".*$regexStr"
+        }
         return Regex(sb.append(regexStr).toString())
     }
 }

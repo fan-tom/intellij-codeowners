@@ -1,5 +1,6 @@
 package com.github.fantom.codeowners.reference
 
+import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.fantom.codeowners.services.PatternCache
 import com.intellij.openapi.Disposable
@@ -24,12 +25,10 @@ import java.util.concurrent.TimeUnit
  */
 typealias AtAnyLevel = Boolean
 typealias DirOnly = Boolean
+typealias Root = String
 
 internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {
-    private val cacheByPrefix =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>() // CharSequence as a key to be able to lookup by substring without instantiation
+    private val cacheByPrefix = mutableMapOf<Root, Cache<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>>()
 
     init {
         ApplicationManager.getApplication().messageBus.connect(this)
@@ -37,7 +36,7 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                 VirtualFileManager.VFS_CHANGES,
                 object : BulkFileListener {
                     override fun after(events: List<VFileEvent>) {
-                        if (cacheByPrefix.estimatedSize() == 0L) {
+                        if (cacheByPrefix.isEmpty()) {
                             return
                         }
 
@@ -58,12 +57,35 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                     }
 
                     private fun cleanupCache(path: String) {
-                        val cacheMap = cacheByPrefix.asMap()
-                        val globCache = PatternCache.getInstance(project)
-                        for (key in cacheMap.keys) {
-                            val regex = globCache.getOrCreatePrefixRegex(key.first, key.second, key.third)
-                            if (regex.containsMatchIn(path)) {
-                                cacheMap.remove(key)
+                        val caches = cacheByPrefix.filterKeys {
+                            path.startsWith(it)
+                        }
+                        // in practice there should be only one cache for given path
+                        caches.forEach { (root, cache) ->
+                            val relativePath = path.removePrefix(root).let {
+                                // TODO check if this condition can be false
+                                if (!it.endsWith('/')) {
+                                    StringBuilder(it).append('/') // glob compiled to regex always contains trailing slash
+                                } else {
+                                    it
+                                }
+                            }
+                            val cacheMap = cache.asMap()
+                            val globCache = PatternCache.getInstance(project)
+                            for (key in cacheMap.keys) {
+                                // TODO think about how to take the fact that path may point to a file into account.
+                                // In this case we shouldn't assume that atAnyLevel glob may point
+                                // to some subtree of this path and so shouldn't invalidate such a glob
+                                val regex = globCache.getOrCreatePrefixRegex(key.first, key.second, key.third)
+                                val match = regex.find(relativePath) ?: continue
+                                // if relative path matched only partially, it means
+                                // it points to a tree that is not covered by this glob,
+                                // even if they have common prefix
+                                if (match.range.last < relativePath.indices.last) {
+                                    continue
+                                } else {
+                                    cacheMap.remove(key)
+                                }
                             }
                         }
                     }
@@ -72,15 +94,23 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
     }
 
     override fun dispose() {
-        cacheByPrefix.invalidateAll()
+        cacheByPrefix.values.forEach { it.invalidateAll() }
+        cacheByPrefix.clear()
     }
 
-    fun getFilesByPrefix(prefix: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Collection<VirtualFile> {
-        return cacheByPrefix.getIfPresent(Triple(prefix, atAnyLevel, dirOnly)) ?: emptyList()
+    private fun getCache(context: String) = cacheByPrefix.computeIfAbsent(context) {
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build() // CharSequence as a key to be able to lookup by substring without instantiation
     }
 
-    fun addFilesByPrefix(prefix: CharSequence, atAnyLevel: AtAnyLevel, dirOnly: DirOnly, files: Collection<VirtualFile>) {
-        cacheByPrefix.put(Triple(prefix, atAnyLevel, dirOnly), files)
+    fun getFilesByPrefix(context: String, prefix: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Collection<VirtualFile> {
+        return getCache(context)
+            .getIfPresent(Triple(prefix, atAnyLevel, dirOnly)) ?: emptyList()
+    }
+
+    fun addFilesByPrefix(context: String, prefix: CharSequence, atAnyLevel: AtAnyLevel, dirOnly: DirOnly, files: Collection<VirtualFile>) {
+        getCache(context).put(Triple(prefix, atAnyLevel, dirOnly), files)
     }
 
     companion object {
