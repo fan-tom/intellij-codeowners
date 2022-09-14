@@ -13,7 +13,7 @@ import com.intellij.openapi.vfs.newvfs.events.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Cache that retrieves matching files using given [Pattern].
+ * Cache that retrieves matching files using given glob prefix, taking at an level/dir only into account.
  * Cache population happened on demand in the background.
  * The cache eviction happen in the following cases:
  * * by using [VirtualFileListener] to handle filesystem changes

@@ -15,10 +15,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiElementResolveResult
-import com.intellij.psi.PsiFileSystemItem
-import com.intellij.psi.PsiManager
-import com.intellij.psi.ResolveResult
+import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReference
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceSet
 import com.intellij.psi.search.FilenameIndex
@@ -26,6 +23,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.GlobalSearchScopes
 import com.intellij.psi.search.scope.packageSet.FilteredNamedScope
 import com.intellij.vcsUtil.VcsUtil
+import java.util.*
 
 class CodeownersEntryReferenceSetRecursiveReverse(
     element: CodeownersEntryBase,
@@ -196,6 +194,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
             private fun Collection<VirtualFile>.toResolveResults() = this
                 .mapNotNull { getPsiFileSystemItem(psiManager, it)?.let(::PsiElementResolveResult) }
             private fun CharSequence.containsMetasymbols() = this.any { it == '*' || it == '?' }
+
             // (prefix, null) if no delimiter found
             // (prefix, "") if delimiter found at the end of the string
             // (prefix, suffix) otherwise
@@ -217,7 +216,9 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                 val project = context.project
                 val currentDir = context.virtualFile
 
-                val unescapedText = Glob.unescape(text)
+                // toString to have working == operator
+                // TODO think about using String everywhere
+                val unescapedText = Glob.unescape(text).toString()
 
                 if (unescapedText == "**") {
                     val iterator: (VirtualFile) -> Boolean = iter@{
@@ -262,7 +263,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     // let parent class handle basic case
                     if (dirOnly) {
                         val resolveResults = mutableListOf<ResolveResult>()
-                        super@CodeownersEntryReference.innerResolveInContext(unescapedText.toString(), context, resolveResults, caseSensitive)
+                        super@CodeownersEntryReference.innerResolveInContext(unescapedText, context, resolveResults, caseSensitive)
                         result.addAll(
                             resolveResults
                                 .filter {
@@ -271,28 +272,27 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                                 }
                         )
                     } else {
-                        super@CodeownersEntryReference.innerResolveInContext(unescapedText.toString(), context, result, caseSensitive)
+                        super@CodeownersEntryReference.innerResolveInContext(unescapedText, context, result, caseSensitive)
                     }
                 }
             }
 
             private fun resolveStrictlyUnderContext(
-                text: CharSequence, // can have only leading and middle slashes
+                text: CharSequence, // can have only middle slashes
                 context: PsiFileSystemItem,
                 result: MutableCollection<ResolveResult>,
                 caseSensitive: Boolean,
                 dirOnly: Boolean
             ) {
-                // /foo/**/baz
+                // foo/**/baz
                 // check cache
                 //   if found - return immediately
                 //   otherwise:
-                //     split into /foo/** and baz
+                //     split into foo/** and baz
                 //     resolve first part recursively
                 //     resolve baz in context of result
 
                 // no escaping handling as slash cannot be part of filename
-                // TODO preserve trailing slash in reparse method
                 // TODO handle splitting in language implementation
                 val (prefix, fragment) = text.splitLast('/')
                 when {
@@ -300,10 +300,13 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     fragment == null -> resolveFragment(prefix, context, result, caseSensitive, dirOnly)
                     // trailing slash is excluded on input text normalization
                     fragment == "" -> TODO("unreachable")
-                    prefix == "" -> { // /foo leads to that case, need to resolve fragment as a fragment
-                        resolveFragment(fragment, context, result, caseSensitive, dirOnly)
-                    }
+                    // impossible as leading slash is trimmed from the very beginning
+//                    prefix == "" -> { // /foo leads to that case, need to resolve fragment as a fragment
+//                        resolveFragment(fragment, context, result, caseSensitive, dirOnly)
+//                    }
                     else -> {
+                        // TODO remove after verification
+                        assert(prefix.isNotEmpty())
                         val contexts = mutableListOf<ResolveResult>()
                         // on recursive call we should resolve strictly in context and to all variants
                         innerResolveInContextRecursive(prefix.toString(), context, contexts, caseSensitive, false, false)
@@ -321,13 +324,15 @@ class CodeownersEntryReferenceSetRecursiveReverse(
             }
 
             private fun resolveAtAnyLevel(
-                text: CharSequence, // can have only leading slash
+                text: CharSequence, // cannot have any slashes
                 context: PsiFileSystemItem,
                 result: MutableCollection<ResolveResult>,
                 caseSensitive: Boolean,
                 dirOnly: Boolean
             ) {
+                // TODO remove as leading slashes are trimmed from the very beginning
                 val nameOnly = text.trimStart('/')
+                assert(nameOnly == text)
                 val project = context.project
 
                 val scope = if (dirOnly) {
@@ -358,7 +363,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                         }
                         true
                     }
-                } else {
+                } else { // TODO think about utilizing FilenameIndex.getAllFilesByExt in case of *.ext pattern
                     result.addAll(
                         FilenameIndex
                             .getVirtualFilesByName(nameOnly.toString(), caseSensitive, scope)
@@ -369,7 +374,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
 
             // only this method should be called recursively from other methods in this class
             fun innerResolveInContextRecursive(
-                normalizedText: CharSequence, // can have only leading and middle slashes, can be empty
+                normalizedText: CharSequence, // can have only middle slashes, can be empty
                 context: PsiFileSystemItem,
                 result: MutableCollection<ResolveResult>,
                 caseSensitive: Boolean,
@@ -386,6 +391,15 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                         return
                     }
 
+                    // here we should go only if we resolve the first ref
+                    // bc IDEA should have resolved all the prev refs in the set and we cached them already
+                    // TODO but it might be not the case if cache is invalidated and IDEA didn't re-resolve prev ref
+                    // in this case we have two possibilities:
+                    // 1. we are resolving ref in context of prev ref (call from outside)
+                    // 2. we are resolving ref in context of itself (recursive call from resolveStrictlyUnderContext)
+                    // In 1st case we should resolve the last fragment in context
+                    // In 2nd case we should return the context itself and resolve the last fragment in this context
+                    // when returned from this call
                     if (atAnyLevel) {
                         resolveAtAnyLevel(normalizedText, context, result, caseSensitive, dirOnly)
                     } else {
@@ -422,22 +436,19 @@ class CodeownersEntryReferenceSetRecursiveReverse(
          * @param caseSensitive is ignored
          */
         override fun innerResolveInContext(
-            text: String,
+            text: String, // only leading and middle slash are possible, trailing slash is trimmed in reparse()
             context: PsiFileSystemItem,
             result: MutableCollection<ResolveResult>,
             caseSensitive: Boolean
         ) {
-            fun CharSequence.ensureStartsWith(char: Char) = if (!this.startsWith(char)) {
-                "$char${this}"
-            } else {
-                this
-            }
-
             ProgressManager.checkCanceled()
             val tracer = tracerStub?.start("CodeownersEntryReference.innerResolveInContext '$text' (in $context)")
             val textSequence = text as CharSequence
             withNullableCloseable(tracer) {
-                val (atAnyLevel, dirOnly, normalizedText) = if (index == 0) {
+                // should remove leading slash to cache /foo/bar and foo/bar under the same key
+                // whether it should match at any level or not is encoded by dedicated flag
+                val normalizedText = textSequence.trimStart('/')
+                val (atAnyLevel, dirOnly) = if (index == 0) {
                     // to decide whether we should resolve reference relative to the root or at any level
                     // we need to look at the whole pattern
                     // we cannot rely on the number of references in the set because there may be single reference but
@@ -445,34 +456,23 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     val wholePattern = this.fileReferenceSet.pathString
                     // assert: last reference must exist since we have one at hands
 //                        this.lastFileReference!!.canonicalText
-                    // TODO preserve trailing slash in reparse method
-                    var atAnyLevel = when (wholePattern.indexOf('/')) {
+                    val atAnyLevel = when (wholePattern.indexOf('/')) {
                         // no slashes or only trailing one
                         -1, (wholePattern.length - 1) -> true
                         else -> false
                     }
-                    // the first ref can be also the last one, so need to check trailing slash
-                    // shouldn't remove leading slash to properly cache results
-                    var normalizedText = textSequence.trimEnd('/')
-                    if (!atAnyLevel) {
-                        // for the first ref in set it is meaningful whether it has leading slash or not
-                        // should add leading slash if not at any level
-                        // to cache foo in /foo/bar and foo/bar under the same key
-                        normalizedText = normalizedText.ensureStartsWith('/')
-                    }
-//                    val dirOnly = normalizedText.length < textSequence.length
-                    val dirOnly = wholePattern.endsWith('/')
-                    Triple(atAnyLevel, dirOnly, normalizedText)
+                    // we don't care about trailing slash if it is not the last reference in the set
+                    val dirOnly = isLast && wholePattern.endsWith('/')
+                    Pair(atAnyLevel, dirOnly)
                 } else if (isLast) {
-                    val normalizedText = textSequence.trimEnd('/').ensureStartsWith('/')
-//                    val dirOnly = normalizedText.length < textSequence.length
                     val wholePattern = this.fileReferenceSet.pathString
                     val dirOnly = wholePattern.endsWith('/')
-                    // to cache both /foo/bar and foo/bar under the same key
-                    Triple(false, dirOnly, normalizedText)
+                    // not at any level because we come here only if we didn't pass the first check, which means
+                    // there are at least two components in the path, thus at least one slash
+                    Pair(false, dirOnly)
                 } else {
                     // it is not the first ref in the set, so there exists at least one slash, thus we should resolve strictly in context
-                    Triple(false, false, textSequence.ensureStartsWith('/'))
+                    Pair(false, false)
                 }
                 Resolver().innerResolveInContextRecursive(normalizedText, context, result, caseSensitive, atAnyLevel, dirOnly)
             }
