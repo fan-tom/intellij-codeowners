@@ -10,6 +10,9 @@
 - Incorrect parsing of paths without owners (reset ownership) for GitHub syntax
 - Resolving files from file patterns
 
+### Removed
+- Support for IDEA versions older than 2022.1
+
 ## [v0.3.5](https://github.com/fan-tom/intellij-codeowners/tree/v0.3.5) (2022-07-05)
 ### Added
 - Support codeowners unsetting for Github files, see https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
