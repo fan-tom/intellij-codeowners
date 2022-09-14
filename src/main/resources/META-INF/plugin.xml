@@ -94,13 +94,22 @@
 <!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersDuplicateEntryInspection"-->
 <!--                key="codeInspection.duplicateEntry"-->
 <!--                level="ERROR"/>-->
-<!--        <localInspection-->
-<!--                bundle="messages.CodeownersBundle"-->
-<!--                enabledByDefault="true"-->
-<!--                groupKey="codeInspection.group"-->
-<!--                implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedEntryInspection"-->
-<!--                key="codeInspection.unusedEntry"-->
-<!--                level="WEAK WARNING"/>-->
+        <localInspection
+            language="CODEOWNERS"
+            bundle="messages.CodeownersBundle"
+            enabledByDefault="true"
+            groupKey="codeInspection.group"
+            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedEntryInspection"
+            key="codeInspection.unusedEntry"
+            level="WEAK WARNING"/>
+        <localInspection
+            language="CODEOWNERS"
+            bundle="messages.CodeownersBundle"
+            enabledByDefault="true"
+            groupKey="codeInspection.group"
+            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersMetasymbolsUsageInspection"
+            key="codeInspection.metasymbolsUsage"
+            level="WEAK WARNING"/>
 <!--        <localInspection-->
 <!--                bundle="messages.CodeownersBundle"-->
 <!--                enabledByDefault="true"-->

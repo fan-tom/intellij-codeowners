@@ -5,14 +5,17 @@ import com.github.fantom.codeowners.file.type.kind.BitbucketFileType
 import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.indexing.PatternString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
+import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeam
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeamReference
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersVisitor
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTypes
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import com.intellij.psi.tree.IElementType
 import com.intellij.util.ProcessingContext
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersVisitor as BitbucketCodeownersVisitor
 
 class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") {
     companion object {
@@ -23,8 +26,19 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
     override val fileType
         get() = BitbucketFileType.INSTANCE
 
+    override fun getCrlfToken(): IElementType {
+        return CodeownersTypes.CRLF
+    }
+
+    override fun getVisitor(visitor: CodeownersVisitor) =
+        object : BitbucketCodeownersVisitor() {
+            override fun visitPattern(entry: CodeownersPattern) {
+                visitor.visitPattern(entry)
+            }
+        }
+
     override fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>) =
-        object : CodeownersVisitor() {
+        object : BitbucketCodeownersVisitor() {
             override fun visitPattern(entry: CodeownersPattern) {
                 val regex = entry.entry.regex(false)
                 items.add(
