@@ -1,19 +1,21 @@
 package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
+import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.lang.CodeownersPatternBase
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.source.tree.TreeUtil
+import com.intellij.psi.tree.IElementType
 
 /**
  * QuickFix action that removes specified entry handled by code inspections like [CodeownersCoverEntryInspection],
  * [CodeownersDuplicateEntryInspection], [CodeownersUnusedEntryInspection].
  */
-class CodeownersRemoveEntryFix(pattern: CodeownersPattern) : LocalQuickFixAndIntentionActionOnPsiElement(pattern) {
+class CodeownersRemoveEntryFix(pattern: CodeownersPatternBase<*, *>) : LocalQuickFixAndIntentionActionOnPsiElement(pattern) {
 
     override fun invoke(
         project: Project,
@@ -22,21 +24,22 @@ class CodeownersRemoveEntryFix(pattern: CodeownersPattern) : LocalQuickFixAndInt
         startElement: PsiElement,
         endElement: PsiElement
     ) {
-        if (startElement is CodeownersPattern) {
-            removeCrlf(startElement)
+        val crlfToken = (file.fileType as CodeownersFileType).codeownersLanguage.getCrlfToken()
+        if (startElement is CodeownersPatternBase<*, *>) {
+            removeCrlf(startElement, crlfToken)
             startElement.delete()
         }
     }
 
-    private fun removeCrlf(startElement: PsiElement) {
+    private fun removeCrlf(startElement: PsiElement, crlfToken: IElementType) {
         (
             TreeUtil.findSibling(
                 startElement.node,
-                com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF
+                crlfToken
             )
                 ?: TreeUtil.findSiblingBackward(
                     startElement.node,
-                    com.github.fantom.codeowners.lang.kind.github.psi.CodeownersTypes.CRLF
+                    crlfToken
                 )
             )?.psi?.delete()
     }
