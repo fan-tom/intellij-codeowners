@@ -6,11 +6,14 @@ import com.github.fantom.codeowners.services.PatternCache
 import com.github.fantom.codeowners.util.Glob
 import com.github.fantom.codeowners.util.TimeTracerStub
 import com.github.fantom.codeowners.util.withNullableCloseable
+import com.intellij.diagnostic.PluginException
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Condition
+import com.intellij.openapi.util.RecursionManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -416,6 +419,51 @@ class CodeownersEntryReferenceSetRecursiveReverse(
             }
         }
 
+        private fun isAllowedEmptyPath(text: String): Boolean {
+            return text.isEmpty() && isLast &&
+                (
+                    fileReferenceSet.pathString.isEmpty() && fileReferenceSet.isEmptyPathAllowed ||
+                        !fileReferenceSet.isEndingSlashNotAllowed && index > 0
+                    )
+        }
+
+        // overridden to avoid iteration over results of resolving prev ref
+        override fun innerResolve(caseSensitive: Boolean, containingFile: PsiFile): Array<ResolveResult> {
+            val referenceText = text
+            if (referenceText.isEmpty() && index == 0) {
+                return arrayOf(PsiElementResolveResult(containingFile))
+            }
+
+            val contexts = RecursionManager.doPreventingRecursion(
+                this,
+                false
+            ) {
+                val result = mutableListOf<PsiFileSystemItem>()
+
+                val defaultContexts = fileReferenceSet.defaultContexts
+                for (context in defaultContexts) {
+                    if (context == null) {
+                        LOG.error(PluginException.createByClass("Null context", null, fileReferenceSet.javaClass))
+                    }
+                }
+                result.addAll(defaultContexts)
+                result
+            }
+            if (contexts == null) {
+                LOG.error("Recursion occurred for " + javaClass + " on " + element.text)
+                return ResolveResult.EMPTY_ARRAY
+            }
+            val result = LinkedHashSet<ResolveResult>()
+            for (context in contexts) {
+                innerResolveInContext(referenceText, context, result, caseSensitive)
+            }
+            if (contexts.isEmpty() && isAllowedEmptyPath(referenceText)) {
+                result.add(PsiElementResolveResult(containingFile))
+            }
+            val resultCount = result.size
+            return if (resultCount > 0) result.toTypedArray() else ResolveResult.EMPTY_ARRAY
+        }
+
         /**
          * Resolves reference to the filesystem.
          * Terms:
@@ -436,7 +484,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
          * @param caseSensitive is ignored
          */
         override fun innerResolveInContext(
-            text: String, // only leading and middle slash are possible, trailing slash is trimmed in reparse()
+            text: String, // only leading and middle slashes are possible, trailing slash is trimmed in reparse()
             context: PsiFileSystemItem,
             result: MutableCollection<ResolveResult>,
             caseSensitive: Boolean
@@ -495,6 +543,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
     }
 
     companion object {
+        internal val LOG = Logger.getInstance(CodeownersEntryReferenceSetRecursiveReverse::class.java)
         private fun isFileUnderSameVcsRoot(project: Project, vcsRoot: VirtualFile, file: VirtualFile): Boolean {
             val fileVcsRoot = VcsUtil.getVcsRootFor(project, file)
             return fileVcsRoot != null && vcsRoot == fileVcsRoot
