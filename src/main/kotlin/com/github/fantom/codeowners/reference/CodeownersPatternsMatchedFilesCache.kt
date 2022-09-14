@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
@@ -28,7 +29,7 @@ typealias DirOnly = Boolean
 typealias Root = String
 
 internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {
-    private val cacheByPrefix = mutableMapOf<Root, Cache<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>>()
+    private val cacheByPrefix = ConcurrentHashMap<Root, Cache<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>>()
 
     init {
         ApplicationManager.getApplication().messageBus.connect(this)
