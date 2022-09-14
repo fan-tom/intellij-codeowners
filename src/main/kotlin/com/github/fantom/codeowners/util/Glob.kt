@@ -1,7 +1,6 @@
 package com.github.fantom.codeowners.util
 
 import com.github.fantom.codeowners.lang.CodeownersEntryBase
-import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Utils.getRelativePath
 import com.intellij.openapi.util.text.StringUtil
@@ -94,16 +93,6 @@ object Glob {
         }
 
     /**
-     * Creates regex [Pattern] using [CodeownersEntry].
-     *
-     * @param entry          [CodeownersEntry]
-     * @param acceptChildren Matches directory children
-     * @return regex [Pattern]
-     */
-    fun createPattern(entry: CodeownersEntry, acceptChildren: Boolean = false, supportSquareBrackets: Boolean) =
-        createPattern(entry.value, acceptChildren, supportSquareBrackets)
-
-    /**
      * Creates regex [Pattern] using glob rule.
      *
      * @param rule   rule value
@@ -124,7 +113,6 @@ object Glob {
         null
     }
 
-    // TODO handle escaping
     fun createFragmentRegex(fragment: CharSequence): String {
         // don't put start/end anchors to reuse this function in glob -> regex conversion
         val sb = StringBuilder()
