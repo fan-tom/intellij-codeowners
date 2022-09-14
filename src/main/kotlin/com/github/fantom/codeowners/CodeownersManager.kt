@@ -127,7 +127,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private var working = false
 
-    // TODO: init with current value instead of relying to the fact that instance of this class is created
+    // TODO init with current value instead of relying to the fact that instance of this class is created
     // before VCS is taken into account and corresponding event sent
     private val vcsRoots = mutableListOf<VcsRoot>()
 

@@ -20,6 +20,9 @@ style:
     active: false
   MagicNumber:
     active: false
+  ReturnCount:
+    active: true
+    max: 3
 
 exceptions:
   PrintStackTrace:
@@ -28,3 +31,8 @@ exceptions:
     active: false
   TooGenericExceptionCaught:
     active: false
+
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 7

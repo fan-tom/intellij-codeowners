@@ -379,7 +379,8 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                 val tracer =
                     tracerStub?.start("CodeownersEntryReference.innerResolveInContextRecursive '$normalizedText' (in $context)")
                 withNullableCloseable(tracer) {
-                    val cachedResult = myCodeownersPatternsMatchedFilesCache.getFilesByPrefix(context.virtualFile.path, normalizedText, atAnyLevel, dirOnly)
+                    val cachedResult = myCodeownersPatternsMatchedFilesCache
+                        .getFilesByPrefix(context.virtualFile.path, normalizedText, atAnyLevel, dirOnly)
                     if (cachedResult.isNotEmpty()) {
                         result.addAll(cachedResult.toResolveResults())
                         return

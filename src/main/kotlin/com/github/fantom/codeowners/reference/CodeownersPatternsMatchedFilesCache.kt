@@ -82,9 +82,7 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                                 // if relative path matched only partially, it means
                                 // it points to a tree that is not covered by this glob,
                                 // even if they have common prefix
-                                if (match.range.last < relativePath.indices.last) {
-                                    continue
-                                } else {
+                                if (match.range.last >= relativePath.indices.last) {
                                     cacheMap.remove(key)
                                 }
                             }

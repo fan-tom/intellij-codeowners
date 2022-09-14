@@ -293,6 +293,7 @@ object Glob {
         return res
     }
 
+    @Suppress("UnusedPrivateMember")
     fun createPrefixRegex(prefixGlob: CharSequence, atAnyLevel: Boolean, dirOnly: Boolean): Regex {
         val sb = StringBuilder("^")
         // TODO can we take dirOnly into account? How dir paths are passed in events?

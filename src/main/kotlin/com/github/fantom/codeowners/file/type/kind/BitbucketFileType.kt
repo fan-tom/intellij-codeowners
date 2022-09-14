@@ -11,7 +11,7 @@ class BitbucketFileType : CodeownersFileType(BitbucketLanguage.INSTANCE) {
         private val subdirectories = setOf(".bitbucket")
     }
 
-    // TODO: need to investigate why parent may be null
+    // TODO need to investigate why parent may be null
     private fun isInSubdir(codeownersFile: VirtualFile) = codeownersFile.parent?.name in subdirectories
 
     override fun getRoot(vcsRoot: VcsRoot, codeownersFile: VirtualFile): VirtualFile? {
