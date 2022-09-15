@@ -3,6 +3,8 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+
+## [v0.4.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.4.0) (2022-09-15)
 ### Added
 - Support of file paths with spaces and `@` for GitHub syntax
 
