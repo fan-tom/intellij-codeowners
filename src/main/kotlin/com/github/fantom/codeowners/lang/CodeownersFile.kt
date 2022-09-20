@@ -45,7 +45,7 @@ class CodeownersFile(viewProvider: FileViewProvider, private val fileType: Codeo
 
     override fun toString() = fileType.name
 
-    fun getPatternsList(): List<Pair<RegexString, OwnersReference>> {
+    fun getRulesList(): List<Pair<RegexString, OwnersReference>> {
         val items = mutableListOf<Pair<RegexString, OwnersReference>>()
         language.getPatternsVisitor(items)?.let { acceptChildren(it) }
         return items

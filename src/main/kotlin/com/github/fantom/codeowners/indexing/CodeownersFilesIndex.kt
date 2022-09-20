@@ -100,7 +100,7 @@ class CodeownersFilesIndex :
 
         return Collections.singletonMap(
             (inputData.fileType as CodeownersFileType),
-            CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getPatternsList())
+            CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getRulesList())
         )
     }
 
