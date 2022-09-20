@@ -3,7 +3,7 @@ package com.github.fantom.codeowners.lang
 import com.github.fantom.codeowners.CodeownersException
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
-import com.github.fantom.codeowners.indexing.PatternString
+import com.github.fantom.codeowners.indexing.RegexString
 import com.intellij.lang.Language
 import com.intellij.lang.LanguageParserDefinitions
 import com.intellij.psi.FileViewProvider
@@ -45,8 +45,8 @@ class CodeownersFile(viewProvider: FileViewProvider, private val fileType: Codeo
 
     override fun toString() = fileType.name
 
-    fun getPatternsList(): List<Pair<PatternString, OwnersReference>> {
-        val items = mutableListOf<Pair<PatternString, OwnersReference>>()
+    fun getPatternsList(): List<Pair<RegexString, OwnersReference>> {
+        val items = mutableListOf<Pair<RegexString, OwnersReference>>()
         language.getPatternsVisitor(items)?.let { acceptChildren(it) }
         return items
     }

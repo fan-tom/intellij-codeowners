@@ -88,12 +88,12 @@ class CodeownersFilesIndex :
             return emptyMap()
         } ?: return emptyMap()
 
-//        val items = mutableListOf<Pair<PatternString, List<OwnerString>>>()
+//        val items = mutableListOf<Pair<RegexString, List<OwnerString>>>()
 //        inputDataPsi.acceptChildren(
 //            object : com.github.fantom.codeowners.lang.kind.github.psi.CodeownersVisitor() {
 //                override fun visitPattern(entry: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern) {
 //                    val regex = entry.entryFile.regex(false)
-//                    items.add(Pair(PatternString(regex), entry.owners.ownerList.map{ OwnerString(it.text) }))
+//                    items.add(Pair(RegexString(regex), entry.owners.ownerList.map{ OwnerString(it.text) }))
 //                }
 //            }
 //        )

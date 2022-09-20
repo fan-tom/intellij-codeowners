@@ -2,7 +2,7 @@ package com.github.fantom.codeowners.lang
 
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
-import com.github.fantom.codeowners.indexing.PatternString
+import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.reference.CodeownersEntryReferenceSetRecursiveReverse
 import com.github.fantom.codeowners.util.TimeTracerKey
 import com.github.fantom.codeowners.util.withNullableCloseable
@@ -38,7 +38,7 @@ open class CodeownersLanguage protected constructor(name: String) : Language(INS
     open fun getCrlfToken(): IElementType = TODO("This method should be overridden in class ${this::class}")
 
     open fun getVisitor(visitor: CodeownersVisitor): PsiElementVisitor? = null
-    open fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>): PsiElementVisitor? = null
+    open fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>): PsiElementVisitor? = null
     open fun getReferencesByElement(
         psiElement: PsiElement,
         processingContext: ProcessingContext

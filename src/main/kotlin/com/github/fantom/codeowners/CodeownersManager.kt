@@ -248,7 +248,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
         return codeownersFile.items.lastOrNull {
             LOGGER.trace(">>>getFileOwners check pattern ${it.first} against $relativePath")
-            val pattern = Glob.getPattern(it.first.pattern)
+            val pattern = Glob.getPattern(it.first.regex)
 //                if (
             return@lastOrNull matcher.match(pattern, relativePath)
 //                ) {

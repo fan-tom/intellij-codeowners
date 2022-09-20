@@ -3,7 +3,7 @@ package com.github.fantom.codeowners.lang.kind.github
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.kind.GithubFileType
 import com.github.fantom.codeowners.indexing.OwnerString
-import com.github.fantom.codeowners.indexing.PatternString
+import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner
@@ -35,13 +35,13 @@ class GithubLanguage private constructor() : CodeownersLanguage("Github") {
             }
         }
 
-    override fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>) =
+    override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
         object : GithubCodeownersVisitor() {
             override fun visitPattern(pattern: CodeownersPattern) {
                 val regex = pattern.entry.regex(false)
                 items.add(
                     Pair(
-                        PatternString(regex),
+                        RegexString(regex),
                         OwnersReference(pattern.owners.map { OwnerString(it.text) }, pattern.textOffset)
                     )
                 )

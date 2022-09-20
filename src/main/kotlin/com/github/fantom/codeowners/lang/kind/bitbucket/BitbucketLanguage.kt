@@ -3,7 +3,7 @@ package com.github.fantom.codeowners.lang.kind.bitbucket
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.kind.BitbucketFileType
 import com.github.fantom.codeowners.indexing.OwnerString
-import com.github.fantom.codeowners.indexing.PatternString
+import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
@@ -37,13 +37,13 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
             }
         }
 
-    override fun getPatternsVisitor(items: MutableList<Pair<PatternString, OwnersReference>>) =
+    override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
         object : BitbucketCodeownersVisitor() {
             override fun visitPattern(entry: CodeownersPattern) {
                 val regex = entry.entry.regex(false)
                 items.add(
                     Pair(
-                        PatternString(regex),
+                        RegexString(regex),
                         OwnersReference(entry.owners.map { OwnerString(it.text) }, entry.textOffset)
                     )
                 )

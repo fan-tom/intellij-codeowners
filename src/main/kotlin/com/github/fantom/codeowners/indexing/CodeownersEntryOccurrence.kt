@@ -10,8 +10,8 @@ import java.io.DataOutput
 import java.io.IOException
 import java.io.Serializable
 
-inline class PatternString(val pattern: String) {
-    override fun toString() = pattern
+inline class RegexString(val regex: String) {
+    override fun toString() = regex
 }
 
 inline class OwnerString(val owner: String) {
@@ -23,7 +23,7 @@ inline class OwnerString(val owner: String) {
  * of codeowners entries with line numbers for better performance. Class is used for indexing.
  */
 @Suppress("SerialVersionUIDInSerializableClass")
-class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<PatternString, OwnersReference>>) : Serializable {
+class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<RegexString, OwnersReference>>) : Serializable {
 
     /**
      * Returns current [VirtualFile].
@@ -47,7 +47,7 @@ class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<Pa
                 writeUTF(entry.url)
                 writeInt(entry.items.size)
                 entry.items.forEach {
-                    writeUTF(it.first.pattern)
+                    writeUTF(it.first.regex)
                     writeInt(it.second.offset)
                     writeInt(it.second.owners.size)
                     it.second.owners.forEach { owner ->
@@ -61,12 +61,12 @@ class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<Pa
         @Throws(IOException::class)
         fun deserialize(input: DataInput): CodeownersEntryOccurrence {
             val url = input.readUTF()
-            val items = mutableListOf<Pair<PatternString, OwnersReference>>()
+            val items = mutableListOf<Pair<RegexString, OwnersReference>>()
 
             if (!StringUtils.isEmpty(url)) {
                 val size = input.readInt()
                 repeat((0 until size).count()) {
-                    val pattern = PatternString(input.readUTF())
+                    val pattern = RegexString(input.readUTF())
                     val offset = input.readInt()
                     val size = input.readInt()
                     val owners = mutableListOf<OwnerString>()
