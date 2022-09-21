@@ -2,7 +2,7 @@ package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.file.type.CodeownersFileType
-import com.github.fantom.codeowners.lang.CodeownersPatternBase
+import com.github.fantom.codeowners.lang.CodeownersRuleBase
 import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
@@ -22,8 +22,8 @@ class CodeownersMetasymbolsUsageInspection : LocalInspectionTool() {
 //        val matcher = holder.project.service<CodeownersMatcher>()
         val inspectionManager = InspectionManager.getInstance(holder.project)
         val visitor = object : CodeownersVisitor() {
-            override fun visitPattern(pattern: CodeownersPatternBase<*, *>) {
-                val entry = pattern.entry
+            override fun visitRule(rule: CodeownersRuleBase<*, *>) {
+                val entry = rule.entry
                 val text = entry.text
                 if (text.startsWith("**/")) {
                     when (text.indexOf('/', 3)) {

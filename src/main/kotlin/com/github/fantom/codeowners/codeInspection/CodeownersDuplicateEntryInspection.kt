@@ -14,47 +14,47 @@ import com.intellij.util.containers.MultiMap
 /**
  * Inspection tool that checks if entries are duplicated by others.
  */
-class CodeownersDuplicateEntryInspection : LocalInspectionTool() {
-    private val LOG = Logger.getInstance(LocalInspectionTool::class.java)
-
-    override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
-        if (file !is CodeownersFile) {
-            return null
-        }
-        LOG.warn("Checking file for duplicates ${file.name}")
-
-        val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
-        val entries = MultiMap.create<String, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern>()
-        file.acceptChildren(
-            object : CodeownersVisitor() {
-                override fun visitPattern(
-                    pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
-                ) {
-                    val entry = pattern.entry
-                    LOG.warn("Remembering entry ${entry.text}")
-                    entries.putValue(entry.text, pattern)
-                    super.visitEntry(entry)
-                }
-            }
-        )
-
-        LOG.warn("Remembered entries $entries")
-        entries.entrySet().forEach { (_, value) ->
-            val iterator = value.iterator()
-
-            iterator.next()
-            while (iterator.hasNext()) {
-                val pattern = iterator.next()
-                problemsHolder.registerProblem(
-                    pattern,
-                    CodeownersBundle.message("codeInspection.duplicateEntry.message"),
-                    CodeownersRemoveEntryFix(pattern)
-                )
-            }
-        }
-
-        return problemsHolder.resultsArray
-    }
-
-    override fun runForWholeFile() = true
-}
+//class CodeownersDuplicateEntryInspection : LocalInspectionTool() {
+//    private val LOG = Logger.getInstance(LocalInspectionTool::class.java)
+//
+//    override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
+//        if (file !is CodeownersFile) {
+//            return null
+//        }
+//        LOG.warn("Checking file for duplicates ${file.name}")
+//
+//        val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
+//        val entries = MultiMap.create<String, com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern>()
+//        file.acceptChildren(
+//            object : CodeownersVisitor() {
+//                override fun visitPattern(
+//                    pattern: com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
+//                ) {
+//                    val entry = pattern.entry
+//                    LOG.warn("Remembering entry ${entry.text}")
+//                    entries.putValue(entry.text, pattern)
+//                    super.visitEntry(entry)
+//                }
+//            }
+//        )
+//
+//        LOG.warn("Remembered entries $entries")
+//        entries.entrySet().forEach { (_, value) ->
+//            val iterator = value.iterator()
+//
+//            iterator.next()
+//            while (iterator.hasNext()) {
+//                val pattern = iterator.next()
+//                problemsHolder.registerProblem(
+//                    pattern,
+//                    CodeownersBundle.message("codeInspection.duplicateEntry.message"),
+//                    CodeownersRemoveRuleFix(pattern)
+//                )
+//            }
+//        }
+//
+//        return problemsHolder.resultsArray
+//    }
+//
+//    override fun runForWholeFile() = true
+//}

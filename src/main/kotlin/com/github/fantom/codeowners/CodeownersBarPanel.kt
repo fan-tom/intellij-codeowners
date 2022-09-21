@@ -91,13 +91,13 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
                 } ?: noOwnersTriple
             }
             else -> {
-                val firstMatchingEntry = ownersMap.firstNotNullOfOrNull { it.value.ref }
+                val firstMatchingRule = ownersMap.firstNotNullOfOrNull { it.value.ref }
                 val firstSetOwners = ownersMap
                     .mapNotNull { it.value.ref?.owners }
                     .firstOrNull { it.isNotEmpty() }
                 if (firstSetOwners != null) {
                     ownersMapper(firstSetOwners, ownersMap.entries)
-                } else if (firstMatchingEntry != null) {
+                } else if (firstMatchingRule != null) {
                     unsetTriple
                 } else {
                     noOwnersTriple

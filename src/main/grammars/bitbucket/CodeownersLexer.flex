@@ -44,7 +44,7 @@ DISABLE                     = disable
 BRANCH_PATTERN              = [^\s]+
 
 
-ENTRY_FIRST_CHARACTER = [^#\ ]
+RULE_FIRST_CHARACTER = [^#\ ]
 //VALUE=[^@/\s\/]+
 VALUE                 = ("\\\["|"\\\]"|"\\\/"|[^\[\]\r\n\/\s])+
 NAME_                 = [^#@/\s\/]+
@@ -68,7 +68,7 @@ SPACES                = \s+
     {SUBDIRECTORY_OVERRIDES}             { yybegin(IN_TOPLEVEL_CONFIG); return SUBDIRECTORY_OVERRIDES; }
     {CREATE_PULL_REQUEST_COMMENT}        { yybegin(IN_TOPLEVEL_CONFIG); return CREATE_PULL_REQUEST_COMMENT; }
 
-    {ENTRY_FIRST_CHARACTER}              { yypushback(1); yybegin(IN_ENTRY); }
+    {RULE_FIRST_CHARACTER}               { yypushback(1); yybegin(IN_ENTRY); }
 }
 
 <IN_BRANCH_PATTERN> {

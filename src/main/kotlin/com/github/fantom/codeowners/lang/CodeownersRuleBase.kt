@@ -2,7 +2,7 @@ package com.github.fantom.codeowners.lang
 
 import com.intellij.psi.PsiElement
 
-interface CodeownersPatternBase<EntryType : CodeownersEntryBase, OwnersType> : PsiElement {
+interface CodeownersRuleBase<EntryType : CodeownersEntryBase, OwnersType : PsiElement> : PsiElement {
     /**
      * Returns fs path.
      */

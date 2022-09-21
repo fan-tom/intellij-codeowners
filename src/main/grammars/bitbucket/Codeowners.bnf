@@ -38,14 +38,14 @@
   name("Entry.*")           = "entry"
   implements("Entry")       = "com.github.fantom.codeowners.lang.CodeownersEntryBase"
   mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersEntryExtImpl"
-  implements("Pattern")     = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPatternBase"
-  mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPatternExtImpl"
+  implements("Rule")     = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersRuleBase"
+  mixin("Rule")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersRuleExtImpl"
 //  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
 }
 
 codeownersFile          ::= item_ *
 private item_           ::= HEADER | SECTION | COMMENT | ConfigurationLine | value_item_ | CRLF
-private value_item_     ::= (Pattern | TeamDefinition) WSS? COMMENT?
+private value_item_     ::= (Rule | TeamDefinition) WSS? COMMENT?
 
 ConfigurationLine              ::= DestinationBranchConfig | SubdirectoryOverridesConfig | CreatePullRequestCommentConfig
 DestinationBranchConfig        ::= DESTINATION_BRANCH WSS BRANCH_PATTERN
@@ -62,7 +62,7 @@ TeamDefinition          ::= '@''@''@' TeamName WSS Owners {
 
 Assign                  ::= Entry /*SPACES*/ WSS Owners /*CRLF*/
 
-Pattern                 ::= Reset | Assign
+Rule                    ::= Reset | Assign
 
 Entry                   ::= EntryDirectory | EntryFile
 

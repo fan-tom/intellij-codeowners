@@ -2,7 +2,7 @@ package com.github.fantom.codeowners.codeInspection
 
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.file.type.CodeownersFileType
-import com.github.fantom.codeowners.lang.CodeownersPatternBase
+import com.github.fantom.codeowners.lang.CodeownersRuleBase
 import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemHighlightType
@@ -25,8 +25,8 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
      */
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         val visitor = object : CodeownersVisitor() {
-            override fun visitPattern(pattern: CodeownersPatternBase<*, *>) {
-                val entry = pattern.entry
+            override fun visitRule(rule: CodeownersRuleBase<*, *>) {
+                val entry = rule.entry
                 val lastReference = entry.references.lastOrNull {
                     it is FileReferenceOwner
                 } ?: return
@@ -36,7 +36,7 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
                         entry,
                         CodeownersBundle.message("codeInspection.unusedEntry.message"),
                         ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                        CodeownersRemoveEntryFix(pattern)
+                        CodeownersRemoveRuleFix(rule)
                     )
                 }
             }

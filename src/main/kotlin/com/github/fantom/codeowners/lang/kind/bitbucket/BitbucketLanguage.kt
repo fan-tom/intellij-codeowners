@@ -6,7 +6,7 @@ import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.CodeownersVisitor
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersRule
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeam
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTeamReference
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersTypes
@@ -32,19 +32,19 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
 
     override fun getVisitor(visitor: CodeownersVisitor) =
         object : BitbucketCodeownersVisitor() {
-            override fun visitPattern(entry: CodeownersPattern) {
-                visitor.visitPattern(entry)
+            override fun visitRule(rule: CodeownersRule) {
+                visitor.visitRule(rule)
             }
         }
 
     override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
         object : BitbucketCodeownersVisitor() {
-            override fun visitPattern(entry: CodeownersPattern) {
-                val regex = entry.entry.regex(false)
+            override fun visitRule(rule: CodeownersRule) {
+                val regex = rule.entry.regex(false)
                 items.add(
                     Pair(
                         RegexString(regex),
-                        OwnersReference(entry.owners.map { OwnerString(it.text) }, entry.textOffset)
+                        OwnersReference(rule.owners.map { OwnerString(it.text) }, rule.textOffset)
                     )
                 )
             }

@@ -33,18 +33,18 @@
   mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersEntryExtImpl"
   mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersNamedOwnerExtImpl"
   implements("Entry")       = "com.github.fantom.codeowners.lang.CodeownersEntryBase"
-  implements("Pattern")     = "com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPatternBase"
-  mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersPatternExtImpl"
+  implements("Rule")     = "com.github.fantom.codeowners.lang.kind.github.psi.CodeownersRuleBase"
+  mixin("Rule")          = "com.github.fantom.codeowners.lang.kind.github.psi.impl.CodeownersRuleExtImpl"
 }
 
 codeownersFile          ::= item_ *
-private item_           ::= HEADER | SECTION | COMMENT | Pattern | CRLF
+private item_           ::= HEADER | SECTION | COMMENT | Rule | CRLF
 
 Reset                   ::= (EntryDirectory | EntryFile)
 
 Assign                  ::= (EntryDirectory | EntryFile) SPACES Owners
 
-Pattern                 ::= Assign | Reset
+Rule                    ::= Assign | Reset
 
 Entry                   ::= '/' ? <<list_macro PATHNAME>>
 EntryDirectory          ::= '/' ? <<list_macro PATHNAME>> '/' { extends = "EntryFile"}
