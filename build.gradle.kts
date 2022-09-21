@@ -30,7 +30,7 @@ repositories {
 }
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("io.arrow-kt:arrow-core:1.1.2")
+    implementation("io.arrow-kt:arrow-core:1.1.3")
 }
 
 val generateGithubLexer = task<GenerateLexerTask>("generateGithubLexer") {
