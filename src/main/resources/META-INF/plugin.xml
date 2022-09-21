@@ -99,8 +99,8 @@
             bundle="messages.CodeownersBundle"
             enabledByDefault="true"
             groupKey="codeInspection.group"
-            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedEntryInspection"
-            key="codeInspection.unusedEntry"
+            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersUnusedPatternInspection"
+            key="codeInspection.unusedPattern"
             level="WEAK WARNING"/>
         <localInspection
             language="CODEOWNERS"
@@ -132,7 +132,7 @@
         <fileBasedIndex implementation="com.github.fantom.codeowners.indexing.CodeownersFilesIndex"/>
         <lang.elementManipulator
                 forClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry"
-                implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntryManipulator"/>
+                implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPatternManipulator"/>
         <lang.elementManipulator
                 forClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner"
                 implementationClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwnerManipulator"/>

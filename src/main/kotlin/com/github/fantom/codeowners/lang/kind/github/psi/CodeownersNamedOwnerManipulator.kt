@@ -24,9 +24,9 @@ class CodeownersNamedOwnerManipulator : AbstractElementManipulator<CodeownersNam
         val file = PsiFileFactory.getInstance(owner.project)
             .createFileFromText(language.filename, fileType, range.replace(owner.text, newContent))
 
-        return when (val newEntry = PsiTreeUtil.findChildOfType(file, CodeownersNamedOwner::class.java)) {
+        return when (val newOwner = PsiTreeUtil.findChildOfType(file, CodeownersNamedOwner::class.java)) {
             null -> owner
-            else -> owner.replace(newEntry) as CodeownersNamedOwner
+            else -> owner.replace(newOwner) as CodeownersNamedOwner
         }
     }
 }

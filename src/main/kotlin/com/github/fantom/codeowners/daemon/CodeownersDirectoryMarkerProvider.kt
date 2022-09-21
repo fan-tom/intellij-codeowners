@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.daemon
 
 import com.github.fantom.codeowners.CodeownersBundle
-import com.github.fantom.codeowners.lang.CodeownersEntryBase
+import com.github.fantom.codeowners.lang.CodeownersPatternBase
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Glob
 import com.github.fantom.codeowners.util.Utils
@@ -28,7 +28,7 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
      */
     @Suppress("ReturnCount")
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
-        if (element !is CodeownersEntryBase) {
+        if (element !is CodeownersPatternBase) {
             return null
         }
         var isDirectory = element.isDirectory

@@ -35,7 +35,7 @@ FIRST_CHARACTER = [^#\s]
 VALUE           = [^@\s/]+
 PATHNAME        = ([^\s/]|\\\s)+
 
-%state IN_ENTRY, IN_OWNERS
+%state IN_PATTERN, IN_OWNERS
 
 %%
 <YYINITIAL> {
@@ -45,14 +45,14 @@ PATHNAME        = ([^\s/]|\\\s)+
     {SECTION}          { return SECTION; }
     {COMMENT}          { return COMMENT; }
 
-    {FIRST_CHARACTER}  { yypushback(1); yybegin(IN_ENTRY); }
+    {FIRST_CHARACTER}  { yypushback(1); yybegin(IN_PATTERN); }
 }
 
-<IN_ENTRY> {
+<IN_PATTERN> {
     {LINE_WS}+          { yybegin(IN_OWNERS); return SPACES; }
-    {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
+    {SLASH}             { yybegin(IN_PATTERN); return SLASH; }
 
-    {PATHNAME}          { yybegin(IN_ENTRY); return PATHNAME; }
+    {PATHNAME}          { yybegin(IN_PATTERN); return PATHNAME; }
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
 }
 

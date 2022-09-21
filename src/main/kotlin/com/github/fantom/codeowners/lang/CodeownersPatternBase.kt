@@ -3,7 +3,7 @@ package com.github.fantom.codeowners.lang
 import com.intellij.psi.PsiElement
 import java.util.regex.Pattern
 
-interface CodeownersEntryBase : PsiElement {
+interface CodeownersPatternBase : PsiElement {
     /**
      * Returns current value.
      *

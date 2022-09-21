@@ -35,11 +35,11 @@
 //    SPACES                  = 'regexp:\s+'
   ]
 
-  name("Entry.*")           = "entry"
-  implements("Entry")       = "com.github.fantom.codeowners.lang.CodeownersEntryBase"
-  mixin("Entry")            = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersEntryExtImpl"
-  implements("Rule")     = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersRuleBase"
-  mixin("Rule")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersRuleExtImpl"
+  name("Pattern.*")         = "pattern"
+  implements("Pattern")     = "com.github.fantom.codeowners.lang.CodeownersPatternBase"
+  mixin("Pattern")          = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersPatternExtImpl"
+  implements("Rule")        = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersRuleBase"
+  mixin("Rule")             = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersRuleExtImpl"
 //  mixin("NamedOwner")       = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersNamedOwnerExtImpl"
 }
 
@@ -54,17 +54,17 @@ CreatePullRequestCommentConfig ::= CREATE_PULL_REQUEST_COMMENT WSS EnableOrDisab
 EnableOrDisable                ::= ENABLE | DISABLE
 
 NEGATION                ::= "!"
-Reset                   ::= NEGATION Entry
+Reset                   ::= NEGATION Pattern
 
 TeamDefinition          ::= '@''@''@' TeamName WSS Owners {
   mixin = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersTeamDefinitionExtImpl"
 }
 
-Assign                  ::= Entry /*SPACES*/ WSS Owners /*CRLF*/
+Assign                  ::= Pattern /*SPACES*/ WSS Owners /*CRLF*/
 
 Rule                    ::= Reset | Assign
 
-Entry                   ::= EntryDirectory | EntryFile
+Pattern                 ::= PatternDirectory | PatternFile
 
 //QuotedEntry             ::= '"' <<entry_macro VALUES_LIST>> '"'
 //private meta QuotedEntry::= '"' <<p>> '"'
@@ -74,10 +74,10 @@ Entry                   ::= EntryDirectory | EntryFile
 //private meta entry_file_raw ::= '/' ? <<list_macro <<p>>>>
 //private meta entry_dir_raw  ::= '/' ? <<list_macro <<p>>>> '/'
 
-EntryDirectory          ::= '/' ? <<list_macro VALUE>> '/' //| ('"' '/' ? <<list_macro VALUES_LIST>> '/' '"') //{ extends = "EntryFile"}
-EntryFile               ::= '/' ? <<list_macro VALUE>> //| ('"' '/' ? <<list_macro VALUES_LIST>> '"')  //{ extends = "Entry"}
-//EntryDirectory          ::= ('/' ? <<list_macro VALUE>> '/') | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> '/'>> //{ extends = "EntryFile"}
-//EntryFile               ::= ('/' ? <<list_macro VALUE>>) | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> >> //{ extends = "Entry"}
+PatternDirectory        ::= '/' ? <<list_macro VALUE>> '/' //| ('"' '/' ? <<list_macro VALUES_LIST>> '/' '"') //{ extends = "EntryFile"}
+PatternFile             ::= '/' ? <<list_macro VALUE>> //| ('"' '/' ? <<list_macro VALUES_LIST>> '"')  //{ extends = "Entry"}
+//EntryDirectory        ::= ('/' ? <<list_macro VALUE>> '/') | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> '/'>> //{ extends = "EntryFile"}
+//EntryFile             ::= ('/' ? <<list_macro VALUE>>) | <<QuotedEntry '/' ? <<list_macro VALUES_LIST>> >> //{ extends = "Entry"}
 
 Owners                  ::= Owner (WSS Owner)*
 Owner                   ::= Email | NamedOwner

@@ -1,6 +1,6 @@
 package com.github.fantom.codeowners.util
 
-import com.github.fantom.codeowners.lang.CodeownersEntryBase
+import com.github.fantom.codeowners.lang.CodeownersPatternBase
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.util.Utils.getRelativePath
 import com.intellij.openapi.util.text.StringUtil
@@ -20,11 +20,11 @@ object Glob {
      * Finds for [VirtualFile] list using glob rule in given root directory.
      *
      * @param root  root directory
-     * @param entry ignore entry
+     * @param pattern ignore entry
      * @return search result
      */
-    fun findOne(root: VirtualFile, entry: CodeownersEntryBase, matcher: CodeownersMatcher) =
-        find(root, listOf(entry), matcher, false)[entry]?.firstOrNull()
+    fun findOne(root: VirtualFile, pattern: CodeownersPatternBase, matcher: CodeownersMatcher) =
+        find(root, listOf(pattern), matcher, false)[pattern]?.firstOrNull()
 
     /**
      * Finds for [VirtualFile] list using glob rule in given root directory.
@@ -34,9 +34,9 @@ object Glob {
      * @param includeNested attach children to the search result
      * @return search result
      */
-    fun find(root: VirtualFile, entries: List<CodeownersEntryBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
-        concurrentMapOf<CodeownersEntryBase, MutableList<VirtualFile>>().apply {
-            val map = concurrentMapOf<CodeownersEntryBase, Pattern>()
+    fun find(root: VirtualFile, entries: List<CodeownersPatternBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
+        concurrentMapOf<CodeownersPatternBase, MutableList<VirtualFile>>().apply {
+            val map = concurrentMapOf<CodeownersPatternBase, Pattern>()
 
             entries.forEach {
                 this[it] = mutableListOf()
@@ -45,13 +45,13 @@ object Glob {
                 }
             }
 
-            val visitor = object : VirtualFileVisitor<Map<CodeownersEntryBase, Pattern?>>(NO_FOLLOW_SYMLINKS) {
+            val visitor = object : VirtualFileVisitor<Map<CodeownersPatternBase, Pattern?>>(NO_FOLLOW_SYMLINKS) {
                 @Suppress("ReturnCount")
                 override fun visitFile(file: VirtualFile): Boolean {
                     if (root == file) {
                         return true
                     }
-                    val current = mutableMapOf<CodeownersEntryBase, Pattern?>()
+                    val current = mutableMapOf<CodeownersPatternBase, Pattern?>()
                     val path = getRelativePath(root, file)
                     if (currentValue.isEmpty() || path == null) {
                         return false
@@ -83,7 +83,7 @@ object Glob {
      * @param includeNested attach children to the search result
      * @return search result
      */
-    fun findAsPaths(root: VirtualFile, entries: List<CodeownersEntryBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
+    fun findAsPaths(root: VirtualFile, entries: List<CodeownersPatternBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
         find(root, entries, matcher, includeNested).mapValues { (_, value) ->
             value
                 .asSequence()

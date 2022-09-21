@@ -34,5 +34,5 @@ object CodeownersHighlighterColors {
     val CONFIG_VALUE = TextAttributesKey.createTextAttributesKey("CODEOWNERS.CONFIG_VALUE")
 
     /** Default style for unused entry */
-    val UNUSED = TextAttributesKey.createTextAttributesKey("CODEOWNERS.UNUSED_ENTRY")
+    val UNUSED = TextAttributesKey.createTextAttributesKey("CODEOWNERS.UNUSED_PATTERN")
 }

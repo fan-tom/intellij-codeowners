@@ -1,7 +1,7 @@
 package com.github.fantom.codeowners.reference
 
-import com.github.fantom.codeowners.lang.CodeownersEntryBase
 import com.github.fantom.codeowners.lang.CodeownersLanguage
+import com.github.fantom.codeowners.lang.CodeownersPatternBase
 import com.github.fantom.codeowners.services.PatternCache
 import com.github.fantom.codeowners.util.Glob
 import com.github.fantom.codeowners.util.TimeTracerStub
@@ -28,8 +28,8 @@ import com.intellij.psi.search.scope.packageSet.FilteredNamedScope
 import com.intellij.vcsUtil.VcsUtil
 import java.util.*
 
-class CodeownersEntryReferenceSetRecursiveReverse(
-    element: CodeownersEntryBase,
+class CodeownersPatternReferenceSetRecursiveReverse(
+    element: CodeownersPatternBase,
     val tracerStub: TimeTracerStub? = null
 ) :
     FileReferenceSet(element) {
@@ -42,7 +42,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
     }
 
     /**
-     * Creates [CodeownersEntryReference] instance basing on passed text value.
+     * Creates [CodeownersPatternReference] instance basing on passed text value.
      *
      * @param range text range
      * @param index start index
@@ -50,7 +50,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
      * @return file reference
      */
     override fun createFileReference(range: TextRange, index: Int, text: String): FileReference {
-        return CodeownersEntryReference(this, range, index, text)
+        return CodeownersPatternReference(this, range, index, text)
     }
 
     /**
@@ -185,7 +185,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
     /**
      * Custom definition of [FileReference].
      */
-    private inner class CodeownersEntryReference constructor(
+    private inner class CodeownersPatternReference constructor(
         fileReferenceSet: FileReferenceSet,
         range: TextRange,
         index: Int,
@@ -266,7 +266,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                     // let parent class handle basic case
                     if (dirOnly) {
                         val resolveResults = mutableListOf<ResolveResult>()
-                        super@CodeownersEntryReference.innerResolveInContext(unescapedText, context, resolveResults, caseSensitive)
+                        super@CodeownersPatternReference.innerResolveInContext(unescapedText, context, resolveResults, caseSensitive)
                         result.addAll(
                             resolveResults
                                 .filter {
@@ -275,7 +275,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
                                 }
                         )
                     } else {
-                        super@CodeownersEntryReference.innerResolveInContext(unescapedText, context, result, caseSensitive)
+                        super@CodeownersPatternReference.innerResolveInContext(unescapedText, context, result, caseSensitive)
                     }
                 }
             }
@@ -377,7 +377,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
             ) {
                 ProgressManager.checkCanceled()
                 val tracer =
-                    tracerStub?.start("CodeownersEntryReference.innerResolveInContextRecursive '$normalizedText' (in $context)")
+                    tracerStub?.start("CodeownersPatternReference.innerResolveInContextRecursive '$normalizedText' (in $context)")
                 withNullableCloseable(tracer) {
                     val cachedResult = myCodeownersPatternsMatchedFilesCache
                         .getFilesByPrefix(context.virtualFile.path, normalizedText, atAnyLevel, dirOnly)
@@ -474,7 +474,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
             caseSensitive: Boolean
         ) {
             ProgressManager.checkCanceled()
-            val tracer = tracerStub?.start("CodeownersEntryReference.innerResolveInContext '$text' (in $context)")
+            val tracer = tracerStub?.start("CodeownersPatternReference.innerResolveInContext '$text' (in $context)")
             val textSequence = text as CharSequence
             withNullableCloseable(tracer) {
                 // should remove leading slash to cache /foo/bar and foo/bar under the same key
@@ -527,7 +527,7 @@ class CodeownersEntryReferenceSetRecursiveReverse(
     }
 
     companion object {
-        internal val LOG = Logger.getInstance(CodeownersEntryReferenceSetRecursiveReverse::class.java)
+        internal val LOG = Logger.getInstance(CodeownersPatternReferenceSetRecursiveReverse::class.java)
         private fun isFileUnderSameVcsRoot(project: Project, vcsRoot: VirtualFile, file: VirtualFile): Boolean {
             val fileVcsRoot = VcsUtil.getVcsRootFor(project, file)
             return fileVcsRoot != null && vcsRoot == fileVcsRoot

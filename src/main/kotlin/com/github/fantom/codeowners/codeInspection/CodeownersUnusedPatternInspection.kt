@@ -14,7 +14,7 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferen
 /**
  * Inspection tool that checks if entries are unused - does not cover any file or directory.
  */
-class CodeownersUnusedEntryInspection : LocalInspectionTool() {
+class CodeownersUnusedPatternInspection : LocalInspectionTool() {
 
     /**
      * Checks if entries are related to any file.
@@ -26,15 +26,15 @@ class CodeownersUnusedEntryInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         val visitor = object : CodeownersVisitor() {
             override fun visitRule(rule: CodeownersRuleBase<*, *>) {
-                val entry = rule.entry
-                val lastReference = entry.references.lastOrNull {
+                val pattern = rule.pattern
+                val lastReference = pattern.references.lastOrNull {
                     it is FileReferenceOwner
                 } ?: return
                 val hasNoTargets = (lastReference as PsiPolyVariantReference).multiResolve(false).isEmpty()
                 if (hasNoTargets) {
                     holder.registerProblem(
-                        entry,
-                        CodeownersBundle.message("codeInspection.unusedEntry.message"),
+                        pattern,
+                        CodeownersBundle.message("codeInspection.unusedPattern.message"),
                         ProblemHighlightType.LIKE_UNUSED_SYMBOL,
                         CodeownersRemoveRuleFix(rule)
                     )

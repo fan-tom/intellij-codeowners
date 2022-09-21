@@ -62,7 +62,7 @@
             <option name="FOREGROUND" value="08FF00" />
         </value>
     </option>
-    <option name="CODEOWNERS.UNUSED_ENTRY">
+    <option name="CODEOWNERS.UNUSED_PATTERN">
         <value>
             <option name="FOREGROUND" value="808080" />
             <option name="FONT_TYPE" value="2" />

@@ -1,7 +1,8 @@
 package com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl
 
 import com.github.fantom.codeowners.lang.CodeownersElementImpl
-import com.github.fantom.codeowners.lang.kind.bitbucket.psi.*
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersNegation
+import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersPattern
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.text.StringUtil
@@ -9,7 +10,7 @@ import com.intellij.openapi.util.text.StringUtil
 /**
  * Custom [CodeownersElementImpl] implementation.
  */
-abstract class CodeownersEntryExtImpl(node: ASTNode) : CodeownersElementImpl(node), CodeownersEntry {
+abstract class CodeownersPatternExtImpl(node: ASTNode) : CodeownersElementImpl(node), CodeownersPattern {
 
     /**
      * Checks if the first child is negated - i.e. `!file.txt` entry.
@@ -18,13 +19,14 @@ abstract class CodeownersEntryExtImpl(node: ASTNode) : CodeownersElementImpl(nod
      */
     val isNegated
         get() = firstChild is CodeownersNegation
+
     /**
      * Checks if current entry is a directory - i.e. `dir/`.
      *
      * @return is directory
      */
     override val isDirectory
-        get() = this.entryDirectory != null
+        get() = this.patternDirectory != null
 
     /**
      * Returns entry value without leading `!` if entry is negated.

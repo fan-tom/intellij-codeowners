@@ -3,7 +3,7 @@ package com.github.fantom.codeowners.lang
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
 import com.github.fantom.codeowners.indexing.RegexString
-import com.github.fantom.codeowners.reference.CodeownersEntryReferenceSetRecursiveReverse
+import com.github.fantom.codeowners.reference.CodeownersPatternReferenceSetRecursiveReverse
 import com.github.fantom.codeowners.util.TimeTracerKey
 import com.github.fantom.codeowners.util.withNullableCloseable
 import com.intellij.lang.Language
@@ -47,7 +47,7 @@ open class CodeownersLanguage protected constructor(name: String) : Language(INS
             it?.start()
             withNullableCloseable(it) {
                 when (psiElement) {
-                    is CodeownersEntryBase -> CodeownersEntryReferenceSetRecursiveReverse(psiElement, it?.nested()).allReferences
+                    is CodeownersPatternBase -> CodeownersPatternReferenceSetRecursiveReverse(psiElement, it?.nested()).allReferences
                     else -> null
                 }
             }

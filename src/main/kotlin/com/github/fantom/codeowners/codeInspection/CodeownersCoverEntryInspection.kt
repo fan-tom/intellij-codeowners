@@ -88,7 +88,7 @@ package com.github.fantom.codeowners.codeInspection
 //        entries: List<com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry>,
 //        matcher: CodeownersMatcher
 //    ) =
-//        mutableMapOf<CodeownersEntryBase, Set<String>>().apply {
+//        mutableMapOf<CodeownersPatternBase, Set<String>>().apply {
 //            val found = Glob.findAsPaths(contextDirectory, entries, matcher, true)
 //            found.forEach { (key, value) ->
 //                ProgressManager.checkCanceled()

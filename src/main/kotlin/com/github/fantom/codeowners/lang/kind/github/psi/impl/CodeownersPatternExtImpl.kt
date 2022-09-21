@@ -1,14 +1,15 @@
 package com.github.fantom.codeowners.lang.kind.github.psi.impl
 
 import com.github.fantom.codeowners.lang.CodeownersElementImpl
-import com.github.fantom.codeowners.lang.kind.github.psi.*
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPattern
+import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersPatternDirectory
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.lang.ASTNode
 
 /**
  * Custom [CodeownersElementImpl] implementation.
  */
-abstract class CodeownersEntryExtImpl(node: ASTNode) : CodeownersElementImpl(node), CodeownersEntry {
+abstract class CodeownersPatternExtImpl(node: ASTNode) : CodeownersElementImpl(node), CodeownersPattern {
 
     /**
      * Checks if current entry is a directory - i.e. `dir/`.
@@ -16,7 +17,7 @@ abstract class CodeownersEntryExtImpl(node: ASTNode) : CodeownersElementImpl(nod
      * @return is directory
      */
     override val isDirectory
-        get() = this is CodeownersEntryDirectory
+        get() = this is CodeownersPatternDirectory
 
     /**
      * Returns entry value

@@ -40,7 +40,7 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
     override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
         object : BitbucketCodeownersVisitor() {
             override fun visitRule(rule: CodeownersRule) {
-                val regex = rule.entry.regex(false)
+                val regex = rule.pattern.regex(false)
                 items.add(
                     Pair(
                         RegexString(regex),

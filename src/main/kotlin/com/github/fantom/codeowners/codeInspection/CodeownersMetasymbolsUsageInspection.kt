@@ -23,13 +23,13 @@ class CodeownersMetasymbolsUsageInspection : LocalInspectionTool() {
         val inspectionManager = InspectionManager.getInstance(holder.project)
         val visitor = object : CodeownersVisitor() {
             override fun visitRule(rule: CodeownersRuleBase<*, *>) {
-                val entry = rule.entry
-                val text = entry.text
+                val pattern = rule.pattern
+                val text = pattern.text
                 if (text.startsWith("**/")) {
                     when (text.indexOf('/', 3)) {
                         -1, text.indices.last ->
                             holder.registerProblem(
-                                entry.findElementAt(1)!!,
+                                pattern.findElementAt(1)!!,
                                 CodeownersBundle.message("codeInspection.metasymbolsUsage.leadingDoubleStar"),
                             )
                     }
@@ -39,7 +39,7 @@ class CodeownersMetasymbolsUsageInspection : LocalInspectionTool() {
                 if (idx != -1) {
                     holder.registerProblem(
                         inspectionManager.createProblemDescriptor(
-                            entry,
+                            pattern,
                             TextRange(idx, idx + doubleStars.length),
                             CodeownersBundle.message("codeInspection.metasymbolsUsage.consecutiveDoubleStars"),
                             ProblemHighlightType.WEAK_WARNING,

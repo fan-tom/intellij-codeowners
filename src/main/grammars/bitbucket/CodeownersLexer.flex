@@ -51,7 +51,7 @@ NAME_                 = [^#@/\s\/]+
 //VALUES_LIST=[^@/]+
 SPACES                = \s+
 
-%state IN_BRANCH_PATTERN, IN_TOPLEVEL_CONFIG, IN_ENTRY, IN_OWNERS, IN_TEAM_DEFINITION
+%state IN_BRANCH_PATTERN, IN_TOPLEVEL_CONFIG, IN_PATTERN, IN_OWNERS, IN_TEAM_DEFINITION
 
 %%
 <YYINITIAL> {
@@ -68,7 +68,7 @@ SPACES                = \s+
     {SUBDIRECTORY_OVERRIDES}             { yybegin(IN_TOPLEVEL_CONFIG); return SUBDIRECTORY_OVERRIDES; }
     {CREATE_PULL_REQUEST_COMMENT}        { yybegin(IN_TOPLEVEL_CONFIG); return CREATE_PULL_REQUEST_COMMENT; }
 
-    {RULE_FIRST_CHARACTER}               { yypushback(1); yybegin(IN_ENTRY); }
+    {RULE_FIRST_CHARACTER}               { yypushback(1); yybegin(IN_PATTERN); }
 }
 
 <IN_BRANCH_PATTERN> {
@@ -92,15 +92,15 @@ SPACES                = \s+
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
 }
 
-<IN_ENTRY> {
+<IN_PATTERN> {
 //    {QUOTE}             { yybegin(IN_WS_ENTRY); return QUOTE; }
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
     {LINE_WS}+          { yybegin(IN_OWNERS); return WSS; }
-    {SLASH}             { yybegin(IN_ENTRY); return SLASH; }
+    {SLASH}             { yybegin(IN_PATTERN); return SLASH; }
 
 //  "@"                 { return AT; }
 
-    {VALUE}             { yybegin(IN_ENTRY); return VALUE; }
+    {VALUE}             { yybegin(IN_PATTERN); return VALUE; }
 //  {SPACES}           { return SPACES; }
 }
 
