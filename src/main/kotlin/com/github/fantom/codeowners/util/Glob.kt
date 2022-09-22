@@ -307,7 +307,8 @@ object Glob {
             val fragmentRegex = createFragmentRegex(fragment)
             "($fragmentRegex/$suffix)?"
         }
-        var regexStr = "$head/$tailRegex"
+        val headRegex = createFragmentRegex(head)
+        var regexStr = "$headRegex/$tailRegex"
         if (atAnyLevel) {
             regexStr = ".*$regexStr"
         }
