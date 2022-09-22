@@ -3,6 +3,8 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+### Fixed
+- Resolving files from file patterns when CODEOWNERS file not in the repository root
 
 ## [v0.4.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.4.0) (2022-09-15)
 ### Added

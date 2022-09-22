@@ -69,17 +69,10 @@ class CodeownersPatternReferenceSetRecursiveReverse(
      */
     override fun computeDefaultContexts(): Collection<PsiFileSystemItem> {
         val codeownersFile = element.containingFile
-        var containingDirectory = codeownersFile.parent ?: codeownersFile.originalFile.containingDirectory
-        if (containingDirectory == null) {
-            val language = codeownersFile.language
-            if (language is CodeownersLanguage) {
-                val affectedRoot = language.fileType.getRoot(codeownersFile.originalFile.virtualFile)
-//                if (affectedRoot != null) {
-                containingDirectory = codeownersFile.manager.findDirectory(affectedRoot)
-//                }
-            }
-        }
-        return containingDirectory?.let { listOf(it) } ?: super.computeDefaultContexts()
+        val language = codeownersFile.language as CodeownersLanguage
+        val affectedRoot = language.fileType.getRoot(codeownersFile.originalFile.virtualFile)
+        val rootDirectory = codeownersFile.manager.findDirectory(affectedRoot)
+        return rootDirectory?.let { listOf(it) } ?: super.computeDefaultContexts()
     }
 
     override fun getReferenceCompletionFilter(): Condition<PsiFileSystemItem> {
