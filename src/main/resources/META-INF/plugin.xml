@@ -110,6 +110,14 @@
             implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersMetasymbolsUsageInspection"
             key="codeInspection.metasymbolsUsage"
             level="WEAK WARNING"/>
+        <localInspection
+            language="CODEOWNERS"
+            bundle="messages.CodeownersBundle"
+            enabledByDefault="true"
+            groupKey="codeInspection.group"
+            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersCoverPatternInspectionNew"
+            key="codeInspection.coverPattern"
+            level="WEAK WARNING"/>
 <!--        <localInspection-->
 <!--                bundle="messages.CodeownersBundle"-->
 <!--                enabledByDefault="true"-->
