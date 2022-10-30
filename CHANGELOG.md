@@ -5,9 +5,13 @@
 ## [Unreleased]
 ### Added
 - Pattern overlap inspection: detect patterns that override other patterns earlier in file
+- Support IDEA 2022.3
 
 ### Fixed
 - Order of grouping by code owner and by file in search results
+
+### Removed
+- Support for IDEA versions older than 2022.3
 
 
 ## [v0.4.1](https://github.com/fan-tom/intellij-codeowners/tree/v0.4.1) (2022-11-03)

@@ -22,12 +22,15 @@ plugins {
 group = properties("pluginGroup")
 version = properties("pluginVersion")
 
-sourceSets["main"].java.srcDirs("src/main/gen")
+kotlin {
+    jvmToolchain(17)
+}
 
 // Configure project's dependencies
 repositories {
     mavenCentral()
 }
+
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("io.arrow-kt:arrow-core:1.1.3")
@@ -111,7 +114,7 @@ tasks {
     patchPluginXml {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
+        untilBuild.set("")
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(

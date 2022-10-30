@@ -116,7 +116,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
     }
 
     @Suppress("ReturnCount")
-    override fun createPopup(context: DataContext?): ListPopup? {
+    override fun createPopup(context: DataContext): ListPopup? {
         val owners = manager
             .getFileOwners(selectedFile ?: return null)
             .unwrap { return null }
