@@ -2,7 +2,7 @@ package com.github.fantom.codeowners.grouping.usage
 
 import com.github.fantom.codeowners.CodeownersIcons
 import com.github.fantom.codeowners.CodeownersManager
-import com.github.fantom.codeowners.OwnersSet
+import com.github.fantom.codeowners.OwnersReference
 import com.intellij.injected.editor.VirtualFileWindow
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
@@ -35,25 +35,27 @@ class CodeownersGroupingRule(project: Project) :
             ?.values
             ?.firstOrNull()
             ?.ref
-            ?.owners
-            ?.toSet()
-            ?.let(::CodeownersGroup)
+            .let(::CodeownersGroup)
     }
 
     override fun getGroupingActionId(): String {
         return "UsageGrouping.Codeowner"
     }
 
-    private data class CodeownersGroup(private val owners: OwnersSet) : UsageGroupBase(1) {
+    private data class CodeownersGroup(private val ownersRef: OwnersReference?) : UsageGroupBase(1) {
         override fun getIcon(): Icon {
             return CodeownersIcons.FILE
         }
 
         override fun getPresentableGroupText(): String {
-            return if (owners.isEmpty()) {
-                "<Unowned>"
-            } else {
-                owners.joinToString(", ")
+            val owners = ownersRef?.owners
+            return when(owners?.isEmpty()) {
+                null, true -> {
+                    "<Unowned>"
+                }
+                else -> {
+                    owners.joinToString(", ")
+                }
             }
         }
     }
