@@ -152,15 +152,9 @@
 
         <changesGroupingPolicy key="codeowners" id="codeowners"
                                implementationClass="com.github.fantom.codeowners.grouping.changes.CodeownersChangesGroupingPolicy$Factory"/>
-        <usageGroupingRuleProvider implementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageGroupingRuleProviderImpl" order="first"/>
+        <usageGroupingRuleProvider implementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageGroupingRuleProvider"/>
         <applicationService serviceImplementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageViewSettings"/>
     </extensions>
-
-    <application-components>
-        <component>
-            <implementation-class>com.github.fantom.codeowners.grouping.usage.CodeownersUsageGroupingRuleProviderImpl</implementation-class>
-        </component>
-    </application-components>
 
     <actions>
         <action id="ChangesView.GroupBy.Codeowner"

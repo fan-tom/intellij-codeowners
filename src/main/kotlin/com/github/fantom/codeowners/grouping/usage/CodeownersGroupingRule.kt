@@ -12,6 +12,7 @@ import com.intellij.usages.Usage
 import com.intellij.usages.UsageGroup
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.impl.rules.UsageGroupBase
+import com.intellij.usages.impl.rules.UsageGroupingRulesDefaultRanks
 import com.intellij.usages.rules.SingleParentUsageGroupingRule
 import com.intellij.usages.rules.UsageGroupingRuleEx
 import com.intellij.usages.rules.UsageInFile
@@ -61,6 +62,6 @@ class CodeownersGroupingRule(project: Project) :
     }
 
     override fun getRank(): Int {
-        return super<UsageGroupingRuleEx>.getRank() - 1
+        return UsageGroupingRulesDefaultRanks.AFTER_DIRECTORY_STRUCTURE.absoluteRank
     }
 }
