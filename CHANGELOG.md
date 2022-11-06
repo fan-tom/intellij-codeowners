@@ -3,6 +3,8 @@
 # intellij-codeowners Changelog
 
 ## [Unreleased]
+### Fixed
+- Order of grouping by code owner and by file in search results
 
 ## [v0.4.1](https://github.com/fan-tom/intellij-codeowners/tree/v0.4.1) (2022-11-03)
 ### Fixed
