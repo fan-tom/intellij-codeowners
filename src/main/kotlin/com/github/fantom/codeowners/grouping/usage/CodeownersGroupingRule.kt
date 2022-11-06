@@ -2,7 +2,7 @@ package com.github.fantom.codeowners.grouping.usage
 
 import com.github.fantom.codeowners.CodeownersIcons
 import com.github.fantom.codeowners.CodeownersManager
-import com.github.fantom.codeowners.OwnersSet
+import com.github.fantom.codeowners.OwnersReference
 import com.intellij.injected.editor.VirtualFileWindow
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
@@ -12,6 +12,7 @@ import com.intellij.usages.Usage
 import com.intellij.usages.UsageGroup
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.impl.rules.UsageGroupBase
+import com.intellij.usages.impl.rules.UsageGroupingRulesDefaultRanks
 import com.intellij.usages.rules.SingleParentUsageGroupingRule
 import com.intellij.usages.rules.UsageGroupingRuleEx
 import com.intellij.usages.rules.UsageInFile
@@ -35,30 +36,32 @@ class CodeownersGroupingRule(project: Project) :
             ?.values
             ?.firstOrNull()
             ?.ref
-            ?.owners
-            ?.toSet()
-            ?.let(::CodeownersGroup)
+            .let(::CodeownersGroup)
     }
 
     override fun getGroupingActionId(): String {
         return "UsageGrouping.Codeowner"
     }
 
-    private data class CodeownersGroup(private val owners: OwnersSet) : UsageGroupBase(1) {
+    private data class CodeownersGroup(private val ownersRef: OwnersReference?) : UsageGroupBase(1) {
         override fun getIcon(): Icon {
             return CodeownersIcons.FILE
         }
 
         override fun getPresentableGroupText(): String {
-            return if (owners.isEmpty()) {
-                "<Unowned>"
-            } else {
-                owners.joinToString(", ")
+            val owners = ownersRef?.owners
+            return when(owners?.isEmpty()) {
+                null, true -> {
+                    "<Unowned>"
+                }
+                else -> {
+                    owners.joinToString(", ")
+                }
             }
         }
     }
 
     override fun getRank(): Int {
-        return super<UsageGroupingRuleEx>.getRank() - 1
+        return UsageGroupingRulesDefaultRanks.AFTER_DIRECTORY_STRUCTURE.absoluteRank
     }
 }
