@@ -230,6 +230,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             @Suppress("LoopWithTooManyJumpStatements")
             for (codeownersFile in codeownersFiles) {
                 ProgressManager.checkCanceled()
+                LOGGER.trace(">>getFileOwners ${file.name} inspecting codeowners file ${codeownersFile.file}")
                 getFileOwners(file, codeownersFile).map {
                     ownersMap[fileType] = it ?: return@map
                 }
@@ -290,12 +291,16 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private fun getRoot(codeownersVirtualFile: VirtualFile): VirtualFile? {
         val vcsRoot = vcsRoots
-            .minByOrNull {
+            .mapNotNull { root ->
                 // TODO consider VcsUtils.getVscRootFor(Project, VirtualFile)
-                VfsUtilCore.getRelativePath(it.path, codeownersVirtualFile)?.run {
-                    split(VfsUtilCore.VFS_SEPARATOR_CHAR).count()
-                } ?: 0
-            } ?: return null
+                VfsUtilCore.getRelativePath(codeownersVirtualFile, root.path)
+                    ?.split(VfsUtilCore.VFS_SEPARATOR_CHAR)
+                    ?.count()
+                    ?.let { Pair(root, it)}
+            }
+            .minByOrNull {
+                it.second
+            }?.first ?: return null
         return (codeownersVirtualFile.fileType as CodeownersFileType).getRoot(vcsRoot, codeownersVirtualFile)
     }
 
