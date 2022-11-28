@@ -27,12 +27,13 @@ sourceSets["main"].java.srcDirs("src/main/gen")
 
 // Configure project's dependencies
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("io.arrow-kt:arrow-core:1.1.3")
-    implementation("com.github.marianobarrios:dregex_2.12:0.7.0") { exclude(group = "org.slf4j") }
+    implementation("com.github.marianobarrios:dregex_2.13:0.7.1-SNAPSHOT") { exclude(group = "org.slf4j") }
 }
 
 val generateGithubLexer = task<GenerateLexerTask>("generateGithubLexer") {
