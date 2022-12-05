@@ -10,7 +10,7 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.nextLeafs
+import com.intellij.psi.util.nextLeaf
 import com.intellij.util.PlatformIcons
 
 /**
@@ -49,7 +49,7 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
         }
 
         return if (isDirectory) LineMarkerInfo(
-            element.nextLeafs.first(),
+            element.nextLeaf() ?: element,
             element.getTextRange(),
             PlatformIcons.FOLDER_ICON,
             null,
