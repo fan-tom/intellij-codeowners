@@ -1,0 +1,11 @@
+<html>
+<body>
+Detects incorrect/redundant usage of metasymbols
+<br>
+Detected issues:
+<list>
+    <li>Leading double stars (<code>**/foo</code>), if there are no other filepath delimiters after them</li>
+    <li>Consecutive double stars (<code>/foo/**/**/bar</code>), as they may be replaced by single pair of stars</li>
+</list>
+</body>
+</html>
