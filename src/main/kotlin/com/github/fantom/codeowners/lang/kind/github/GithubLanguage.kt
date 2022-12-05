@@ -1,9 +1,6 @@
 package com.github.fantom.codeowners.lang.kind.github
 
-import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.kind.GithubFileType
-import com.github.fantom.codeowners.indexing.OwnerString
-import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.github.fantom.codeowners.lang.kind.github.psi.CodeownersNamedOwner
@@ -35,18 +32,18 @@ class GithubLanguage private constructor() : CodeownersLanguage("Github") {
             }
         }
 
-    override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
-        object : GithubCodeownersVisitor() {
-            override fun visitRule(rule: CodeownersRule) {
-                val regex = rule.pattern.regex(false)
-                items.add(
-                    Pair(
-                        RegexString(regex),
-                        OwnersReference(rule.owners.map { OwnerString(it.text) }, rule.textOffset)
-                    )
-                )
-            }
-        }
+//    override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
+//        object : GithubCodeownersVisitor() {
+//            override fun visitRule(rule: CodeownersRule) {
+//                val regex = rule.pattern.regex(false)
+//                items.add(
+//                    Pair(
+//                        RegexString(regex),
+//                        OwnersReference(rule.owners.map { OwnerString(it.text) }, rule.textOffset)
+//                    )
+//                )
+//            }
+//        }
 
     override fun getReferencesByElement(
         psiElement: PsiElement,

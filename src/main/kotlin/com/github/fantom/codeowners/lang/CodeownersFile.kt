@@ -3,6 +3,7 @@ package com.github.fantom.codeowners.lang
 import com.github.fantom.codeowners.CodeownersException
 import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
+import com.github.fantom.codeowners.indexing.OwnerString
 import com.github.fantom.codeowners.indexing.RegexString
 import com.intellij.lang.Language
 import com.intellij.lang.LanguageParserDefinitions
@@ -47,7 +48,28 @@ class CodeownersFile(viewProvider: FileViewProvider, private val fileType: Codeo
 
     fun getRulesList(): List<Pair<RegexString, OwnersReference>> {
         val items = mutableListOf<Pair<RegexString, OwnersReference>>()
-        language.getPatternsVisitor(items)?.let { acceptChildren(it) }
+//        language.getPatternsVisitor(items)?.let { acceptChildren(it) }
+        language.getVisitor(object : CodeownersVisitor() {
+            override fun visitRule(rule: CodeownersRuleBase<*, *>) {
+                val regex = rule.pattern.regex(false)
+                items.add(
+                    Pair(
+                        RegexString(regex),
+                        OwnersReference(rule.owners.map { OwnerString(it.text) }, rule.textOffset)
+                    )
+                )
+            }
+        })?.let { acceptChildren(it) }
         return items
+    }
+
+    fun getRules(): List<CodeownersRuleBase<*, *>> {
+        val result = mutableListOf<CodeownersRuleBase<*, *>>()
+        language.getVisitor(object : CodeownersVisitor() {
+            override fun visitRule(rule: CodeownersRuleBase<*, *>) {
+                result.add(rule)
+            }
+        })?.let { acceptChildren(it) }
+        return result
     }
 }

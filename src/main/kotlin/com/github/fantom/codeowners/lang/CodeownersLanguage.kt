@@ -1,8 +1,6 @@
 package com.github.fantom.codeowners.lang
 
-import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.CodeownersFileType
-import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.reference.CodeownersPatternReferenceSetRecursiveReverse
 import com.github.fantom.codeowners.util.TimeTracerKey
 import com.github.fantom.codeowners.util.withNullableCloseable
@@ -37,8 +35,9 @@ open class CodeownersLanguage protected constructor(name: String) : Language(INS
     // TODO tech debt, find a way to have abstract/reused token types
     open fun getCrlfToken(): IElementType = TODO("This method should be overridden in class ${this::class}")
 
+    // TODO check if we can simply throw exception from this method to not make return type nullable
     open fun getVisitor(visitor: CodeownersVisitor): PsiElementVisitor? = null
-    open fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>): PsiElementVisitor? = null
+    //    open fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>): PsiElementVisitor? = null
     open fun getReferencesByElement(
         psiElement: PsiElement,
         processingContext: ProcessingContext

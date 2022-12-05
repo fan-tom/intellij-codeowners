@@ -1,9 +1,6 @@
 package com.github.fantom.codeowners.lang.kind.bitbucket
 
-import com.github.fantom.codeowners.OwnersReference
 import com.github.fantom.codeowners.file.type.kind.BitbucketFileType
-import com.github.fantom.codeowners.indexing.OwnerString
-import com.github.fantom.codeowners.indexing.RegexString
 import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.lang.CodeownersVisitor
 import com.github.fantom.codeowners.lang.kind.bitbucket.psi.CodeownersRule
@@ -37,18 +34,18 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
             }
         }
 
-    override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
-        object : BitbucketCodeownersVisitor() {
-            override fun visitRule(rule: CodeownersRule) {
-                val regex = rule.pattern.regex(false)
-                items.add(
-                    Pair(
-                        RegexString(regex),
-                        OwnersReference(rule.owners.map { OwnerString(it.text) }, rule.textOffset)
-                    )
-                )
-            }
-        }
+//    override fun getPatternsVisitor(items: MutableList<Pair<RegexString, OwnersReference>>) =
+//        object : BitbucketCodeownersVisitor() {
+//            override fun visitRule(rule: CodeownersRule) {
+//                val regex = rule.pattern.regex(false)
+//                items.add(
+//                    Pair(
+//                        RegexString(regex),
+//                        OwnersReference(rule.owners.map { OwnerString(it.text) }, rule.textOffset)
+//                    )
+//                )
+//            }
+//        }
 
     override fun getReferencesByElement(
         psiElement: PsiElement,
