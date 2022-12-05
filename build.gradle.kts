@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    id("scala")
     // Java support
     id("java")
     // Kotlin support
@@ -27,13 +26,12 @@ sourceSets["main"].java.srcDirs("src/main/gen")
 
 // Configure project's dependencies
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("io.arrow-kt:arrow-core:1.1.3")
-    implementation("com.github.marianobarrios:dregex_2.13:0.7.1-SNAPSHOT") { exclude(group = "org.slf4j") }
+    implementation("dk.brics:automaton:1.12-4")
 }
 
 val generateGithubLexer = task<GenerateLexerTask>("generateGithubLexer") {

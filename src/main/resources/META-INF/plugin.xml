@@ -115,7 +115,7 @@
             bundle="messages.CodeownersBundle"
             enabledByDefault="true"
             groupKey="codeInspection.group"
-            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersCoverPatternInspectionNew"
+            implementationClass="com.github.fantom.codeowners.codeInspection.CodeownersCoverPatternInspection"
             key="codeInspection.coverPattern"
             level="WEAK WARNING"/>
 <!--        <localInspection-->

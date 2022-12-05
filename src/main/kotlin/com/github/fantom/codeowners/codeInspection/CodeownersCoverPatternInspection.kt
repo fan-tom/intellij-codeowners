@@ -3,22 +3,22 @@ package com.github.fantom.codeowners.codeInspection
 import com.github.fantom.codeowners.CodeownersBundle
 import com.github.fantom.codeowners.lang.CodeownersFile
 import com.github.fantom.codeowners.services.PatternCache
-import com.github.fantom.codeowners.util.Constants
 import com.github.fantom.codeowners.util.Utils
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import dk.brics.automaton.BasicOperations
 
 /**
  * Inspection tool that checks if entries are covered by others.
  */
-class CodeownersCoverPatternInspectionNew : LocalInspectionTool() {
+class CodeownersCoverPatternInspection : LocalInspectionTool() {
 
     /**
      * Reports problems at file level. Checks if entries are covered by other entries.
@@ -42,26 +42,23 @@ class CodeownersCoverPatternInspectionNew : LocalInspectionTool() {
 
         val rules = codeownersFile.getRules()
         val compiledRegexes =
-                cache.getOrCreateGlobRegexes(
-                    codeownersFile,
-            rules
-            .map { rulePsi ->
+            rules.map { rulePsi ->
                 val glob = rulePsi.pattern.value
-                    glob
+                cache.getOrCreateGlobRegexes2(glob)
             }
-                )
 
         val regexes = rules.zip(compiledRegexes)
 
         for ((idx, pivot) in regexes.withIndex()) {
             for ((rulePsi, current) in regexes.drop(idx + 1)) {
                 ProgressManager.checkCanceled()
-                if (pivot.second.isProperSubsetOf(current)) {
+                // improper subsetOf
+                if (BasicOperations.subsetOf(pivot.second, current)) {
                     val coveredPattern = pivot.first.pattern
                     val coveringPattern = rulePsi.pattern
                     problemsHolder.registerProblem(
                         coveredPattern,
-                        message(coveringPattern, virtualFile, isOnTheFly)
+                        message(coveringPattern, virtualFile)
                     )
                 }
             }
@@ -83,19 +80,12 @@ class CodeownersCoverPatternInspectionNew : LocalInspectionTool() {
      */
     private fun message(
         coveringPattern: PsiElement,
-        virtualFile: VirtualFile,
-        onTheFly: Boolean
+        virtualFile: VirtualFile
     ): String {
-        val document = FileDocumentManager.getInstance().getDocument(virtualFile)
-
-        return if (onTheFly || document == null) {
-            CodeownersBundle.message("codeInspection.coverPattern.message", "\'" + coveringPattern.text + "\'")
-        } else {
-            CodeownersBundle.message(
-                "codeInspection.coverPattern.message",
-                "<a href=\"" + virtualFile.url + Constants.HASH + coveringPattern.textRange.startOffset + "\">" +
-                    coveringPattern.text + "</a>"
-            )
-        }
+        val path = FileUtil.toSystemIndependentName(virtualFile.path)
+        return CodeownersBundle.message(
+            "codeInspection.coverPattern.message",
+            """<a href="#navigation/${path}:${coveringPattern.textRange.startOffset}">${coveringPattern.text}</a>"""
+        )
     }
 }

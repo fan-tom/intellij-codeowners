@@ -1,0 +1,12 @@
+<html>
+<body>
+Detects rules that are covered by other rules later in file
+<br>E.g if we have such rules in our CODEOWNERS file
+<pre>
+    /foo/bar/baz/ @owner1
+    # some other rules
+    /foo/ @owner2
+</pre>
+the first rule will never have effect, as it is overridden by the second rule
+</body>
+</html>
