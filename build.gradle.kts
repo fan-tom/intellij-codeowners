@@ -50,6 +50,19 @@ val generateGithubParser = task<GenerateParserTask>("generateGithubParser") {
     pathToParser.set("/com/github/fantom/codeowners/lang/kind/github/parser/CodeownersParser.java")
     pathToPsiRoot.set("/com/github/fantom/codeowners/lang/kind/github/psi")
     purgeOldFiles.set(true)
+    // TODO remove once fixed
+    sourceFile.convention(source.map {
+        project.layout.projectDirectory.file(it)
+    })
+    targetRootOutputDir.convention(targetRoot.map {
+        project.layout.projectDirectory.dir(it)
+    })
+    parserFile.convention(pathToParser.map {
+        project.layout.projectDirectory.file("${targetRoot.get()}/$it")
+    })
+    psiDir.convention(pathToPsiRoot.map {
+        project.layout.projectDirectory.dir("${targetRoot.get()}/$it")
+    })
 }
 
 val generateBitbucketLexer = task<GenerateLexerTask>("generateBitbucketLexer") {
@@ -65,6 +78,19 @@ val generateBitbucketParser = task<GenerateParserTask>("generateBitbucketParser"
     pathToParser.set("/com/github/fantom/codeowners/lang/kind/bitbucket/parser/CodeownersParser.java")
     pathToPsiRoot.set("/com/github/fantom/codeowners/lang/kind/bitbucket/psi")
     purgeOldFiles.set(true)
+    // TODO remove once fixed
+    sourceFile.convention(source.map {
+        project.layout.projectDirectory.file(it)
+    })
+    targetRootOutputDir.convention(targetRoot.map {
+        project.layout.projectDirectory.dir(it)
+    })
+    parserFile.convention(pathToParser.map {
+        project.layout.projectDirectory.file("${targetRoot.get()}/$it")
+    })
+    psiDir.convention(pathToPsiRoot.map {
+        project.layout.projectDirectory.dir("${targetRoot.get()}/$it")
+    })
 }
 
 // Configure gradle-intellij-plugin plugin.
