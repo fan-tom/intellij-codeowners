@@ -94,7 +94,6 @@ changelog {
 tasks {
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
-            kotlinOptions.jvmTarget = "11"
             kotlinOptions.freeCompilerArgs = listOf("-Xinline-classes")
 
             dependsOn(generateGithubLexer, generateGithubParser, generateBitbucketLexer, generateBitbucketParser)
