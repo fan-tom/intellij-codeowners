@@ -4,6 +4,9 @@
 
 ## Unreleased
 
+### Fixed
+- Exception on showing quick documentation (`F1`) for GitHub user name (`@user`) / team name (`@org/team`)
+
 ## [v0.5.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.5.0) (2022-12-06)
 
 ### Added
