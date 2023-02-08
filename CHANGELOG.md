@@ -4,6 +4,9 @@
 
 ## Unreleased
 
+### Changed
+- Update template to [1.4.0](https://github.com/JetBrains/intellij-platform-plugin-template/releases/tag/v1.4.0)
+
 ### Fixed
 - Exception on showing quick documentation (`F1`) for GitHub user name (`@user`) / team name (`@org/team`)
 
