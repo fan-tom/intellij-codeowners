@@ -10,11 +10,13 @@ import java.io.DataOutput
 import java.io.IOException
 import java.io.Serializable
 
-inline class RegexString(val regex: String) {
+@JvmInline
+value class RegexString(val regex: String) {
     override fun toString() = regex
 }
 
-inline class OwnerString(val owner: String) {
+@JvmInline
+value class OwnerString(val owner: String) {
     override fun toString() = owner
 }
 

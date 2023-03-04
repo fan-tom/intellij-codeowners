@@ -6,12 +6,12 @@ import java.util.concurrent.ConcurrentMap
 /**
  * [ConcurrentMap] wrapper with additional ability to cache values.
  */
-class CachedConcurrentMap<K, V> private constructor(private val fetcher: DataFetcher<K, V>) {
+class CachedConcurrentMap<K: Any, V: Any> private constructor(private val fetcher: DataFetcher<K, V>) {
 
     private val map: ConcurrentMap<K, V> = ContainerUtil.createConcurrentWeakMap()
 
     companion object {
-        fun <K, V> create(fetcher: DataFetcher<K, V>) = CachedConcurrentMap(fetcher)
+        fun <K: Any, V: Any> create(fetcher: DataFetcher<K, V>) = CachedConcurrentMap(fetcher)
     }
 
     operator fun get(key: K): V? {

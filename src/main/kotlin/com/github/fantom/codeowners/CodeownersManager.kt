@@ -104,7 +104,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     private val commonRunnableListeners = CommonRunnableListeners(debouncedStatusesChanged)
     private var messageBus = project.messageBus.connect(this)
     private val cachedCodeownersFilesIndex = CachedConcurrentMap
-        .create<CodeownersFileType, List<CodeownersEntryOccurrence>?> { key ->
+        .create<CodeownersFileType, List<CodeownersEntryOccurrence>> { key ->
             CodeownersFilesIndex.getEntries(
                 project,
                 key

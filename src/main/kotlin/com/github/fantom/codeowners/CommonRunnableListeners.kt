@@ -18,7 +18,7 @@ class CommonRunnableListeners(private val task: Runnable) : CodeownersManager.Re
 
     override fun rootsChanged(event: ModuleRootEvent) = task.run()
 
-    override fun moduleAdded(project: Project, module: Module) = task.run()
+    override fun modulesAdded(project: Project, module: List<Module>) = task.run()
 
     override fun beforeModuleRemoved(project: Project, module: Module) = Unit
 

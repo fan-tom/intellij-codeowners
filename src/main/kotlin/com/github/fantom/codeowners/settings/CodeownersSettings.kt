@@ -2,9 +2,9 @@ package com.github.fantom.codeowners.settings
 
 import com.github.fantom.codeowners.util.Listenable
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.util.containers.ContainerUtil
 import org.jdom.Element
 
@@ -70,10 +70,6 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //        }
 //
     private val listeners = ContainerUtil.createConcurrentList<Listener>()
-
-    companion object {
-        fun getInstance(): CodeownersSettings = ServiceManager.getService(CodeownersSettings::class.java)
-    }
 
     override fun getState() = Element(KEY.ROOT.toString()).apply {
         setAttribute(KEY.MISSING_CODEOWNERS.toString(), missingCodeowners.toString())
@@ -164,4 +160,8 @@ class CodeownersSettings : PersistentStateComponent<Element?>, Listenable<Codeow
 //            return copy
 //        }
 //    }
+
+    companion object {
+        fun getInstance(): CodeownersSettings = service()
+    }
 }

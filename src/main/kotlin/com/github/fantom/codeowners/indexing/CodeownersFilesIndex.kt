@@ -15,7 +15,7 @@ import com.intellij.util.io.KeyDescriptor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
-import java.util.Collections
+import java.util.*
 
 /**
  * Implementation of [AbstractCodeownersFilesIndex] that allows to index all codeowners files content using native
@@ -60,7 +60,7 @@ class CodeownersFilesIndex :
          * @param fileType filetype
          * @return [CodeownersEntryOccurrence] collection
          */
-        fun getEntries(project: Project, fileType: CodeownersFileType): List<CodeownersEntryOccurrence>? {
+        fun getEntries(project: Project, fileType: CodeownersFileType): List<CodeownersEntryOccurrence> {
             LOGGER.trace(">getEntries for file type $fileType in project ${project.name}")
 //            try {
             if (ApplicationManager.getApplication().isReadAccessAllowed) {
@@ -72,7 +72,7 @@ class CodeownersFilesIndex :
 //            } catch (ignored: RuntimeException) {
 //            }
             LOGGER.trace("<getEntries ${project.name} null")
-            return null // emptyList()
+            return emptyList()
         }
     }
 
