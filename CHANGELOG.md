@@ -3,6 +3,8 @@
 # intellij-codeowners Changelog
 
 ## Unreleased
+### Fixed
+- Allow trailing comments for GitHub syntax
 
 ### Changed
 - Update template to [1.4.0](https://github.com/JetBrains/intellij-platform-plugin-template/releases/tag/v1.4.0)

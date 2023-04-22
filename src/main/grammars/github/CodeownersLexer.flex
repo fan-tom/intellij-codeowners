@@ -40,7 +40,7 @@ PATHNAME        = ([^\s/]|\\\s)+
 %%
 <YYINITIAL> {
     {WHITE_SPACE}+     { yybegin(YYINITIAL); return CRLF; }
-    {LINE_WS}+         { return CRLF; }
+    {LINE_WS}+         { return SPACES; }
     {HEADER}           { return HEADER; }
     {SECTION}          { return SECTION; }
     {COMMENT}          { return COMMENT; }
@@ -57,6 +57,7 @@ PATHNAME        = ([^\s/]|\\\s)+
 }
 
 <IN_OWNERS> {
+    {COMMENT}           { yybegin(YYINITIAL); return COMMENT; }
     {CRLF}+             { yybegin(YYINITIAL); return CRLF; }
     {LINE_WS}+          { yybegin(IN_OWNERS); return SPACES; }
     {VALUE}             { yybegin(IN_OWNERS); return VALUE; }
