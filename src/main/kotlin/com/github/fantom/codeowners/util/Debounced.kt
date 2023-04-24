@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 /**
- * Debounced runnable class that allows to run command just once in case it was triggered to often.
+ * Debounced runnable class that allows to run command just once in case it was triggered too often.
  */
 abstract class Debounced<T>(private val delay: Int) : DumbAwareRunnable, Disposable {
 

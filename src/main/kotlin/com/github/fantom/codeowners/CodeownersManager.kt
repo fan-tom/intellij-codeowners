@@ -39,6 +39,7 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
+import com.intellij.serviceContainer.AlreadyDisposedException
 import com.intellij.util.Time
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.messages.Topic
@@ -95,7 +96,11 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         override fun task(argument: Any?) {
             LOGGER.trace("debouncedStatusesChanged task")
             expiringStatusCache.clear()
-            FileStatusManager.getInstance(project).fileStatusesChanged()
+            try{
+                FileStatusManager.getInstance(project).fileStatusesChanged()
+            } catch (e: AlreadyDisposedException) {
+                LOGGER.infoWithDebug("Component already disposed", e)
+            }
         }
     }.also {
         Disposer.register(this, it)
