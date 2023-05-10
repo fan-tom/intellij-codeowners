@@ -3,16 +3,14 @@
 # intellij-codeowners Changelog
 
 ## Unreleased
-### Fixed
-- Allow trailing comments for GitHub syntax
-- AlreadyDisposedException was thrown when closing a project
 
-### Changed
-- Update template to [1.4.0](https://github.com/JetBrains/intellij-platform-plugin-template/releases/tag/v1.4.0)
+### Added
 - Add dark icon in status bar
 
 ### Fixed
 - Exception on showing quick documentation (`F1`) for GitHub user name (`@user`) / team name (`@org/team`)
+- Allow trailing comments for GitHub syntax
+- AlreadyDisposedException was thrown when closing a project
 
 ## [v0.5.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.5.0) (2022-12-06)
 
