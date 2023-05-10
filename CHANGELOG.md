@@ -5,7 +5,6 @@
 ## Unreleased
 
 ### Added
-- Add dark icon in status bar
 - Support IDEA 2023.2
 - Show ownership changes in Local Changes panel, after file/dir is moved/renamed 
 
