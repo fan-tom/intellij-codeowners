@@ -43,7 +43,7 @@ private value_item_     ::= Rule SPACES? COMMENT?
 
 Reset                   ::= (PatternDirectory | PatternFile)
 
-Assign                  ::= (PatternDirectory | PatternFile) SPACES Owners
+Assign                  ::= (PatternDirectory | PatternFile) SPACES Owners SPACES?
 
 Rule                    ::= Assign | Reset
 

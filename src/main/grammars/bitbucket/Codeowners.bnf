@@ -60,7 +60,7 @@ TeamDefinition          ::= '@''@''@' TeamName WSS Owners {
   mixin = "com.github.fantom.codeowners.lang.kind.bitbucket.psi.impl.CodeownersTeamDefinitionExtImpl"
 }
 
-Assign                  ::= Pattern /*SPACES*/ WSS Owners /*CRLF*/
+Assign                  ::= Pattern /*SPACES*/ WSS Owners WSS? /*CRLF*/
 
 Rule                    ::= Reset | Assign
 
