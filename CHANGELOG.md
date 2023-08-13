@@ -6,11 +6,15 @@
 
 ### Added
 - Add dark icon in status bar
+- Support IDEA 2023.2
 
 ### Fixed
 - Exception on showing quick documentation (`F1`) for GitHub user name (`@user`) / team name (`@org/team`)
 - Allow trailing comments for GitHub syntax
 - AlreadyDisposedException was thrown when closing a project
+
+### Removed
+- Support for IDEA versions older than 2023.2
 
 ## [v0.5.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.5.0) (2022-12-06)
 

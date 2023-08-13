@@ -63,6 +63,7 @@ data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int
 
 /**
  * Represents a reference to given CODEOWNERS file together with reference to particular entry in this file, if any
+ *
  * Reference may be null if no entry in given CODEOWNERS file matches the file for which this reference was created
  */
 data class OwnersFileReference(val url: String, val ref: OwnersReference?)
@@ -423,7 +424,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
                             FILE_TYPES_ASSOCIATION_QUEUE.remove(fileName)
                         }
                     },
-                    ModalityState.NON_MODAL
+                    ModalityState.nonModal()
                 )
             } else if (!FILE_TYPES_ASSOCIATION_QUEUE.containsKey(fileName)) {
                 FILE_TYPES_ASSOCIATION_QUEUE[fileName] = fileType

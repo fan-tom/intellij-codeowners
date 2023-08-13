@@ -72,7 +72,7 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
     }
 
     companion object {
-        val CODEOWNERS_CACHE = NotNullLazyKey.create<
+        val CODEOWNERS_CACHE = NotNullLazyKey.createLazyKey<
             MutableMap<
                 ChangesBrowserNode<*>,
                 MutableMap<Set<OwnerString>, ChangesBrowserNode<*>>,

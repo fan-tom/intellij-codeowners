@@ -14,6 +14,7 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.impl.status.EditorBasedStatusBarPopup
+import com.intellij.util.messages.MessageBusConnection
 import com.jetbrains.rd.util.first
 import java.util.*
 
@@ -118,7 +119,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
     @Suppress("ReturnCount")
     override fun createPopup(context: DataContext): ListPopup? {
         val owners = manager
-            .getFileOwners(selectedFile ?: return null)
+            .getFileOwners(getSelectedFile() ?: return null)
             .unwrap { return null }
         when {
             owners.isEmpty() -> return null
@@ -145,8 +146,8 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
 
     override fun createInstance(project: Project) = CodeownersBarPanel(project)
 
-    override fun registerCustomListeners() {
-        myConnection.subscribe(
+    override fun registerCustomListeners(connection: MessageBusConnection) {
+        connection.subscribe(
             DumbService.DUMB_MODE,
             object : DumbService.DumbModeListener {
                 override fun exitDumbMode() {

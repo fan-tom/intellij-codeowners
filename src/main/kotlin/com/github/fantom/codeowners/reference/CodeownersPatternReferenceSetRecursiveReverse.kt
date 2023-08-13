@@ -178,7 +178,7 @@ class CodeownersPatternReferenceSetRecursiveReverse(
     /**
      * Custom definition of [FileReference].
      */
-    private inner class CodeownersPatternReference constructor(
+    private inner class CodeownersPatternReference(
         fileReferenceSet: FileReferenceSet,
         range: TextRange,
         index: Int,
@@ -256,7 +256,7 @@ class CodeownersPatternReferenceSetRecursiveReverse(
                     )
                 } else {
                     // simply find children with given name
-                    // let parent class handle basic case
+                    // let parent class handle basic cases
                     if (dirOnly) {
                         val resolveResults = mutableListOf<ResolveResult>()
                         super@CodeownersPatternReference.innerResolveInContext(unescapedText, context, resolveResults, caseSensitive)
@@ -463,7 +463,7 @@ class CodeownersPatternReferenceSetRecursiveReverse(
         override fun innerResolveInContext(
             text: String, // only leading and middle slashes are possible, trailing slash is trimmed in reparse()
             context: PsiFileSystemItem,
-            result: MutableCollection<ResolveResult>,
+            result: MutableCollection<in ResolveResult>,
             caseSensitive: Boolean
         ) {
             ProgressManager.checkCanceled()
@@ -499,7 +499,15 @@ class CodeownersPatternReferenceSetRecursiveReverse(
                     // it is not the first ref in the set, so there exists at least one slash, thus we should resolve strictly in context
                     Pair(false, false)
                 }
-                Resolver().innerResolveInContextRecursive(normalizedText, context, result, caseSensitive, atAnyLevel, dirOnly)
+
+                // to not leak variance bound further
+                // TODO is it ok to ignore what was already collected here?
+                // inside we iterate over this passed collection, won't we miss anything in this case?
+                val localResult = mutableListOf<ResolveResult>()
+
+                Resolver().innerResolveInContextRecursive(normalizedText, context, localResult, caseSensitive, atAnyLevel, dirOnly)
+
+                result.addAll(localResult)
             }
             tracer?.toString()?.let(::println)
         }
