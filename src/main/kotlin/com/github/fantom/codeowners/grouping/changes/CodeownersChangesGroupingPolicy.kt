@@ -78,7 +78,7 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
         val prevOwnersRef = changeListManager.getChange(nodePath.filePath)?.let { change ->
             if (change.type == Change.Type.MOVED) { // includes renaming
                 change
-                    .beforeRevision!! // there should be a previous revision, as the file is not new
+                    .beforeRevision!! // there must be a previous revision, as the file is not new
                     .file
 //                    .virtualFile?. // returns null for deleted files
                     .let { codeownersManager
@@ -94,17 +94,23 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
             // TODO handle error properly
             ?.let { codeownersManager.getFileOwners(it).getOrNull() }
             ?.let { ownersMap ->
-                val ownersRef = ownersMap.toPersisted()
+                val persistentOwnersMap = ownersMap.toPersisted()
+
+                val data = ChangesNodeData(
+                    persistentOwnersMap,
+                    prevOwnersRef.takeIf { it != persistentOwnersMap }
+                )
+
                 val grandParent = nextPolicyParent ?: subtreeRoot
                 val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
 
-                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[ownersRef]?.let { return it }
+                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[data]?.let { return it }
 
-                CodeownersChangesBrowserNode(ChangesNodeData(ownersRef, if (prevOwnersRef == ownersRef) null else prevOwnersRef), project).let {
+                CodeownersChangesBrowserNode(data, project).let {
                     it.markAsHelperNode()
                     model.insertNodeInto(it, grandParent, grandParent.childCount)
 
-                    CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[ownersRef] = it
+                    CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[data] = it
                     return it
                 }
             }
@@ -117,10 +123,10 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
     }
 
     companion object {
-        val CODEOWNERS_CACHE = NotNullLazyKey.createLazyKey<
+        private val CODEOWNERS_CACHE = NotNullLazyKey.createLazyKey<
             MutableMap<
                 ChangesBrowserNode<*>,
-                MutableMap<PersistedOwnersMap, ChangesBrowserNode<*>>,
+                MutableMap<ChangesNodeData, ChangesBrowserNode<*>>,
                 >,
             ChangesBrowserNode<*>
             >("ChangesTree.CodeownersCache") { mutableMapOf() }
