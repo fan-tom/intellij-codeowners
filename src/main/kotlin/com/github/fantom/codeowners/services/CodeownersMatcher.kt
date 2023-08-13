@@ -2,10 +2,12 @@ package com.github.fantom.codeowners.services
 
 import com.github.fantom.codeowners.util.MatcherUtil
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.Service
 import com.intellij.util.containers.IntObjectCache
 import org.apache.commons.lang.builder.HashCodeBuilder
 import java.util.regex.Pattern
 
+@Service(Service.Level.APP)
 class CodeownersMatcher : Disposable {
 
     private val cache = IntObjectCache<Boolean>()

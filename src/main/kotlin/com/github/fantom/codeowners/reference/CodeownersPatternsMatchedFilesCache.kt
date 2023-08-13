@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.fantom.codeowners.services.PatternCache
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileListener
@@ -28,6 +29,7 @@ typealias AtAnyLevel = Boolean
 typealias DirOnly = Boolean
 typealias Root = String
 
+@Service(Service.Level.PROJECT)
 internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {
     private val cacheByPrefix = ConcurrentHashMap<Root, Cache<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>>()
 

@@ -2,6 +2,7 @@ package com.github.fantom.codeowners.services
 
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import dk.brics.automaton.Automaton
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentMap
 /**
  * Component that prepares patterns for glob/regex statements and cache them.
  */
+@Service(Service.Level.PROJECT)
 class PatternCache(project: Project) : Disposable {
     private val PREFIX_TO_REGEX_CACHE: ConcurrentMap<Triple<CharSequence, Boolean, Boolean>, Regex> = ConcurrentHashMap()
 
