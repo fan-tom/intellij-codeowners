@@ -7,6 +7,7 @@
 ### Added
 - Add dark icon in status bar
 - Support IDEA 2023.2
+- Show ownership changes in Local Changes panel, after file/dir is moved/renamed 
 
 ### Fixed
 - Exception on showing quick documentation (`F1`) for GitHub user name (`@user`) / team name (`@org/team`)
