@@ -131,7 +131,7 @@
         <vcsConfigurableProvider
                 implementation="com.github.fantom.codeowners.settings.CodeownersSettingsConfigurable"/>
 
-        <statusBarWidgetFactory id="codeownersWidget" implementation="com.github.fantom.codeowners.CodeownersBarWidgetFactory" order="after positionWidget"/>
+        <statusBarWidgetFactory id="codeownersWidget" implementation="com.github.fantom.codeowners.CodeownersBarWidgetFactory" order="after Position"/>
         <fileBasedIndex implementation="com.github.fantom.codeowners.indexing.CodeownersFilesIndex"/>
         <lang.elementManipulator
                 forClass="com.github.fantom.codeowners.lang.kind.github.psi.CodeownersEntry"
