@@ -44,7 +44,7 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
         val file = resolveVirtualFile(nodePath)
         file
             // TODO handle error properly
-            ?.let { codeownersManager.getFileOwners(it).orNull() }
+            ?.let { codeownersManager.getFileOwners(it).getOrNull() }
             ?.let { ownersRef ->
                 val grandParent = nextPolicyParent ?: subtreeRoot
                 val cachingRoot = getCachingRoot(grandParent, subtreeRoot)

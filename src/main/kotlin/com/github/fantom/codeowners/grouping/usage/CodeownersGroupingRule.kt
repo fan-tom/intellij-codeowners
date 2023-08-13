@@ -32,7 +32,7 @@ class CodeownersGroupingRule(project: Project) :
     private fun getGroupForFile(virtualFile: VirtualFile): UsageGroup? {
         return codeownersManager.getFileOwners(virtualFile)
             // TODO handle error properly
-            .orNull()
+            .getOrNull()
             ?.values
             ?.firstOrNull()
             ?.ref

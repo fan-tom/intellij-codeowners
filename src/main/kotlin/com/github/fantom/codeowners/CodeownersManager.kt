@@ -15,6 +15,7 @@ import com.intellij.ProjectTopics
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.ExactFileNameMatcher
@@ -87,6 +88,7 @@ sealed class GetFileOwnersError {
  * [CodeownersManager] handles CODEOWNERS files indexing and status caching.
  */
 @Suppress("MagicNumber", "TooManyFunctions")
+@Service(Service.Level.PROJECT)
 class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
     private val matcher = project.service<CodeownersMatcher>()

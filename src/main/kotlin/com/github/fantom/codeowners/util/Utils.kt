@@ -1,8 +1,8 @@
 package com.github.fantom.codeowners.util
 
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.modules
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -33,7 +33,7 @@ object Utils {
      * @return module containing passed file or null
      */
     fun getModuleForFile(file: VirtualFile, project: Project): Module? =
-        ModuleManager.getInstance(project).modules.find { it.moduleContentScope.contains(file) }
+        project.modules.find { it.moduleContentScope.contains(file) }
 
     fun getModuleRootForFile(file: VirtualFile, project: Project) = getModuleForFile(file, project)?.let { module ->
         ModuleRootManager.getInstance(module).contentRoots.first()?.takeIf { it.isDirectory }
@@ -47,5 +47,5 @@ object Utils {
      * @return file is under directory
      */
     fun isInProject(file: VirtualFile, project: Project) =
-        getModuleForFile(file, project) != null || StringUtil.startsWith(file.url, "temp://")
+        StringUtil.startsWith(file.url, "temp://") || getModuleForFile(file, project) != null
 }
