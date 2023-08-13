@@ -48,6 +48,7 @@ import com.jetbrains.rd.util.concurrentMapOf
 
 typealias OwnersList = List<OwnerString>
 typealias OwnersSet = Set<OwnerString>
+typealias OwnersMap = Map<CodeownersFileType, OwnersFileReference>
 
 // data class OwnersSet(owners: Sequence<OwnerString>) {
 //     val owners = owners.sortedWith()
@@ -120,7 +121,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         }
 
     private val expiringStatusCache =
-        ExpiringMap<VirtualFile, Map<CodeownersFileType, OwnersFileReference>?>(Time.SECOND)
+        ExpiringMap<VirtualFile, OwnersMap?>(Time.SECOND)
 
     private val debouncedExitDumbMode = object : Debounced<Boolean?>(3000) {
         override fun task(argument: Boolean?) {
@@ -203,7 +204,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
      * Error if cannot retrieve them due to project or IDE state (dumb mode, disposed)
      */
     @Suppress("ComplexCondition", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
-    fun getFileOwners(file: VirtualFile): Either<GetFileOwnersError, Map<CodeownersFileType, OwnersFileReference>> {
+    fun getFileOwners(file: VirtualFile): Either<GetFileOwnersError, OwnersMap> {
         LOGGER.trace(">getFileOwners ${file.name}")
         expiringStatusCache[file]?.let {
             LOGGER.trace("<getFileOwners ${file.name} cached ${it.entries.joinToString(",")}")
