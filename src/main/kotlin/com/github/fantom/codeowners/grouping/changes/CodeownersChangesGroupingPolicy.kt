@@ -25,14 +25,53 @@ private data class ChangesNodeData(
     val prevOwners: PersistedOwnersMap?, /*set only if differs from current owners */
 )
 
+private interface ChangeNodeRenderer {
+    fun append(s: String)
+    fun append(s: String, linkAttributes: SimpleTextAttributes, fn: Runnable)
+
+    class TextPresentationChangeNodeRenderer : ChangeNodeRenderer {
+        private val sb = StringBuilder()
+
+        override fun append(s: String) {
+            sb.append(s)
+        }
+
+        override fun append(s: String, linkAttributes: SimpleTextAttributes, fn: Runnable) {
+            sb.append(s)
+        }
+
+        val string = sb.toString()
+    }
+
+    class RichChangeNodeRenderer(private val renderer: ChangesBrowserNodeRenderer) : ChangeNodeRenderer {
+        override fun append(s: String) {
+            renderer.append(s)
+        }
+
+        override fun append(s: String, linkAttributes: SimpleTextAttributes, fn: Runnable) {
+            renderer.append(s, linkAttributes, fn)
+        }
+    }
+}
+
 private class CodeownersChangesBrowserNode(
     data: ChangesNodeData,
     private val project: Project,
 ) : ChangesBrowserNode<ChangesNodeData>(data) {
-    override fun render(renderer: ChangesBrowserNodeRenderer, selected: Boolean, expanded: Boolean, hasFocus: Boolean) {
-        fun getRepr(o: PersistedOwnersMap) =
-            o.values.firstNotNullOfOrNull { it.ref?.owners }?.joinToString(", ") ?: "<Unowned>"
+    private fun getRepr(o: PersistedOwnersMap) =
+        o.values.firstNotNullOfOrNull { it.ref?.owners }?.joinToString(", ") ?: "<Unowned>"
 
+    override fun render(renderer: ChangesBrowserNodeRenderer, selected: Boolean, expanded: Boolean, hasFocus: Boolean) {
+        val myRenderer = ChangeNodeRenderer.RichChangeNodeRenderer(renderer)
+
+        render(myRenderer)
+
+        appendCount(renderer)
+
+        renderer.icon = CodeownersIcons.FILE
+    }
+
+    private fun render(renderer: ChangeNodeRenderer) {
         val (currentOwners, prevOwners) = getUserObject()
 
         val currOwners = getRepr(currentOwners)
@@ -48,9 +87,14 @@ private class CodeownersChangesBrowserNode(
 //                | <a href="#navigation/${prevOwnersFileRef.url}:${prevOwnersFileRef.ref!!.offset}">$repr</a>
 //                | #loc</body></html>""".trimMargin()
         }
-        appendCount(renderer)
-//        super.render(renderer, selected, expanded, hasFocus)
-        renderer.icon = CodeownersIcons.FILE
+    }
+
+    override fun getTextPresentation(): String {
+        val renderer = ChangeNodeRenderer.TextPresentationChangeNodeRenderer()
+
+        render(renderer)
+
+        return renderer.string
     }
 
     private fun goToOwner(codeownersFileUrl: String, offset: Int) {
