@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+## [v0.6.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.6.0) (2023-08-13)
+
 ### Added
 - Support IDEA 2023.2
 - Show ownership changes in Local Changes panel, after file/dir is moved/renamed 
