@@ -12,7 +12,7 @@ class BitbucketFileType : CodeownersFileType(BitbucketLanguage.INSTANCE) {
     }
 
     // TODO need to investigate why parent may be null
-    private fun isInSubdir(codeownersFile: VirtualFile) = codeownersFile.parent?.name in subdirectories
+    private fun isInSubdir(codeownersFile: VirtualFile) = codeownersFile.parent?.let { it.name in subdirectories } ?: false
 
     override fun getRoot(vcsRoot: VcsRoot, codeownersFile: VirtualFile): VirtualFile? {
         return super.getRoot(vcsRoot, codeownersFile) ?: codeownersFile.parent?.let { codeownersParentDir ->
