@@ -3,8 +3,8 @@ package com.github.fantom.codeowners.services
 import com.github.fantom.codeowners.util.Glob
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.RegExp
 import java.util.concurrent.ConcurrentHashMap
@@ -13,15 +13,11 @@ import java.util.concurrent.ConcurrentMap
 /**
  * Component that prepares patterns for glob/regex statements and cache them.
  */
-@Service(Service.Level.PROJECT)
-class PatternCache(project: Project) : Disposable {
+@Service(Service.Level.APP)
+class PatternCache : Disposable {
     private val PREFIX_TO_REGEX_CACHE: ConcurrentMap<Triple<CharSequence, Boolean, Boolean>, Regex> = ConcurrentHashMap()
 
     private val GLOB_TO_AUTOMATON_CACHE: ConcurrentMap<String, Automaton> = ConcurrentHashMap()
-
-    init {
-        Disposer.register(project, this)
-    }
 
     override fun dispose() {
         clearCache()
@@ -29,6 +25,7 @@ class PatternCache(project: Project) : Disposable {
 
     private fun clearCache() {
         PREFIX_TO_REGEX_CACHE.clear()
+        GLOB_TO_AUTOMATON_CACHE.clear()
     }
 
     fun createRelativePattern(text: CharSequence, caseSensitive: Boolean): Regex {
@@ -52,8 +49,6 @@ class PatternCache(project: Project) : Disposable {
     }
 
     companion object {
-        fun getInstance(project: Project): PatternCache {
-            return project.getService(PatternCache::class.java)
-        }
+        fun getInstance(project: Project) = project.service<PatternCache>()
     }
 }
