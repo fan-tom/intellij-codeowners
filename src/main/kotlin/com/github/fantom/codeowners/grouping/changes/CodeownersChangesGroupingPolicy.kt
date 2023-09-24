@@ -115,8 +115,12 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
     private val changeListManager = ChangeListManager.getInstance(project)
 
     @Suppress("ReturnCount")
-    override fun getParentNodeFor(nodePath: StaticFilePath, subtreeRoot: ChangesBrowserNode<*>): ChangesBrowserNode<*>? {
-        val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, subtreeRoot)
+    override fun getParentNodeFor(
+        nodePath: StaticFilePath,
+        node: ChangesBrowserNode<*>,
+        subtreeRoot: ChangesBrowserNode<*>,
+    ): ChangesBrowserNode<*>? {
+        val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, node, subtreeRoot)
         if (!codeownersManager.isAvailable) return nextPolicyParent
 
         val prevOwnersRef = changeListManager.getChange(nodePath.filePath)?.let { change ->

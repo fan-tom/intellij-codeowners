@@ -11,7 +11,6 @@ import com.github.fantom.codeowners.lang.CodeownersLanguage
 import com.github.fantom.codeowners.services.CodeownersMatcher
 import com.github.fantom.codeowners.settings.CodeownersSettings
 import com.github.fantom.codeowners.util.*
-import com.intellij.ProjectTopics
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -21,11 +20,9 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.ExactFileNameMatcher
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.*
 import com.intellij.openapi.project.DumbService.DumbModeListener
-import com.intellij.openapi.project.NoAccessDuringPsiEvents
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vcs.FileStatusManager
@@ -360,9 +357,9 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
                 }
             }
         )
-        messageBus.subscribe(ProjectTopics.PROJECT_ROOTS, commonRunnableListeners)
+        messageBus.subscribe(ModuleRootListener.TOPIC, commonRunnableListeners)
         messageBus.subscribe(RefreshStatusesListener.REFRESH_STATUSES, commonRunnableListeners)
-        messageBus.subscribe(ProjectTopics.MODULES, commonRunnableListeners)
+        messageBus.subscribe(ModuleListener.TOPIC, commonRunnableListeners)
         working = true
     }
 
