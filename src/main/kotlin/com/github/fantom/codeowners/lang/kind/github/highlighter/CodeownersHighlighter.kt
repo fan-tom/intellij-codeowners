@@ -5,14 +5,13 @@ import com.github.fantom.codeowners.lang.kind.github.CodeownersLexerAdapter
 import com.github.fantom.codeowners.lang.kind.github.CodeownersParserDefinition
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.tree.IElementType
 
 /**
  * Syntax highlighter definition.
  */
 @Suppress("UnusedPrivateMember")
-class CodeownersHighlighter(private val virtualFile: VirtualFile?) : SyntaxHighlighterBase() {
+class CodeownersHighlighter : SyntaxHighlighterBase() {
 
     companion object {
         private val ATTRIBUTES = mutableMapOf<IElementType, TextAttributesKey>()

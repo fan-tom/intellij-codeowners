@@ -46,7 +46,7 @@ class CodeownersColorSettingsPage : ColorSettingsPage {
     override fun getIcon(): Icon? = null
 
     // we use bitbucket file type because it is more feature-rich
-    override fun getHighlighter() = CodeownersHighlighter(null)
+    override fun getHighlighter() = CodeownersHighlighter()
 
     override fun getDemoText() = SAMPLE_CODEOWNERS
 

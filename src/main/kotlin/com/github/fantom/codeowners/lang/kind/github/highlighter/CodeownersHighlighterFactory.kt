@@ -9,5 +9,5 @@ import com.intellij.openapi.vfs.VirtualFile
  */
 class CodeownersHighlighterFactory : SyntaxHighlighterFactory() {
 
-    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) = CodeownersHighlighter(virtualFile)
+    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) = CodeownersHighlighter()
 }
