@@ -5,11 +5,8 @@ import com.github.fantom.codeowners.lang.kind.github.GithubLanguage
 import com.intellij.openapi.vcs.VcsRoot
 import com.intellij.openapi.vfs.VirtualFile
 
-class GithubFileType : CodeownersFileType(GithubLanguage.INSTANCE) {
-    companion object {
-        val INSTANCE = GithubFileType()
-        private val subdirectories = setOf(".github", "docs")
-    }
+object GithubFileType : CodeownersFileType(GithubLanguage.INSTANCE) {
+    private val subdirectories = setOf(".github", "docs")
 
     // TODO need to investigate why parent may be null
     private fun isInSubdir(codeownersFile: VirtualFile) = codeownersFile.parent?.let { it.name in subdirectories } ?: false

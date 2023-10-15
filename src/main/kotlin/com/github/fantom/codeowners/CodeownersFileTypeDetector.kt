@@ -30,14 +30,14 @@ class CodeownersFileTypeDetector : FileTypeRegistry.FileTypeDetector {
             if (firstCharsIfText != null) {
                 if (firstCharsIfText.lineSequence().any(::detectBitbucketFileType)) {
                     LOGGER.trace("Detected lang using firstCharsIfText: bb")
-                    BitbucketFileType.INSTANCE
+                    BitbucketFileType
                     // firstCharsIfText may be not enough to find bb-specific pattern, so check whole file content
                 } else if (file.inputStream.reader().useLines { it.any(::detectBitbucketFileType) }) {
                     LOGGER.trace("Detected lang using file content: bb")
-                    BitbucketFileType.INSTANCE
+                    BitbucketFileType
                 } else {
                     LOGGER.trace("Detected lang: gh")
-                    GithubFileType.INSTANCE
+                    GithubFileType
                 }
             } else {
                 // CODEOWNERS file must be text, not binary

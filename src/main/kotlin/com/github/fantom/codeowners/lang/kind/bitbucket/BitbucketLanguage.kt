@@ -21,7 +21,7 @@ class BitbucketLanguage private constructor() : CodeownersLanguage("Bitbucket") 
     }
 
     override val fileType
-        get() = BitbucketFileType.INSTANCE
+        get() = BitbucketFileType
 
     override fun getCrlfToken(): IElementType {
         return CodeownersTypes.CRLF

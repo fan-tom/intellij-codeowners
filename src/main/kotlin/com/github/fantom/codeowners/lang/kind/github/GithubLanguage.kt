@@ -19,7 +19,7 @@ class GithubLanguage private constructor() : CodeownersLanguage("Github") {
     }
 
     override val fileType
-        get() = GithubFileType.INSTANCE
+        get() = GithubFileType
 
     override fun getCrlfToken(): IElementType {
         return CodeownersTypes.CRLF

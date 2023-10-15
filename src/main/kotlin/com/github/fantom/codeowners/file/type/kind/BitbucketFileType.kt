@@ -5,11 +5,8 @@ import com.github.fantom.codeowners.lang.kind.bitbucket.BitbucketLanguage
 import com.intellij.openapi.vcs.VcsRoot
 import com.intellij.openapi.vfs.VirtualFile
 
-class BitbucketFileType : CodeownersFileType(BitbucketLanguage.INSTANCE) {
-    companion object {
-        val INSTANCE = BitbucketFileType()
-        private val subdirectories = setOf(".bitbucket")
-    }
+object BitbucketFileType : CodeownersFileType(BitbucketLanguage.INSTANCE) {
+    private val subdirectories = setOf(".bitbucket")
 
     // TODO need to investigate why parent may be null
     private fun isInSubdir(codeownersFile: VirtualFile) = codeownersFile.parent?.let { it.name in subdirectories } ?: false
