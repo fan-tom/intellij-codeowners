@@ -5,7 +5,7 @@ import javax.swing.JCheckBox
 import javax.swing.JPanel
 
 /**
- * UI form for [CodeownersSettings] edition.
+ * UI form for [com.github.fantom.codeowners.settings.CodeownersSettings] edition.
  */
 @Suppress("MagicNumber")
 class CodeownersSettingsPanel : Disposable {

@@ -310,10 +310,10 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         return (codeownersVirtualFile.fileType as CodeownersFileType).getRoot(vcsRoot, codeownersVirtualFile)
     }
 
-    val isAvailable: Boolean get() = working && codeownersFilesExist() ?: false
+    val isAvailable: Boolean get() = working && codeownersFilesExist()
 
     @Suppress("ReturnCount")
-    private fun codeownersFilesExist(): Boolean? {
+    private fun codeownersFilesExist(): Boolean {
         return CodeownersBundle.LANGUAGES
             .asSequence()
             .map { it.filename }

@@ -74,7 +74,6 @@ class CodeownersCoverPatternInspection : LocalInspectionTool() {
      *
      * @param coveringPattern entry that covers message related
      * @param virtualFile   current working file
-     * @param onTheFly      true if called during on the fly editor highlighting. Called from Inspect Code action
      * otherwise
      * @return generated message [String]
      */

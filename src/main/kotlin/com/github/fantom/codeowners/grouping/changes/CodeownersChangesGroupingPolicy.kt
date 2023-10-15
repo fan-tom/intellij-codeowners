@@ -81,7 +81,7 @@ private class CodeownersChangesBrowserNode(
             renderer.append(" - moved from ")
             val repr = getRepr(prevOwners)
             val (url, ref) = prevOwners.values.firstNotNullOf { it.ref?.let { _ -> Pair(it.url, it.ref)} }
-            renderer.append(repr, SimpleTextAttributes.LINK_ATTRIBUTES, Runnable { goToOwner(url, ref.offset) })
+            renderer.append(repr, SimpleTextAttributes.LINK_ATTRIBUTES) { goToOwner(url, ref.offset) }
 //            "$repr -> $currOwners"
 //            """<html><body>$currOwners - moved from
 //                | <a href="#navigation/${prevOwnersFileRef.url}:${prevOwnersFileRef.ref!!.offset}">$repr</a>

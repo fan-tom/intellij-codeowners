@@ -25,9 +25,10 @@ class CodeownersGithubOwnerReference(val owner: CodeownersNamedOwner) : WebRefer
     }
 
     /**
-    * This class basically reimplements WebReference.MyFakePsiElement to be able to show
+    * This class basically reimplements [WebReference.MyFakePsiElement] to be able to show
     * custom tooltip on Ctrl-hover
-    * WebReference.MyFakePsiElement is handled by WebReferenceDocumentationProvider
+     *
+    * WebReference.MyFakePsiElement is handled by [com.intellij.openapi.paths.WebReferenceDocumentationProvider]
     */
     inner class MyFakePsiElement(val element: PsiElement, val url: String) : FakePsiElement(), SyntheticElement {
 

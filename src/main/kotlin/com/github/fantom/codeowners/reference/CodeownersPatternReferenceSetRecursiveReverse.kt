@@ -26,7 +26,6 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.GlobalSearchScopes
 import com.intellij.psi.search.scope.packageSet.FilteredNamedScope
 import com.intellij.vcsUtil.VcsUtil
-import java.util.*
 
 class CodeownersPatternReferenceSetRecursiveReverse(
     element: CodeownersPatternBase,
@@ -448,9 +447,11 @@ class CodeownersPatternReferenceSetRecursiveReverse(
          * prefix - pattern without one or more trailing fragments
          * fragment - part of the pattern surrounded by slash(es), if any, or the pattern itself
          * BNF grammar:
+         * ```bnf
          * FRAGMENT := regex:[^/]+
          * PREFIX := [/]FRAGMENT | PREFIX/FRAGMENT
          * PATTERN := PREFIX[/[FRAGMENT]]
+         * ```
          *
          * This method SHOULD NOT be invoked recursively from inside Resolver as it performs some calculations
          * meaningful only for calls from outside

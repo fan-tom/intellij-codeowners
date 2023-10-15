@@ -12,8 +12,8 @@ import com.intellij.psi.impl.source.tree.TreeUtil
 import com.intellij.psi.tree.IElementType
 
 /**
- * QuickFix action that removes specified entry handled by code inspections like [CodeownersCoverEntryInspection],
- * [CodeownersDuplicateEntryInspection], [CodeownersUnusedPatternInspection].
+ * QuickFix action that removes specified entry handled by code inspections like [CodeownersCoverPatternInspection],
+ * [CodeownersUnusedPatternInspection].
  */
 class CodeownersRemoveRuleFix(rule: CodeownersRuleBase<*, *>) : LocalQuickFixAndIntentionActionOnPsiElement(rule) {
 
