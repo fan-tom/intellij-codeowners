@@ -3,12 +3,11 @@ package com.github.fantom.codeowners.indexing
 import com.github.fantom.codeowners.OwnersReference
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import org.apache.commons.lang.StringUtils
-import org.apache.commons.lang.builder.HashCodeBuilder
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 import java.io.Serializable
+import java.util.*
 
 @JvmInline
 value class RegexString(val regex: String) {
@@ -65,7 +64,7 @@ class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<Re
             val url = input.readUTF()
             val items = mutableListOf<Pair<RegexString, OwnersReference>>()
 
-            if (!StringUtils.isEmpty(url)) {
+            if (url.isNotEmpty()) {
                 val size = input.readInt()
                 repeat((0 until size).count()) {
                     val pattern = RegexString(input.readUTF())
@@ -82,9 +81,7 @@ class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<Re
         }
     }
 
-    override fun hashCode() = HashCodeBuilder().append(url).apply {
-        items.forEach { append(it.first).append(it.second) }
-    }.toHashCode()
+    override fun hashCode() = Objects.hash(url, items)
 
     override fun equals(other: Any?) = when {
         other !is CodeownersEntryOccurrence -> false

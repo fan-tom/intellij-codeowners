@@ -4,7 +4,7 @@ import com.github.fantom.codeowners.util.MatcherUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.util.containers.IntObjectCache
-import org.apache.commons.lang.builder.HashCodeBuilder
+import java.util.*
 import java.util.regex.Pattern
 
 @Service(Service.Level.APP)
@@ -25,7 +25,7 @@ class CodeownersMatcher : Disposable {
             return false
         }
         synchronized(cache) {
-            val hashCode = HashCodeBuilder().append(pattern).append(path).toHashCode()
+            val hashCode = Objects.hash(pattern, path)
             if (!cache.containsKey(hashCode)) {
                 val parts = MatcherUtil.getParts(pattern)
                 var result = false
