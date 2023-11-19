@@ -157,6 +157,8 @@
                                implementationClass="com.github.fantom.codeowners.grouping.changes.CodeownersChangesGroupingPolicy$Factory"/>
         <usageGroupingRuleProvider implementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageGroupingRuleProvider"/>
         <applicationService serviceImplementation="com.github.fantom.codeowners.grouping.usage.CodeownersUsageViewSettings"/>
+
+        <scopeDescriptorProvider implementation="com.github.fantom.codeowners.search.CodeownersSearchScopeDescriptorProvider"/>
     </extensions>
 
     <actions>
