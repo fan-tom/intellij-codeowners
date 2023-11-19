@@ -179,14 +179,14 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     }
 
     /**
-     * @return: list of CODEOWNERS files that can assign owners to given file.
-     * Might be no equal to the list of all existing CODEOWNERS files i.e. in case of local overrides for Bitbucket
+     * @return a list of CODEOWNERS files that can assign owners to the given [file].
+     * Might be not equal to the list of all existing CODEOWNERS files i.e. in case of local overrides for Bitbucket
      */
     @Suppress("UnusedPrivateMember")
     fun getApplicableCodeownersFiles(file: VirtualFile): Map<CodeownersFileType, List<CodeownersEntryOccurrence>> {
         // TODO handle actual overrides
         return FILE_TYPES
-            .mapNotNull { ty -> cachedCodeownersFilesIndex[ty]?.let { Pair(ty, it) } }
+            .map { ty -> Pair(ty, cachedCodeownersFilesIndex[ty]) }
             .associate { it }
     }
 

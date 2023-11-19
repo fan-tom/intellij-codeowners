@@ -14,11 +14,9 @@ class CachedConcurrentMap<K: Any, V: Any> private constructor(private val fetche
         fun <K: Any, V: Any> create(fetcher: DataFetcher<K, V>) = CachedConcurrentMap(fetcher)
     }
 
-    operator fun get(key: K): V? {
-        if (!map.containsKey(key)) {
-            map[key] = fetcher.fetch(key)
-        }
-        return map[key]
+    operator fun get(key: K): V {
+        // fetcher doesn't return nulls
+        return map.computeIfAbsent(key) { fetcher.fetch(key) }
     }
 
     fun remove(key: K) {
