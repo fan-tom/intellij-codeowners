@@ -15,7 +15,11 @@ value class RegexString(val regex: String) {
 }
 
 @JvmInline
-value class OwnerString(val owner: String) {
+value class OwnerString(val owner: String): Comparable<OwnerString> {
+    override fun compareTo(other: OwnerString): Int {
+        return owner.compareTo(other.owner)
+    }
+
     override fun toString() = owner
 }
 

@@ -191,6 +191,19 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     }
 
     /**
+     * Return all known CODEOWNERS files
+     */
+    fun getCodeownersFiles(): List<CodeownersEntryOccurrence> = cachedCodeownersFilesIndex[CodeownersFileType.INSTANCE]
+
+    // TODO make type-specific? Bitbucket teams are declared in the file
+    fun getMentionedOwners(codeownersFile: CodeownersEntryOccurrence): Set<OwnerString> {
+        return codeownersFile.items
+            .asSequence()
+            .flatMap { (_, owners) -> owners.owners.asSequence() }
+            .toSet()
+    }
+
+    /**
      * Checks if file has owners.
      *
      * @param file current file
