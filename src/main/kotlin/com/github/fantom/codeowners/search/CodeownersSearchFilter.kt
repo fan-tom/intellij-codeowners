@@ -7,6 +7,7 @@ import com.github.fantom.codeowners.indexing.OwnerString
 import com.intellij.openapi.vfs.VirtualFile
 
 interface Predicate {
+    // TODO change to OwnersSet, duplicates make no sense
     fun satisfies(fileOwners: OwnersList?): Boolean
 }
 
@@ -62,6 +63,17 @@ sealed interface Filter: Predicate {
             }
 
             override fun satisfies(fileOwners: OwnersList?) = fileOwners?.containsAll(owners) ?: false
+        }
+
+        // files, owned by only given owners, no extra owners allowed
+        data class OwnedByExactly(val owners: Set<OwnerString>): Condition {
+            override fun displayName() = "owned by exactly ${owners.joinToString(", ")}"
+
+            override fun satisfiable(codeownersFile: CodeownersEntryOccurrence): Boolean {
+                return codeownersFile.items.map { it.second }.any { satisfies(it.owners) }
+            }
+
+            override fun satisfies(fileOwners: OwnersList?) = fileOwners?.let { owners == it.toSet() } ?: false
         }
     }
 
