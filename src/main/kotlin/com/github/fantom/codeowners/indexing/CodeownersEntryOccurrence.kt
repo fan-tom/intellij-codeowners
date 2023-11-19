@@ -24,7 +24,7 @@ value class OwnerString(val owner: String) {
  * of codeowners entries with line numbers for better performance. Class is used for indexing.
  */
 @Suppress("SerialVersionUIDInSerializableClass")
-class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<RegexString, OwnersReference>>) : Serializable {
+class CodeownersEntryOccurrence(val url: String, val items: List<Pair<RegexString, OwnersReference>>) : Serializable {
 
     /**
      * Returns current [VirtualFile].
