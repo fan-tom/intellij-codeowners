@@ -179,15 +179,28 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
     }
 
     /**
-     * @return: list of CODEOWNERS files that can assign owners to given file.
-     * Might be no equal to the list of all existing CODEOWNERS files i.e. in case of local overrides for Bitbucket
+     * @return a list of CODEOWNERS files that can assign owners to the given [file].
+     * Might be not equal to the list of all existing CODEOWNERS files i.e. in case of local overrides for Bitbucket
      */
     @Suppress("UnusedPrivateMember")
     fun getApplicableCodeownersFiles(file: VirtualFile): Map<CodeownersFileType, List<CodeownersEntryOccurrence>> {
         // TODO handle actual overrides
         return FILE_TYPES
-            .mapNotNull { ty -> cachedCodeownersFilesIndex[ty]?.let { Pair(ty, it) } }
+            .map { ty -> Pair(ty, cachedCodeownersFilesIndex[ty]) }
             .associate { it }
+    }
+
+    /**
+     * Return all known CODEOWNERS files
+     */
+    fun getCodeownersFiles(): List<CodeownersEntryOccurrence> = cachedCodeownersFilesIndex[CodeownersFileType.INSTANCE]
+
+    // TODO make type-specific? Bitbucket teams are declared in the file
+    fun getMentionedOwners(codeownersFile: CodeownersEntryOccurrence): Set<OwnerString> {
+        return codeownersFile.items
+            .asSequence()
+            .flatMap { (_, owners) -> owners.owners.asSequence() }
+            .toSet()
     }
 
     /**
@@ -247,8 +260,11 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
         return Right(ownersMap)
     }
 
+    /**
+     * Return owners for given [file], defined by given [codeownersFile], or error, or null if no owners defined.
+     */
     @Suppress("ReturnCount")
-    private fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence):
+    fun getFileOwners(file: VirtualFile, codeownersFile: CodeownersEntryOccurrence):
         Either<GetFileOwnersError, OwnersFileReference?> {
         val codeownersVirtualFile = codeownersFile.file ?: return Left(GetFileOwnersError.NoVirtualFile)
         val relativePath = getRelativePathToTheNearestVcsRoot(file, codeownersVirtualFile) ?: return Right(null)
@@ -257,7 +273,7 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
             LOGGER.trace(">>>getFileOwners check pattern ${it.first} against $relativePath")
             val pattern = Glob.getPattern(it.first.regex)
 //                if (
-            return@lastOrNull matcher.match(pattern, relativePath)
+            matcher.match(pattern, relativePath)
 //                ) {
 //                    true
 //                        matched = true
@@ -265,17 +281,17 @@ class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 //                return@lastOrNull false
         }?.let {
             LOGGER.trace("<<<getFileOwners pattern ${it.first} matches $relativePath")
-            return@let Right(OwnersFileReference(codeownersVirtualFile.url, it.second))
+            Right(OwnersFileReference(codeownersVirtualFile.url, it.second))
         }
-            ?: file.parent.let { directory ->
+            ?: file.parent?.let { directory ->
                 vcsRoots.forEach { vcsRoot ->
                     ProgressManager.checkCanceled()
                     if (directory == vcsRoot.path) {
                         return@let Right(OwnersFileReference(codeownersVirtualFile.url, null))
                     }
                 }
-                return@let getFileOwners(file.parent, codeownersFile)
-            }
+                getFileOwners(directory, codeownersFile)
+            } ?: Right(null)
     }
 
     @Suppress("ReturnCount")

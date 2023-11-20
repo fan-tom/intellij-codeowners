@@ -118,7 +118,7 @@ koverReport {
 tasks {
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
-            kotlinOptions.freeCompilerArgs = listOf("-Xinline-classes")
+            kotlinOptions.freeCompilerArgs = listOf("-Xinline-classes", "-Xcontext-receivers")
 
             dependsOn(generateGithubLexer, generateGithubParser, generateBitbucketLexer, generateBitbucketParser)
         }

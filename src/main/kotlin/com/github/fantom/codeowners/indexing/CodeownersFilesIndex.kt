@@ -43,7 +43,7 @@ class CodeownersFilesIndex :
     companion object {
         private val LOGGER = Logger.getInstance(CodeownersFilesIndex::class.java)
         val KEY = ID.create<CodeownersFileType, CodeownersEntryOccurrence>("CodeownersFilesIndex")
-        private const val VERSION = 1
+        private const val VERSION = 2
         private val DATA_EXTERNALIZER = object : DataExternalizer<CodeownersEntryOccurrence> {
 
             @Throws(IOException::class)
@@ -98,9 +98,11 @@ class CodeownersFilesIndex :
 //            }
 //        )
 
-        return Collections.singletonMap(
-            (inputData.fileType as CodeownersFileType),
-            CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getRulesList())
+        val codeownersEntryOccurrence = CodeownersEntryOccurrence(inputData.file.url, inputDataPsi.getRulesList())
+
+        return mapOf(
+            CodeownersFileType.INSTANCE to codeownersEntryOccurrence,
+            (inputData.fileType as CodeownersFileType) to codeownersEntryOccurrence,
         )
     }
 

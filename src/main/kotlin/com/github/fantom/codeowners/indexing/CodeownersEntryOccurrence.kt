@@ -15,7 +15,11 @@ value class RegexString(val regex: String) {
 }
 
 @JvmInline
-value class OwnerString(val owner: String) {
+value class OwnerString(val owner: String): Comparable<OwnerString> {
+    override fun compareTo(other: OwnerString): Int {
+        return owner.compareTo(other.owner)
+    }
+
     override fun toString() = owner
 }
 
@@ -24,7 +28,7 @@ value class OwnerString(val owner: String) {
  * of codeowners entries with line numbers for better performance. Class is used for indexing.
  */
 @Suppress("SerialVersionUIDInSerializableClass")
-class CodeownersEntryOccurrence(private val url: String, val items: List<Pair<RegexString, OwnersReference>>) : Serializable {
+class CodeownersEntryOccurrence(val url: String, val items: List<Pair<RegexString, OwnersReference>>) : Serializable {
 
     /**
      * Returns current [VirtualFile].
