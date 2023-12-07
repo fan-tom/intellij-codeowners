@@ -6,6 +6,7 @@
 
 ### Added
 - Implement ownership-based search scope: build an ownership predicate in a DNF and filter files during search
+- Support IDEA 2023.3
 
 ## [v0.6.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.6.0) (2023-08-13)
 
