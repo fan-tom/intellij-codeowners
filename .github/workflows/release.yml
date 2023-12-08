@@ -53,7 +53,10 @@ jobs:
         env:
           CHANGELOG: ${{ steps.properties.outputs.changelog }}
         run: |
-          ./gradlew patchChangelog --release-note="$CHANGELOG"
+          echo $CHANGELOG
+          ./gradlew --info patchChangelog --release-note="$CHANGELOG" || true
+          git status || true 
+          cat CHANGELOG.md || true
 
       # Publish the plugin to the Marketplace
       - name: Publish Plugin
