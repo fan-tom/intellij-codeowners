@@ -22,7 +22,7 @@ plugins {
     // Gradle Kover Plugin
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
     // gradle-grammar-kit-plugin - read more: https://github.com/JetBrains/gradle-grammar-kit-plugin
-    id("org.jetbrains.grammarkit") version "2022.3.2.1"
+    id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
 group = properties("pluginGroup")
@@ -46,14 +46,13 @@ dependencies {
 
 val generateGithubLexer = task<GenerateLexerTask>("generateGithubLexer") {
     sourceFile.set(file("src/main/grammars/github/CodeownersLexer.flex"))
-    targetDir.set("src/main/gen/com/github/fantom/codeowners/lang/kind/github/lexer")
-    targetClass.set("CodeownersLexer")
+    targetOutputDir.set(file("src/main/gen/com/github/fantom/codeowners/lang/kind/github/lexer"))
     purgeOldFiles.set(true)
 }
 
 val generateGithubParser = task<GenerateParserTask>("generateGithubParser") {
     sourceFile.set(file("src/main/grammars/github/Codeowners.bnf"))
-    targetRoot.set("src/main/gen")
+    targetRootOutputDir.set(file("src/main/gen"))
     pathToParser.set("/com/github/fantom/codeowners/lang/kind/github/parser/CodeownersParser.java")
     pathToPsiRoot.set("/com/github/fantom/codeowners/lang/kind/github/psi")
     purgeOldFiles.set(true)
@@ -61,14 +60,13 @@ val generateGithubParser = task<GenerateParserTask>("generateGithubParser") {
 
 val generateBitbucketLexer = task<GenerateLexerTask>("generateBitbucketLexer") {
     sourceFile.set(file("src/main/grammars/bitbucket/CodeownersLexer.flex"))
-    targetDir.set("src/main/gen/com/github/fantom/codeowners/lang/kind/bitbucket/lexer")
-    targetClass.set("CodeownersLexer")
+    targetOutputDir.set(file("src/main/gen/com/github/fantom/codeowners/lang/kind/bitbucket/lexer"))
     purgeOldFiles.set(true)
 }
 
 val generateBitbucketParser = task<GenerateParserTask>("generateBitbucketParser") {
     sourceFile.set(file("src/main/grammars/bitbucket/Codeowners.bnf"))
-    targetRoot.set("src/main/gen")
+    targetRootOutputDir.set(file("src/main/gen"))
     pathToParser.set("/com/github/fantom/codeowners/lang/kind/bitbucket/parser/CodeownersParser.java")
     pathToPsiRoot.set("/com/github/fantom/codeowners/lang/kind/bitbucket/psi")
     purgeOldFiles.set(true)
