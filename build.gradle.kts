@@ -40,7 +40,7 @@ kotlin {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("io.arrow-kt:arrow-core:1.2.3")
+    implementation("io.arrow-kt:arrow-core:1.2.4")
     implementation("dk.brics:automaton:1.12-4")
 }
 
