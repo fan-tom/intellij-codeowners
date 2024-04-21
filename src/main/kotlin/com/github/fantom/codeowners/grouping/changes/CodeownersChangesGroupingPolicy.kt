@@ -1,28 +1,25 @@
 package com.github.fantom.codeowners.grouping.changes
 
-import com.github.fantom.codeowners.CodeownersIcons
-import com.github.fantom.codeowners.CodeownersManager
-import com.github.fantom.codeowners.OwnersFileReference
-import com.github.fantom.codeowners.OwnersMap
+import com.github.fantom.codeowners.*
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.NotNullLazyKey
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.changes.ui.*
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.SimpleTextAttributes
+import com.intellij.vcsUtil.VcsImplUtil
 import javax.swing.tree.DefaultTreeModel
 
 // FileType objects must not outlive plugin instance when it is reloaded
 typealias PersistedOwnersMap = Map<String, OwnersFileReference>
 
-fun OwnersMap.toPersisted() = this.mapKeys { it.key.name }
+fun OwnersMap.toPersisted(): PersistedOwnersMap = this.mapKeys { it.key.name }
 
-private data class ChangesNodeData(
-    val currentOwners: PersistedOwnersMap,
-    val prevOwners: PersistedOwnersMap?, /*set only if differs from current owners */
+data class ChangesNodeData(
+    val currentOwners: Map<String, OwnersList?>, // file type name to list of owners
+    val prevOwners: PersistedOwnersMap?, /* set only if differs from current owners */
 )
 
 private interface ChangeNodeRenderer {
@@ -58,8 +55,11 @@ private class CodeownersChangesBrowserNode(
     data: ChangesNodeData,
     private val project: Project,
 ) : ChangesBrowserNode<ChangesNodeData>(data) {
-    private fun getRepr(o: PersistedOwnersMap) =
+    private fun getPrevOwnersRepr(o: PersistedOwnersMap) =
         o.values.firstNotNullOfOrNull { it.ref?.owners }?.joinToString(", ") ?: "<Unowned>"
+
+    private fun getCurrOwnersRepr(o: Map<String, OwnersList?>) =
+        o.values.firstNotNullOfOrNull { it }?.joinToString(", ") ?: "<Unowned>"
 
     override fun render(renderer: ChangesBrowserNodeRenderer, selected: Boolean, expanded: Boolean, hasFocus: Boolean) {
         val myRenderer = ChangeNodeRenderer.RichChangeNodeRenderer(renderer)
@@ -74,18 +74,14 @@ private class CodeownersChangesBrowserNode(
     private fun render(renderer: ChangeNodeRenderer) {
         val (currentOwners, prevOwners) = getUserObject()
 
-        val currOwners = getRepr(currentOwners)
+        val currOwners = getCurrOwnersRepr(currentOwners)
         renderer.append(currOwners)
 
         if (prevOwners != null) {
             renderer.append(" - moved from ")
-            val repr = getRepr(prevOwners)
+            val repr = getPrevOwnersRepr(prevOwners)
             val (url, ref) = prevOwners.values.firstNotNullOf { it.ref?.let { _ -> Pair(it.url, it.ref)} }
             renderer.append(repr, SimpleTextAttributes.LINK_ATTRIBUTES) { goToOwner(url, ref.offset) }
-//            "$repr -> $currOwners"
-//            """<html><body>$currOwners - moved from
-//                | <a href="#navigation/${prevOwnersFileRef.url}:${prevOwnersFileRef.ref!!.offset}">$repr</a>
-//                | #loc</body></html>""".trimMargin()
         }
     }
 
@@ -109,19 +105,17 @@ private class CodeownersChangesBrowserNode(
     }
 }
 
-class CodeownersChangesGroupingPolicy(val project: Project, private val model: DefaultTreeModel) :
-    BaseChangesGroupingPolicy() {
+class CodeownersChangesGroupingPolicy(val project: Project, model: DefaultTreeModel) :
+    SimpleChangesGroupingPolicy<ChangesNodeData>(model) {
     private val codeownersManager = project.service<CodeownersManager>()
     private val changeListManager = ChangeListManager.getInstance(project)
 
-    @Suppress("ReturnCount")
-    override fun getParentNodeFor(
-        nodePath: StaticFilePath,
-        node: ChangesBrowserNode<*>,
-        subtreeRoot: ChangesBrowserNode<*>,
-    ): ChangesBrowserNode<*>? {
-        val nextPolicyParent = nextPolicy?.getParentNodeFor(nodePath, node, subtreeRoot)
-        if (!codeownersManager.isAvailable) return nextPolicyParent
+    override fun createGroupRootNode(value: ChangesNodeData): ChangesBrowserNode<ChangesNodeData> {
+        return CodeownersChangesBrowserNode(value, project)
+    }
+
+    override fun getGroupRootValueFor(nodePath: StaticFilePath, node: ChangesBrowserNode<*>): ChangesNodeData? {
+        if (!codeownersManager.isAvailable) return null
 
         val prevOwnersRef = changeListManager.getChange(nodePath.filePath)?.let { change ->
             if (change.type == Change.Type.MOVED) { // includes renaming
@@ -137,46 +131,33 @@ class CodeownersChangesGroupingPolicy(val project: Project, private val model: D
             } else null
         }
 
-        val file = resolveVirtualFile(nodePath)
-        file
+        val file = VcsImplUtil.findValidParentAccurately(nodePath.filePath)
+        return file
             // TODO handle error properly
             ?.let { codeownersManager.getFileOwners(it).getOrNull() }
             ?.let { ownersMap ->
-                val persistentOwnersMap = ownersMap.toPersisted()
+                val persistentOwnersMap = ownersMap.entries
+                    .groupingBy { it.key.name }
+                    .aggregate<_, _, OwnersList?> { _, acc, e, _ ->
+                        val owners = e.value.ref?.owners
+                        if (acc == null) {
+                            owners
+                        } else if (owners != null) {
+                            acc + owners
+                        } else {
+                            acc
+                        }
+                    }
 
-                val data = ChangesNodeData(
+                ChangesNodeData(
                     persistentOwnersMap,
                     prevOwnersRef.takeIf { it != persistentOwnersMap }
                 )
-
-                val grandParent = nextPolicyParent ?: subtreeRoot
-                val cachingRoot = getCachingRoot(grandParent, subtreeRoot)
-
-                CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[data]?.let { return it }
-
-                CodeownersChangesBrowserNode(data, project).let {
-                    it.markAsHelperNode()
-                    model.insertNodeInto(it, grandParent, grandParent.childCount)
-
-                    CODEOWNERS_CACHE.getValue(cachingRoot).getOrPut(grandParent) { mutableMapOf() }[data] = it
-                    return it
-                }
             }
-        return nextPolicyParent
     }
 
     internal class Factory : ChangesGroupingPolicyFactory() {
         override fun createGroupingPolicy(project: Project, model: DefaultTreeModel) =
             CodeownersChangesGroupingPolicy(project, model)
-    }
-
-    companion object {
-        private val CODEOWNERS_CACHE = NotNullLazyKey.createLazyKey<
-            MutableMap<
-                ChangesBrowserNode<*>,
-                MutableMap<ChangesNodeData, ChangesBrowserNode<*>>,
-                >,
-            ChangesBrowserNode<*>
-            >("ChangesTree.CodeownersCache") { mutableMapOf() }
     }
 }
