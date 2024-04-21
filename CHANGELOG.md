@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+### Added
+
+- Support IDEA 2024.1
+
+### Removed
+
+- Support for IDEA versions older than 2024.1
+
 ## [v0.7.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.7.0) (2023-12-08)
 
 ### Added
