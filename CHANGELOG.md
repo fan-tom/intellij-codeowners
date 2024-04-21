@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+## [v0.8.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.8.0) (2024-04-21)
+
 ### Added
 
 - Support IDEA 2024.1
