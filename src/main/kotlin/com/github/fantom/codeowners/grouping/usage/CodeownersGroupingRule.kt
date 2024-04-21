@@ -79,6 +79,6 @@ class CodeownersGroupingRule(project: Project) :
     }
 
     override fun getRank(): Int {
-        return UsageGroupingRulesDefaultRanks.AFTER_DIRECTORY_STRUCTURE.absoluteRank
+        return UsageGroupingRulesDefaultRanks.BEFORE_MODULE.absoluteRank
     }
 }
