@@ -42,6 +42,7 @@ import com.intellij.util.Time
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.messages.Topic
 import com.jetbrains.rd.util.concurrentMapOf
+import java.io.Serializable
 
 typealias OwnersList = List<OwnerString>
 typealias OwnersSet = Set<OwnerString>
@@ -57,8 +58,19 @@ typealias OwnersMap = Map<CodeownersFileType, OwnersFileReference>
  * Class that represents a list of owners together with a link to exact offset in a CODEOWNERS file that assigns them.
  *
  * [owners] list is empty if reference points to an unset record
+ *
+ * NOTE: don't change [equals] or [hashCode] implementations, as this type is used for serialization by
+ * [CodeownersEntryOccurrence]
  */
-data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0)
+data class OwnersReference(val owners: OwnersList = emptyList(), val offset: Int = 0) : Serializable {
+    fun equalsIgnoringOffset(o: OwnersReference): Boolean {
+        return owners == o.owners
+    }
+
+    fun hashCodeIgnoringOffset(): Int {
+        return owners.hashCode()
+    }
+}
 
 /**
  * Represents a reference to given CODEOWNERS file together with reference to particular entry in this file, if any

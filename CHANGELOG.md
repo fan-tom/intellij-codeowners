@@ -4,6 +4,19 @@
 
 ## Unreleased
 
+### Added
+
+- Support IDEA 2024.1
+
+### Fixed
+
+- Duplicate groups when grouping files by ownership in changelist, Pull Requests and usage views
+- Empty groups when grouping by ownership is combined with grouping by e.g. module or directory, in changelist or Pull Requests views
+
+### Removed
+
+- Support for IDEA versions older than 2024.1
+
 ## [v0.7.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.7.0) (2023-12-08)
 
 ### Added

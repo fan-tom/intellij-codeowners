@@ -43,7 +43,7 @@ class CodeownersGroupingRule(project: Project) :
         return "UsageGrouping.Codeowner"
     }
 
-    private data class CodeownersGroup(private val ownersRef: OwnersReference?) : UsageGroupBase(1) {
+    private class CodeownersGroup(private val ownersRef: OwnersReference?) : UsageGroupBase(1) {
         override fun getIcon(): Icon {
             return CodeownersIcons.FILE
         }
@@ -59,9 +59,26 @@ class CodeownersGroupingRule(project: Project) :
                 }
             }
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CodeownersGroup
+
+            return when {
+                ownersRef == null && other.ownersRef == null -> true
+                ownersRef == null || other.ownersRef == null -> false
+                else -> ownersRef.equalsIgnoringOffset(other.ownersRef)
+            }
+        }
+
+        override fun hashCode(): Int {
+            return ownersRef?.hashCodeIgnoringOffset() ?: ownersRef.hashCode()
+        }
     }
 
     override fun getRank(): Int {
-        return UsageGroupingRulesDefaultRanks.AFTER_DIRECTORY_STRUCTURE.absoluteRank
+        return UsageGroupingRulesDefaultRanks.BEFORE_MODULE.absoluteRank
     }
 }
