@@ -12,6 +12,7 @@
 
 - Duplicate groups when grouping files by ownership in changelist, Pull Requests and usage views
 - Empty groups when grouping by ownership is combined with grouping by e.g. module or directory, in changelist or Pull Requests views
+- Opening `Search Structurally` dialog automatically opened `File ownership` scope dialog
 
 ### Removed
 
