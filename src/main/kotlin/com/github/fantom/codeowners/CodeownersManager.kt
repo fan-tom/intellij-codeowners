@@ -101,7 +101,7 @@ sealed class GetFileOwnersError {
 @Service(Service.Level.PROJECT)
 class CodeownersManager(private val project: Project) : DumbAware, Disposable {
 
-    private val matcher = project.service<CodeownersMatcher>()
+    private val matcher = service<CodeownersMatcher>()
     private val settings = CodeownersSettings.getInstance()
     private val projectLevelVcsManager = ProjectLevelVcsManager.getInstance(project)
 

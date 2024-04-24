@@ -16,7 +16,7 @@ import com.intellij.psi.PsiFile
 import dk.brics.automaton.BasicOperations
 
 /**
- * Inspection tool that checks if entries are covered by others.
+ * Inspection tool that checks if earlier entries are covered by later ones.
  */
 class CodeownersCoverPatternInspection : LocalInspectionTool() {
 
@@ -38,7 +38,7 @@ class CodeownersCoverPatternInspection : LocalInspectionTool() {
 
         val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
 
-        val cache = PatternCache.getInstance(manager.project)
+        val cache = PatternCache.getInstance()
 
         val rules = codeownersFile.getRules()
         val compiledRegexes =

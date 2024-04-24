@@ -32,13 +32,9 @@ class CodeownersPatternReferenceSetRecursiveReverse(
     val tracerStub: TimeTracerStub? = null
 ) :
     FileReferenceSet(element) {
-    private val myCodeownersPatternsMatchedFilesCache: CodeownersPatternsMatchedFilesCache
-    private val myPatternCache: PatternCache
-
-    init {
-        myCodeownersPatternsMatchedFilesCache = CodeownersPatternsMatchedFilesCache.getInstance(element.project)
-        myPatternCache = PatternCache.getInstance(element.project)
-    }
+    private val myCodeownersPatternsMatchedFilesCache: CodeownersPatternsMatchedFilesCache =
+        CodeownersPatternsMatchedFilesCache.getInstance(element.project)
+    private val myPatternCache: PatternCache = PatternCache.getInstance()
 
     /**
      * Creates [CodeownersPatternReference] instance basing on passed text value.
@@ -185,7 +181,7 @@ class CodeownersPatternReferenceSetRecursiveReverse(
     ) : FileReference(fileReferenceSet, range, index, text) {
         // TODO unify respecting excluded/ignored project files among usages of different indexes
         inner class Resolver {
-            val psiManager = element.manager
+            val psiManager = element.manager!!
             private fun Collection<VirtualFile>.toResolveResults() = this
                 .mapNotNull { getPsiFileSystemItem(psiManager, it)?.let(::PsiElementResolveResult) }
             private fun CharSequence.containsMetasymbols() = this.any { it == '*' || it == '?' }
@@ -290,15 +286,22 @@ class CodeownersPatternReferenceSetRecursiveReverse(
                 // no escaping handling as slash cannot be part of filename
                 // TODO handle splitting in language implementation
                 val (prefix, fragment) = text.splitLast('/')
-                when {
+                when (fragment) {
                     // no slashes
-                    fragment == null -> resolveFragment(prefix, context, result, caseSensitive, dirOnly)
+                    null -> resolveFragment(prefix, context, result, caseSensitive, dirOnly)
                     // trailing slash is excluded on input text normalization
-                    fragment == "" -> TODO("unreachable")
+                    "" -> TODO("unreachable")
                     else -> {
                         val contexts = mutableListOf<ResolveResult>()
                         // on recursive call we should resolve strictly in context and to all variants
-                        innerResolveInContextRecursive(prefix.toString(), context, contexts, caseSensitive, false, false)
+                        innerResolveInContextRecursive(
+                            prefix.toString(),
+                            context,
+                            contexts,
+                            caseSensitive,
+                            atAnyLevel = false,
+                            dirOnly = false
+                        )
                         contexts.forEach { ctx ->
                             resolveFragment(
                                 fragment,

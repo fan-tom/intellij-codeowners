@@ -4,7 +4,6 @@ import com.github.fantom.codeowners.util.Glob
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.project.Project
 import dk.brics.automaton.Automaton
 import dk.brics.automaton.RegExp
 import java.util.concurrent.ConcurrentHashMap
@@ -43,12 +42,12 @@ class PatternCache : Disposable {
     fun getOrCreateGlobRegexes2(glob: String): Automaton {
         return GLOB_TO_AUTOMATON_CACHE.computeIfAbsent(glob) {
                 RegExp(
-                    Glob.createDregex(it, false, false)
+                    Glob.createDregex(it, acceptChildren = false, supportSquareBrackets = false)
                 ).toAutomaton()
             }
     }
 
     companion object {
-        fun getInstance(project: Project) = project.service<PatternCache>()
+        fun getInstance() = service<PatternCache>()
     }
 }

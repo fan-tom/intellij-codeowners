@@ -1,11 +1,5 @@
 package com.github.fantom.codeowners.util
 
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.search.FilenameIndex
-import com.intellij.psi.search.GlobalSearchScope
-import java.util.ArrayList
 import java.util.regex.Pattern
 
 /**
@@ -34,15 +28,6 @@ class MatcherUtil private constructor() {
         }
 
         /**
-         * Checks if given path contains any of the path parts.
-         *
-         * @param parts that should be contained in path
-         * @param path  to check
-         * @return path contains any of the parts
-         */
-        fun matchAnyPart(parts: Array<String>, path: String) = parts.any { path.contains(it) }
-
-        /**
          * Extracts alphanumeric parts from  [Pattern].
          *
          * @param pattern to handle
@@ -65,33 +50,6 @@ class MatcherUtil private constructor() {
                 }
             }
             return parts.toTypedArray()
-        }
-
-        /**
-         * Finds [VirtualFile] instances for the specific [Pattern] and caches them.
-         *
-         * @param project current project
-         * @param pattern to handle
-         * @return matched files list
-         */
-        fun getFilesForPattern(project: Project, pattern: Pattern): Collection<VirtualFile> {
-            val parts = getParts(pattern).ifEmpty { return emptyList() }
-            val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex
-            val scope = GlobalSearchScope.projectScope(project)
-            val files = mutableSetOf<VirtualFile>()
-
-            projectFileIndex.iterateContent {
-                if (matchAnyPart(parts, it.name)) {
-                    FilenameIndex.getVirtualFilesByName(it.name, scope).forEach { file ->
-                        if (file.isValid && matchAllParts(parts, file.path)) {
-                            files.add(file)
-                        }
-                    }
-                }
-                true
-            }
-
-            return files
         }
     }
 }

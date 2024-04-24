@@ -17,7 +17,7 @@ abstract class CodeownersPatternExtImpl(node: ASTNode) : CodeownersElementImpl(n
      *
      * @return first child is negated
      */
-    val isNegated
+    private val isNegated
         get() = firstChild is CodeownersNegation
 
     /**

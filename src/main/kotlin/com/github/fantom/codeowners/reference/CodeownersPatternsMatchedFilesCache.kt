@@ -30,7 +30,7 @@ typealias DirOnly = Boolean
 typealias Root = String
 
 @Service(Service.Level.PROJECT)
-internal class CodeownersPatternsMatchedFilesCache(private val project: Project) : Disposable {
+internal class CodeownersPatternsMatchedFilesCache : Disposable {
     private val cacheByPrefix = ConcurrentHashMap<Root, Cache<Triple<CharSequence, AtAnyLevel, DirOnly>, Collection<VirtualFile>>>()
 
     init {
@@ -74,7 +74,7 @@ internal class CodeownersPatternsMatchedFilesCache(private val project: Project)
                                 }
                             }
                             val cacheMap = cache.asMap()
-                            val globCache = PatternCache.getInstance(project)
+                            val globCache = PatternCache.getInstance()
                             for (key in cacheMap.keys) {
                                 // TODO think about how to take the fact that path may point to a file into account.
                                 // In this case we shouldn't assume that atAnyLevel glob may point

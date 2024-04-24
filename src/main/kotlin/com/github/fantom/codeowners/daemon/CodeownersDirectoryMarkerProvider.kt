@@ -42,7 +42,7 @@ class CodeownersDirectoryMarkerProvider : LineMarkerProvider {
                 val project = element.getProject()
                 Utils.getModuleForFile(parent, project) ?: return null
 
-                val matcher = project.service<CodeownersMatcher>()
+                val matcher = service<CodeownersMatcher>()
                 val file = Glob.findOne(parent, element, matcher)
                 cache[key] = file != null && file.isDirectory.also { isDirectory = it }
             }

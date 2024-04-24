@@ -3,7 +3,6 @@ package com.github.fantom.codeowners.util
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.modules
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -34,10 +33,6 @@ object Utils {
      */
     fun getModuleForFile(file: VirtualFile, project: Project): Module? =
         project.modules.find { it.moduleContentScope.contains(file) }
-
-    fun getModuleRootForFile(file: VirtualFile, project: Project) = getModuleForFile(file, project)?.let { module ->
-        ModuleRootManager.getInstance(module).contentRoots.first()?.takeIf { it.isDirectory }
-    }
 
     /**
      * Checks if file is in project directory.

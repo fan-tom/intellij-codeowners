@@ -1,13 +1,12 @@
 package com.github.fantom.codeowners.util
 
-import com.github.fantom.codeowners.util.TimeTracer.LogEntry.Log
 import com.github.fantom.codeowners.util.TimeTracer.LogEntry.Nested
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Key
 import org.apache.commons.lang3.time.StopWatch
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class TimeTracerStub(val upper: TimeTracer) {
+class TimeTracerStub(private val upper: TimeTracer) {
     fun start(name: String): TimeTracer {
         val tracer = upper.nested(name)
         tracer.start()
@@ -15,10 +14,10 @@ class TimeTracerStub(val upper: TimeTracer) {
     }
 }
 
-class TimeTracer(val name: String, val isRoot: Boolean = false) : AutoCloseable {
+class TimeTracer(val name: String, private val isRoot: Boolean = false) : AutoCloseable {
     sealed class LogEntry {
         abstract val elapsedNs: Long
-        class Log(val name: String, val ns: Long) : LogEntry() {
+        class Log(val name: String, private val ns: Long) : LogEntry() {
             override val elapsedNs: Long
                 get() = ns
 
@@ -26,7 +25,7 @@ class TimeTracer(val name: String, val isRoot: Boolean = false) : AutoCloseable 
                 return "$name took $ns ns\n"
             }
         }
-        class Nested(val tracer: TimeTracer) : LogEntry() {
+        class Nested(private val tracer: TimeTracer) : LogEntry() {
             override val elapsedNs: Long
                 get() = tracer.nanoTime
 
@@ -41,16 +40,12 @@ class TimeTracer(val name: String, val isRoot: Boolean = false) : AutoCloseable 
         sw.start()
     }
 
-    fun stop() {
+    private fun stop() {
         sw.stop()
     }
 
     val nanoTime
         get() = sw.nanoTime
-
-    fun log(name: String) {
-        logs.add(Log(name, sw.nanoTime - (logs.lastOrNull()?.elapsedNs ?: 0)))
-    }
 
     fun nested(name: String): TimeTracer {
         val nestedTracer = TimeTracer(name)

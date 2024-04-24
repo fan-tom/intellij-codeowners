@@ -26,10 +26,10 @@
 //    USERNAME                = "regexp:[\w\d-]+"
 //    DOMAIN                  = "regexp:\w+(\.\w+)+"
 //    VALUE                   = "regexp:[^@/\s]+"
-    VALUE                   = "regexp:(?![!#\s])(?![\[\]])(?:(?:\\[\[\]])|(?:\/\/)|[^\[\]\/\s])+"
+    VALUE                   = "regexp:(?![!#\s])(?![\[\]])(?:\\[\[\]]|//|[^\[\]/\s])+"
     NAME_                   = "regexp:[^@/\s]+"
     // TODO maybe make it more precise, like https://stackoverflow.com/a/12093994/7286194
-    BRANCH_PATTERN              = "regexp:[^\s]+"
+    BRANCH_PATTERN              = "regexp:\S+"
     //QUOTED_VALUE            = 'regexp:"([^@/]+)+"'
 //    VALUES_LIST             = 'regexp:[^@/]+'
 //    SPACES                  = 'regexp:\s+'

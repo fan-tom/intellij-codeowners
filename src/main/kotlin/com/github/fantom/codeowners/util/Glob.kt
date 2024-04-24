@@ -76,23 +76,6 @@ object Glob {
         }
 
     /**
-     * Finds for [VirtualFile] paths list using glob rule in given root directory.
-     *
-     * @param root          root directory
-     * @param entries       ignore entry
-     * @param includeNested attach children to the search result
-     * @return search result
-     */
-    fun findAsPaths(root: VirtualFile, entries: List<CodeownersPatternBase>, matcher: CodeownersMatcher, includeNested: Boolean) =
-        find(root, entries, matcher, includeNested).mapValues { (_, value) ->
-            value
-                .asSequence()
-                .map { getRelativePath(root, it) }
-                .filterNotNull()
-                .toSet()
-        }
-
-    /**
      * Creates regex [Pattern] using glob rule.
      *
      * @param rule   rule value
