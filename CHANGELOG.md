@@ -4,6 +4,18 @@
 
 ## Unreleased
 
+### Added
+
+- Support IDEA 2024.2
+
+### Fixed
+
+- Sync configuration files with template repository
+
+### Removed
+
+- Support for IDEA versions older than 2024.2
+
 ## [v0.8.0](https://github.com/fan-tom/intellij-codeowners/tree/v0.8.0) (2024-04-21)
 
 ### Added
