@@ -163,13 +163,13 @@ intellijPlatform {
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.empty()
-    repositoryUrl = properties("pluginRepositoryUrl")
-    headerParserRegex.set("\\[?v(\\d(?:\\.\\d+)+)]?.*".toRegex())
-    header.set(
-        provider {
-            "[v${version.get()}](https://github.com/fan-tom/intellij-codeowners/tree/v${version.get()}) (${date()})"
-        }
-    )
+    // this break version rendering, adds square brackets
+    // see https://github.com/JetBrains/gradle-changelog-plugin/issues/149
+    // repositoryUrl = properties("pluginRepositoryUrl")
+    headerParserRegex = "\\[?v(\\d(?:\\.\\d+)+)]?.*".toRegex()
+    header = provider {
+        "[v${version.get()}](https://github.com/fan-tom/intellij-codeowners/tree/v${version.get()}) (${date()})"
+    }
     version = properties("pluginVersion")
 }
 
