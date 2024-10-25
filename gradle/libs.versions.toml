@@ -6,7 +6,7 @@ junit = "4.13.2"
 kotlin = "2.0.21"
 intelliJPlatform = "2.0.1"
 changelog = "2.2.1"
-qodana = "2024.2.3"
+qodana = "2024.2.5"
 kover = "0.8.3"
 grammarkit = "2022.3.2.2"
 
