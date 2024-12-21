@@ -31,6 +31,14 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
 
     private val manager = project.service<CodeownersManager>()
 
+    /**
+     * Owners of the most recent file, for which [getWidgetState] was called last time
+     * Used by [createPopup] to not invoke [CodeownersManager.getFileOwners] as [createPopup] is invoked from EDT
+     * and [CodeownersManager.getFileOwners] uses methods that shouldn't be invoked from EDT (e.g. file index access).
+     */
+    @Volatile // because reads and writes are happening from different threads, BGT vs EDT
+    private var cachedOwners: OwnersMap? = null
+
     override fun ID(): String {
         return "CodeownersPanel"
     }
@@ -75,6 +83,8 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
                 }
             }
 
+        cachedOwners = ownersMap
+
         val unsetTriple = Triple("Owners are unset", "<Unset>", true)
         val noOwnersTriple = Triple("No owners set for current file", "<No owners>", true)
         val ownersMapper = { owners: OwnersList, allOwners: Collection<Any> ->
@@ -118,9 +128,7 @@ class CodeownersBarPanel(project: Project) : EditorBasedStatusBarPopup(project, 
 
     @Suppress("ReturnCount")
     override fun createPopup(context: DataContext): ListPopup? {
-        val owners = manager
-            .getFileOwners(getSelectedFile() ?: return null)
-            .unwrap { return null }
+        val owners = cachedOwners ?: return null
         when {
             owners.isEmpty() -> return null
             owners.size == 1 -> {
