@@ -3,7 +3,7 @@
 junit = "4.13.2"
 
 # plugins
-kotlin = "2.1.10"
+kotlin = "2.1.20"
 intelliJPlatform = "2.2.1"
 changelog = "2.2.1"
 qodana = "2024.3.4"
