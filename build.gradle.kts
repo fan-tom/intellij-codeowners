@@ -50,7 +50,7 @@ repositories {
 dependencies {
     testImplementation(libs.junit)
 
-    implementation("io.arrow-kt:arrow-core:2.0.1")
+    implementation("io.arrow-kt:arrow-core:2.1.0")
     implementation("dk.brics:automaton:1.12-4")
 
     intellijPlatform {
